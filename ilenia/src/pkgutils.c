@@ -215,14 +215,15 @@ int pkgrm (char *pkg, int nocheckdeps, int removeall)
     return(-1);
   }
   struct db *p = NULL; 
-  p=dipendenti(pkg, 0);
   if(removeall){
+    p=dipendenti(pkg, 1);
     while(p!=NULL){
       do_pkgrm(p->nome);
       p=p->prossimo;
     }
     return(0);
   }
+  p=dipendenti(pkg, 0);
   if(conta(p)>1){
     if(nocheckdeps){
       do_pkgrm(pkg);
