@@ -171,7 +171,7 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
     }
 
   strcpy (port, repolist_find (collezione, repository)->path);
-  if(port[strlen(port)]!='/')
+  if (port[strlen (port)] != '/')
     strcat (port, "/");
   if (strncmp (collezione, "local", 5) != 0)
     strcat (port, collezione);
