@@ -19,7 +19,7 @@ A \fIport\fP is a directory containing all necessary files for building a softwa
 Update ports.
 .TP
 .B "\-l, \-\-list"
-List ports.
+List ports. When specified lists ports of the specified collection(s).
 .TP
 .B "\-d, \-\-diff"
 List version differences between local ports and installed packages.
