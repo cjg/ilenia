@@ -2,7 +2,7 @@
  *            dipendenze.h
  *
  *  Sat Sep 11 18:04:47 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 

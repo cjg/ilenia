@@ -2,7 +2,7 @@
  *            deplist.c
  *
  *  Mon Dec 20 13:58:12 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -22,9 +22,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "deplist.h"
 #include <stdlib.h>
 #include <string.h>
+#include "deplist.h"
 
 struct deplist *add (char *pkg, struct deplist *p)
 {

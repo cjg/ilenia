@@ -2,7 +2,7 @@
  *            lsports.h
  *
  *  Sat Jul 10 12:55:46 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 

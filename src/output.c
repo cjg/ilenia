@@ -2,7 +2,7 @@
  *            output.c
  *
  *  Fri Jul 16 18:45:34 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -30,7 +30,6 @@
 #include "deplist.h"
 
 void print_db (struct db *p) {
-  //Nome 20, Versione 15, Collezione 15
   char s[MASSIMO];
   printf ("Package                       Version  Repository\n");
   while (p != NULL) {
@@ -40,12 +39,6 @@ void print_db (struct db *p) {
     strcat (s, p->versione);
     strcat (s, spazi(2));
     strcat (s, p->collezione);
-    //printf ("%s\n", s);
-    /*while(p->depends != NULL) {
-      strcat (s, " ");
-      strcat(s,p->depends->pkg);
-      p->depends=p->depends->next;
-      }*/
     printf ("%s\n", s);
     p = p->prossimo;
   }

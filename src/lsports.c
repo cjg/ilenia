@@ -2,7 +2,7 @@
  *            lsports.c
  *
  *  Sat Jul 10 12:57:55 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -28,7 +28,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdlib.h>
-//#include <time.h>
 #include "manipola.h"
 #include "db.h"
 #include "deplist.h"
@@ -68,7 +67,6 @@ struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
     struct deplist *d=NULL;
     while (fgets (riga, 255, pkgfile)) {
       strcpy (riga, trim (riga));
-      /* dipendenze */
       if (riga[0] == '#') {
 	strcpy (riga, mid (riga, 1, FINE));
 	strcpy (riga, trim (riga));
@@ -81,7 +79,6 @@ struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
 	  }
 	}
       }
-      /* /dipendenze */
       if (strncmp (riga, "name", 4) == 0) {
 	strcpy (nome, mid (riga, 5, strlen (riga) - 5));
       }
@@ -209,11 +206,9 @@ struct db * lsports_acrux_way () {
   struct db *ports=NULL;
   char nome_file[255];
   char estensione[255];
-  //printf("ehi ehi ehi\n");
   if (!(cachefile = fopen ("/var/cache/ilenia", "w"))) {
     return ports;
   }
-  //fprintf (cachefile, "%ld \n", time (NULL));
   etc_ports = opendir ("/etc/ports");
   while ((info_file = readdir (etc_ports))) {
     if (strstr (info_file->d_name, ".")) {
@@ -242,10 +237,8 @@ struct db * lsports ()
 {
   FILE *cachefile;
   struct db *p = NULL;
-  //int update, cache;
   char riga[255];
-  //printf("lsports\n");
-  
+    
   if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
     if(fgets (riga, 255, cachefile)){
       while (fgets (riga, 255, cachefile)) {

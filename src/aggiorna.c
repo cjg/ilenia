@@ -2,7 +2,7 @@
  *            aggiorna.c
  *
  *  Thu Jul 15 16:27:56 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -88,12 +88,10 @@ int aggiorna_collezione (char *collezione) {
   }
   FILE *file;
   char nome_file[255] = "";
-  /* parte nuova */
   strcpy (nome_file, "/var/cache/ilenia");
   if ((file = fopen (nome_file, "w"))) {
     fclose (file);
   }
-  /* fine parte nuova*/
   strcpy (nome_file, "/etc/ports/");
   strcat (nome_file, collezione);
   strcat (nome_file, ".cvsup");
@@ -124,12 +122,10 @@ int aggiorna_ports () {
   char nome_file[255];
   char estensione[255];
   FILE *file;
-  /* parte nuova */
   strcpy (nome_file, "/var/cache/ilenia");
   if ((file = fopen (nome_file, "w"))) {
     fclose (file);
   }
-  /* fine parte nuova */
   etc_ports = opendir ("/etc/ports");
   while ((info_file = readdir (etc_ports))) {
     if (strstr (info_file->d_name, ".")) {
