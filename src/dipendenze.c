@@ -76,7 +76,7 @@ struct db * dipendenze_pacchetto(char * pacchetto, char * collezione)
       }
     }
   } else {
-    dipendenze=inserisci_elemento(pacchetto, "", "non trovato", dipendenze);
+    dipendenze=inserisci_elemento(pacchetto, "", "not found", dipendenze);
   }
   return(dipendenze);
 }
@@ -118,14 +118,14 @@ void stampa_dipendenze (char *pacchetto)
   struct db *d = NULL;
   d = dipendenze (pacchetto);
   while (d != NULL) {
-    if(strcmp(d->collezione, "non trovato")!=0) {
+    if(strcmp(d->collezione, "not found")!=0) {
       printf ("%s [", d->nome);
       if (esiste(d->nome, pacchetti)!=0)
 	printf (" ]\n");
       else
-	printf ("installato]\n");
+	printf ("installed]\n");
     } else {
-      printf("%s [non trovato]\n", d->nome);
+      printf("%s [not found]\n", d->nome);
     }
     d = d->prossimo;
   }
