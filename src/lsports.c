@@ -116,23 +116,25 @@ struct db * leggi_dir(char *collezione, char *prefix, struct db *p){
   DIR *dir;
   struct dirent *info_file;
   struct stat tipo_file; 
+  printf("%s\n", collezione);
   char percorso[255];
   char nome_file[255];
   strcpy(percorso, prefix);
   strcat(percorso, "/");
   strcat(percorso, collezione);
-  dir=opendir(percorso);
-  while ((info_file = readdir (dir))) {
-    //printf("%s\n", info_file->d_name);
-    strcpy (nome_file, prefix);
-    strcat (nome_file, "/");
-    strcat (nome_file, collezione);
-    strcat (nome_file, "/");
-    strcat (nome_file, info_file->d_name);
-    stat (nome_file, &tipo_file);
-    if (S_ISDIR (tipo_file.st_mode) && info_file->d_name[0] != '.') {
-      strcat(nome_file, "/Pkgfile");
-      p=parsa_pkgfile(nome_file, collezione, p);
+  if((dir=opendir(percorso))){
+    while ((info_file = readdir (dir))) {
+      //printf("%s\n", info_file->d_name);
+      strcpy (nome_file, prefix);
+      strcat (nome_file, "/");
+      strcat (nome_file, collezione);
+      strcat (nome_file, "/");
+      strcat (nome_file, info_file->d_name);
+      stat (nome_file, &tipo_file);
+      if (S_ISDIR (tipo_file.st_mode) && info_file->d_name[0] != '.') {
+	strcat(nome_file, "/Pkgfile");
+	p=parsa_pkgfile(nome_file, collezione, p);
+      }
     }
   }
   //print_db(p);
