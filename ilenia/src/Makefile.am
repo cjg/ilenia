@@ -33,7 +33,8 @@ ilenia_SOURCES = \
 	vercmp.c\
 	vercmp.h\
 	dipendenze.c\
-	dipendenze.h
+	dipendenze.h\
+	ilenia.h
 
 ilenia_LDFLAGS = 
 
