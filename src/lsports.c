@@ -178,6 +178,8 @@ struct db * lsports ()
       p = lsports_classico ();
     }
     fclose (cachefile);
+  } else {
+    p= lsports_classico();
   }
   return p;
 }
