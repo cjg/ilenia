@@ -1,0 +1,29 @@
+30/12/2004 - ilenia-1.1 released
+Ilenia now with some new features like the secure removing 
+of packages ("secure" means "with dependencies check").
+With ilenia 1.1 you can store your ports tree in more
+floxible way: ilenia knows where you have the ports tree
+reading from .cvsup and .httpup file; for example you can
+store ports from crux (base and opt), crux-it, clc and 
+various people in different directories under /usr/ports, 
+something like:
+
+/usr/ports/clc:
+contrib/  unmaintained/
+
+/usr/ports/crux:
+base/  opt/
+
+/usr/ports/it:
+devel/  games/  gnome/  multimedia/  network/  office/  science/  system/  x11/
+
+/usr/ports/people:
+acrux/  chw/   jaeger/  jolupa/  maol/        ogg/   sten/    tilman/    yankeegohome/
+alan/   dahl/  jdolan/  jue/     mhedenskog/  pazo/  stsp/    vico/      yhafri/
+albe/   han/   jheino/  jw/      noneus/      rrm3/  tbmnet/  wimpress/  zh_current/
+
+The dependencies system of ilenia had been improved very much in this release.
+
+7/11/2004 - ilenia-1.0 released
+Now 'ilenia' can build, install and update packages
+while resolving the dependencies too. 

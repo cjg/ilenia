@@ -40,7 +40,6 @@ struct db * dipendenze_pacchetto(char * pacchetto, char * collezione)
   thispkg = cerca (pacchetto, ports);
   thispkg = cerca (collezione, thispkg);
   while (thispkg->depends!=NULL){
-    char collection[255];
     if(esiste(thispkg->depends->pkg, ports)==0)
       dependencies=inserisci_elemento_inverso(thispkg->depends->pkg, "", 
 					      il_piu_aggiornato(thispkg->depends->pkg, 
