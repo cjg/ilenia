@@ -82,7 +82,7 @@ main (int argc, char *argv[])
 	  azioni++;
 	  azione[azioni] = AIUTO;
 	}
-      else if (strcmp (argv[i], "--repository-list") == 0 )
+      else if (strcmp (argv[i], "--repository-list") == 0)
 	{
 	  azioni++;
 	  azione[azioni] = REPOLIST;
@@ -186,10 +186,10 @@ main (int argc, char *argv[])
       switch (azione[i])
 	{
 	case REPOLIST:
-	  while(repository!=NULL)
+	  while (repository != NULL)
 	    {
-	      printf("%s\n", repository->repository);
-	      repository=repository->next;
+	      printf ("%s\n", repository->repository);
+	      repository = repository->next;
 	    }
 	  break;
 	case DIPENDENZE:
@@ -247,7 +247,7 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_l; j++)
 		{
-		  p = cerca (opzione_l[j], ports);
+		  p = db_like (opzione_l[j], ports);
 		  print_db (p);
 		}
 	    }

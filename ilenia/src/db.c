@@ -227,3 +227,20 @@ rimuovi_duplicati (struct db *p)
     }
   return (paux);
 }
+
+struct db *
+db_like (char *delim, struct db *p)
+{
+  struct db *paus = NULL;
+  while (p != NULL)
+    {
+      if (strstr (p->nome, delim))
+	{
+	  paus =
+	    inserisci_elemento_ordinato (p->nome, p->versione,
+					 p->collezione, p->depends, paus);
+	}
+      p = p->prossimo;
+    }
+  return (paus);
+}

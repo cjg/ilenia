@@ -46,10 +46,10 @@ deplist_from_deprow (char *deprow)
     {
       char deps[255][MASSIMO];
       int how_many_deps, i;
-      deprow=sed (deprow, ",", " ") ;
-      how_many_deps=split(deprow, " ",deps);
-      for(i=0;i<how_many_deps;i++)
-	  d=add(trim(deps[i]),d);
+      deprow = sed (deprow, ",", " ");
+      how_many_deps = split (deprow, " ", deps);
+      for (i = 0; i < how_many_deps; i++)
+	d = add (trim (deps[i]), d);
     }
   return (d);
 }
@@ -107,7 +107,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    {
 	      p = inserisci_elemento_ordinato (nome, versione, collezione,
 					       d, p);
-	      char dependencies[MASSIMO]="";
+	      char dependencies[MASSIMO] = "";
 	      if (d != NULL)
 		{
 		  while (d != NULL)
@@ -117,14 +117,14 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 		      d = d->next;
 		    }
 		}
-	      
+
 	      fprintf (cachefile, "%s %s %s %s\n", nome, versione,
 		       collezione, dependencies);
 	      strcpy (nome, "");
 	      strcpy (versione, "");
 	      release = 0;
-	      fclose(pkgfile);
-	      return(p);
+	      fclose (pkgfile);
+	      return (p);
 	    }
 	}
       fclose (pkgfile);
