@@ -1,0 +1,11 @@
+#
+# /etc/ports/favoriterepo: ports-evolution(8) configuration for CRUX-Evolution ports system
+#
+# Use:
+# port	repository
+#
+# like:
+# xchat	contrib
+
+
+# End of file
