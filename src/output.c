@@ -45,12 +45,14 @@ void print_db (struct db *p) {
 }
 
 void aiuto() {
-  printf("usage: ports [options] [collection ...]\n");
+  printf("usage: ports [options] [collection ...] [packages]\n");
   printf("options:\n");
   printf("\t-u, --update           update ports\n");
   printf("\t-l, --list             list ports\n");
   printf("\t-d, --diff             list version differences\n");
   printf("\t-p, --updated          list ports with version newer than the installed ones\n");
+  printf("\t-D                     shows dependencies of any package\n");
+  printf("\t-U                     update package(s) and relatives dependencied\n");
   printf("\t-v, --version          print version and exit\n");
   printf("\t-h, --help             print help and exit\n");
   printf("\t--no-favorite-repo     ignore the user's favorite repos\n");

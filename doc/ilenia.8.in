@@ -1,12 +1,17 @@
 .TH ilenia 8 "" "ilenia #VERSION#" ""
 .SH NAME
-ilenia \- update/list ports collection
+ilenia \- update/list ports collection and compile-install/update packages with dependencies
 .SH SYNOPSIS
-\fBilenia [options] [collection ...]\fP
+\fBilenia [options] [collection] [packages]\fP
 .SH DESCRIPTION
-\fBilenia\fP is a replacement of the standard CRUX ports tool.
+\fBilenia\fP was a replacement of the standard CRUX ports tool.
 \fBilenia\fP connects to one or more master repositories and updates the local copy of a
 ports collection. If no collections are specified then all collections will be updated.
+\filenia\fP, now can also update or install a package (or all packages that need to be 
+updated) with relatives dependencies; \filenia\fP chooses which port (with same name) to 
+compile and install in the "ilenia --updated" way: she, if there is the same port in 
+different repos, and if the port/package isn't controlled by favoriterepo or 
+favoriteversion, compile and install the one with newer version.
 A \fIport\fP is a directory containing all necessary files for building a software package using pkgmk(8).
 .SH OPTIONS
 .TP
@@ -21,6 +26,13 @@ List version differences between local ports and installed packages.
 .TP
 .B "\-p, \-\-updated"
 Show the ports that are newer than installed packages.
+.TP 
+.B "\-U"
+Update or install the specified package with relativese dependencies, if no package is
+specified, ilenia updates all packages.
+.TP
+.B "\-D"
+Show ths dependencies of the specified package.
 .TP
 .B "\-\-no\-favorite\-repo"
 Used with \-d option. Ignore the user's favorite repository for ports listed in /etc/ports/favoriterepo
