@@ -7,8 +7,8 @@ ilenia \- update/list ports collection and compile-install/update packages with 
 \fBilenia\fP was a replacement of the standard CRUX ports tool.
 \fBilenia\fP connects to one or more master repositories and updates the local copy of a
 ports collection. If no collections are specified then all collections will be updated.
-\filenia\fP, now can also update or install a package (or all packages that need to be 
-updated) with relatives dependencies; \filenia\fP chooses which port (with same name) to 
+\fBilenia\fP, now can also update or install a package (or all packages that need to be 
+updated) with relatives dependencies; \fBilenia\fP chooses which port (with same name) to 
 compile and install in the "ilenia --updated" way: she, if there is the same port in 
 different repos, and if the port/package isn't controlled by favoriterepo or 
 favoriteversion, compile and install the one with newer version.
@@ -57,10 +57,10 @@ Root of local ports collection.
 Directory for port collection configuration.
 .TP
 .B "/etc/ports/favoriterepo"
-File where're sored the information about favorite repository.
+File where are stored the information about favorite repository.
 .TP
 .B "/etc/ports/favoriteversion"
-File where're sored the information about favorite version.
+File where are stored the information about favorite version.
 .SH SEE ALSO
 pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1), httpup(8)
 .SH AUTHOR
