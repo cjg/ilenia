@@ -175,6 +175,7 @@ struct db * lsports_acrux_way () {
     }
   }
   fclose(cachefile);
+  chmod("/tmp/ilenia.cache", S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   return(ports);
 }
 
