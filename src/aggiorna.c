@@ -27,18 +27,20 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 #include "manipola.h"
 
 int cvsup (char *nome_file) {
   int stato;
   pid_t pid = fork ();
-  if (pid == 0) {
-    execl ("/usr/bin/cvsup", "", "-g", "-L", "1", "-r", "0", "-c",".cvsup", nome_file, 0);
+  if (pid == 0)	{
+    execl ("/usr/bin/cvsup", "", "-g", "-L", "1", "-r", "0", "-c",
+	   ".cvsup", nome_file, 0);
   } else if (pid < 0) {
     stato = -1;
   } else {
-    while ((waitpid (pid, &stato, WNOHANG) == 0)) {
+    while ((waitpid (pid, &stato, WNOHANG) == 0)){
     }
   }
   return (stato);
@@ -62,11 +64,12 @@ int httpup (char *nome_file) {
 	int stato;
 	pid_t pid = fork ();
 	if (pid == 0) {
-	  execl ("/usr/bin/httpup", "", "sync", url, root_dir, 0);
+	  execl ("/usr/bin/httpup", "", "sync",
+		 url, root_dir, 0);
 	} else if (pid < 0) {
 	  stato = -1;
 	} else {
-	  while ((waitpid (pid, &stato, WNOHANG) == 0)) {
+	  while ((waitpid (pid, &stato, WNOHANG)== 0)) {
 	  }
 	}
 	root_dir[0] = '\0';
@@ -78,32 +81,38 @@ int httpup (char *nome_file) {
   return (-1);
 }
 
-int aggiorna_collezione (char *collezione)
-{
+int aggiorna_collezione (char *collezione) {
   if (getuid () != 0) {
     printf ("ilenia: only root can update the ports tree\n\n");
     return (-1);
   }
   FILE *file;
-  char nome_file[255]="";
-  strcpy(nome_file, "/etc/ports/");
-  strcat(nome_file, collezione);
-  strcat(nome_file, ".cvsup");
-  if((file=fopen(nome_file, "r"))) {
-    fclose(file);
-    cvsup(nome_file);
-    return(0);
+  char nome_file[255] = "";
+  /* parte nuova */
+  strcpy (nome_file, "/var/cache/ilenia");
+  if ((file = fopen (nome_file, "w"))) {
+    fprintf(file, "%ld", time(NULL));
+    fclose (file);
   }
-  strcpy(nome_file, "/etc/ports/");
-  strcat(nome_file, collezione);
-  strcat(nome_file, ".httpup");
-  if((file=fopen(nome_file, "r"))) {
-    fclose(file);
-    httpup(nome_file);
-    return(0);
+  /* fine parte nuova*/
+  strcpy (nome_file, "/etc/ports/");
+  strcat (nome_file, collezione);
+  strcat (nome_file, ".cvsup");
+  if ((file = fopen (nome_file, "r"))) {
+    fclose (file);
+    cvsup (nome_file);
+    return (0);
   }
-  printf("ilenia: %s not found\n\n", collezione);
-  return(-1);
+  strcpy (nome_file, "/etc/ports/");
+  strcat (nome_file, collezione);
+  strcat (nome_file, ".httpup");
+  if ((file = fopen (nome_file, "r"))) {
+    fclose (file);
+    httpup (nome_file);
+    return (0);
+  }
+  printf ("ilenia: %s not found\n\n", collezione);
+  return (-1);
 }
 
 int aggiorna_ports () {
@@ -115,6 +124,14 @@ int aggiorna_ports () {
   struct dirent *info_file;
   char nome_file[255];
   char estensione[255];
+  FILE *file;
+  /* parte nuova */
+  strcpy (nome_file, "/var/cache/ilenia");
+  if ((file = fopen (nome_file, "w"))) {
+    fprintf(file, "%ld", time(NULL));
+    fclose (file);
+  }
+  /* fine parte nuova */
   etc_ports = opendir ("/etc/ports");
   while ((info_file = readdir (etc_ports))) {
     if (strstr (info_file->d_name, ".")) {
@@ -124,7 +141,7 @@ int aggiorna_ports () {
       strcat (nome_file, info_file->d_name);
       if (strcmp (estensione, "cvsup") == 0) {
 	cvsup (nome_file);
-      } else if (strcmp (estensione, "httpup") == 0) {
+      }	else if (strcmp (estensione, "httpup") == 0) {
 	httpup (nome_file);
       }
     }

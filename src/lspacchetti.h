@@ -23,6 +23,8 @@
  */
 
 #define DB_FILE "/var/lib/pkg/db"
+#define VERSIONE        5
+#define REPO            2
 
 struct db *lspacchetti ();
-
+struct db *prendi_favorite (int quale);

@@ -13,26 +13,29 @@ AM_CFLAGS =\
 bin_PROGRAMS = ilenia
 
 ilenia_SOURCES = \
-		 aggiorna.c \
-		 aggiorna.h \
-		 confronto.c \
-		 confronto.h \
-		 db.c \
-		 db.h \
-		 lspacchetti.c \
-		 lspacchetti.h \
-		 lsports.c \
-		 lsports.h \
-		 main.c \
-		 manipola.c \
-		 manipola.h \
-		 output.c \
-		 output.h \
-		 vercmp.c \
-		 vercmp.h
-	
+	main.c\
+	aggiorna.c\
+	aggiorna.h\
+	confronto.c\
+	confronto.h\
+	db.c\
+	db.h\
+	lspacchetti.c\
+	lspacchetti.h\
+	lsports.c\
+	lsports.h\
+	manipola.c\
+	manipola.h\
+	output.c\
+	output.h\
+	pkgutils.c\
+	pkgutils.h\
+	vercmp.c\
+	vercmp.h\
+	dipendenze.c\
+	dipendenze.h
+
 ilenia_LDFLAGS = 
 
 ilenia_LDADD = 
-
 

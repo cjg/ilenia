@@ -24,7 +24,9 @@
 
 #define FINE -1
 char *trim (char *s);
-char *tab2spazi(char *s);
+char *tab2spazi (char *s);
 char *mid (char *stringa, int inizio, int lunghezza);
 char *mid_ (char *stringa, int inizio);
 char *spazi (int n);
+char *sedchr (char *s, int trova, int sostituisci);
+char *sed (char *s, char *trova, char *sostituisci);
