@@ -189,7 +189,20 @@ int aggiorna_pacchetti (int opzioni_confronto)
 
 int do_pkgrm (char *pkg)
 {
-  printf("pkgrm %s\n", pkg);
+  int stato;
+  pid_t pid = fork ();
+  printf("Removing %s\n", pkg);
+  if (pid == 0) {
+    execl ("/usr/bin/pkgrm", "pkgrm", pkg, 0);
+  } else if (pid < 0) {
+    stato = -1;
+  } else {
+    while ((waitpid (pid, &stato, WNOHANG) == 0))
+      {
+      }
+  }
+  if(stato!=0)
+    return(stato);
   return(0);
 }
 
@@ -200,7 +213,7 @@ int pkgrm (char *pkg, int nocheckdeps, int removeall)
     return(-1);
   }
   struct db *p = NULL; 
-  p=dipendenti(pkg);
+  p=dipendenti(pkg, 0);
   if(removeall){
     while(p!=NULL){
       do_pkgrm(p->nome);
@@ -213,7 +226,7 @@ int pkgrm (char *pkg, int nocheckdeps, int removeall)
       do_pkgrm(pkg);
       return(0);
     } else {
-      printf("ilenia: there are some packages that depends from %s, use --remove-all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk\n", pkg, pkg);
+      printf("ilenia: there are some packages that depends from %s, use --remove-all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T %s to see a list of the packages that need %s.\n", pkg, pkg, pkg, pkg);
       return(-1);
     }
   }

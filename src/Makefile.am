@@ -34,7 +34,9 @@ ilenia_SOURCES = \
 	vercmp.h\
 	dipendenze.c\
 	dipendenze.h\
-	ilenia.h
+	ilenia.h\
+	deplist.c\
+	deplist.h
 
 ilenia_LDFLAGS = 
 

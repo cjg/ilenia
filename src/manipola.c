@@ -115,3 +115,19 @@ char * spazi (int n)
   s[n] = '\0';
   return ((char *) s);
 }
+
+int split (char *s, char *delim, char splitted[][MASSIMO])
+{
+  char local_s[MASSIMO];
+  char tmp[MASSIMO];
+  strcpy(local_s, s);
+  int i=0;
+  while(strlen(local_s)>0){
+    strcpy(tmp, local_s);
+    strtok(tmp, delim);
+    strcpy(splitted[i], tmp);
+    strcpy(local_s, mid(local_s, strlen(tmp), FINE));
+    i++;
+  }
+  return(i);
+}
