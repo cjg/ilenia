@@ -28,11 +28,12 @@
 #include <unistd.h>
 #include <string.h>
 #include "db.h"
-#include "lsports.h"
-#include "lspacchetti.h"
 #include "manipola.h"
 #include "confronto.h"
 #include "dipendenze.h"
+#include "ilenia.h"
+#include "lsports.h"
+#include "lspacchetti.h"
 
 int esegui_script (char *script) 
 {
@@ -98,14 +99,12 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   char collezione[255];
   char port[255];
   struct db *p;
-  struct db *i = lspacchetti ();
-  struct db *s = lsports ();
   /* aggiornare o installare?! */
-  if (cerca (pacchetto, i))
+  if (cerca (pacchetto, pacchetti))
     aggiornare = 1;
   
   /* prendiamo il più aggiornato */
-  strcpy (collezione, il_piu_aggiornato (pacchetto, s));
+  strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
 
   /* è controllato da favoriterepo?! */
   if (opzioni_confronto != NO_REPO && opzioni_confronto != NO_FAVORITE) {
@@ -121,7 +120,7 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
     if ((p = cerca (pacchetto, p))) {
       /* adesso devo vedere quale repo ha quel pacchetto con quella 
        * versione */
-      strcpy (collezione, questa_versione (pacchetto, p->versione, s));
+      strcpy (collezione, questa_versione (pacchetto, p->versione, ports));
     }
   }
   
@@ -136,13 +135,11 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
 int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 {
   struct db *d = NULL;
-  struct db *p = NULL;
-  p = lspacchetti ();
   d = dipendenze (pacchetto);
   while (d->prossimo != NULL) {
     printf ("%s [", d->nome);
     if(strcmp(d->collezione, "non trovato")!=0){
-      if (!(cerca (d->nome, p))) {
+      if (!(cerca (d->nome, pacchetti))) {
 	//aggiorna_pacchetto_(opzioni_confronto, d->nome);
 	printf ("installa]\n");
 	if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
@@ -164,7 +161,7 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 int aggiorna_pacchetti (int opzioni_confronto)
 {
   struct db *p = NULL;
-  p = confronta (lspacchetti (), lsports (), AGGIORNATI, opzioni_confronto, 0);
+  p = confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 0);
   while (p != NULL) {
     printf ("%s\n", p->nome);
     if (aggiorna_pacchetto_ (opzioni_confronto, p->nome) != 0)
