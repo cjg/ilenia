@@ -136,9 +136,7 @@ struct db * dipendenti (char *pacchetto, int all)
 void stampa_dipendenze (char *pacchetto)
 {
   struct db *d = NULL;
-  printf("entrato\n");
   d = dipendenze (pacchetto);
-  printf("tornato\n");
   while (d != NULL) {
     if(strcmp(d->collezione, "not found")!=0) {
       printf("%s [", d->nome);
