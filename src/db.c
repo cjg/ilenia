@@ -87,7 +87,6 @@ inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
 	strcpy (paus->nome, _nome);
 	strcpy (paus->versione, _versione);
 	strcpy (paus->collezione, _collezione);
-	printf ("prima if %s\n", _nome);
 	if (p == NULL)
 	{
 		p = paus;

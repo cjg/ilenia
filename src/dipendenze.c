@@ -31,129 +31,170 @@
 #include "confronto.h"
 #include "output.h"
 
-struct db *
-cerca_dipendenze (struct db *p, struct db *s)
+struct db * dipendenze_pacchetto(char * pacchetto, char * collezione, struct db * ports)
 {
-	struct db *d = NULL;
-	FILE *file;
-	char pkgfile[255];
-	d = p;
-	while (p != NULL)
-	{
-		strcpy (pkgfile, "/usr/ports/");
-		strcat (pkgfile, p->collezione);
-		strcat (pkgfile, "/");
-		strcat (pkgfile, p->nome);
-		strcat (pkgfile, "/Pkgfile");
-		//char queste_dipendenze[255];
-		if ((file = fopen (pkgfile, "r")))
-		{
-			char riga[255] = "";
-			char dep[255] = "";
-			while (fgets (riga, 255, file))
-			{
-				if (riga[0] == '#')
-				{
-					strcpy (riga, mid (riga, 1, FINE));
-					strcpy (riga, trim (riga));
-					if (strncasecmp (riga, "Depends", 7)
-					    == 0)
-					{
-						strcpy (riga,
-							mid (strstr
-							     (riga, ":"), 1,
-							     FINE));
-						strcpy (dep, trim (riga));
-						break;
-					}
-				}
-			}
-				if (strlen (dep) > 0)
-			{
-				char tmp[255];
-				strcpy (dep, sed (dep, " ", ","));
-				while (strlen (dep) > 0)
-				{
-					if (strstr (dep, ","))
-					{
-						strcpy (tmp,
-							strstr (dep, ","));
-						strcpy (tmp,
-							mid (dep, 0,
-							     strlen (dep) -
-							     strlen (tmp)));
-						strcpy (dep,
-							mid (strstr
-							     (dep, ","), 1,
-							     FINE));
-					}
-					else
-					{
-						strcpy (tmp, dep);
-						strcpy (dep, "");
-					}
+  char pkgfile[255];
+  struct db * dipendenze=NULL;
+  FILE * file;
+  strcpy (pkgfile, "/usr/ports/");
+  strcat (pkgfile, collezione);
+  strcat (pkgfile, "/");
+  strcat (pkgfile, pacchetto);
+  strcat (pkgfile, "/Pkgfile");
+  if ((file = fopen (pkgfile, "r")))	{
+    char riga[MASSIMO] = "";
+    char dep[MASSIMO] = "";
+    while (fgets (riga, MASSIMO, file)) {
+      if (riga[0] == '#') {
+	strcpy (riga, mid (riga, 1, FINE));
+	strcpy (riga, trim (riga));
+	if (strncasecmp (riga, "Depends", 7) == 0) {
+	  strcpy (riga, mid (strstr (riga, ":"), 1, FINE));
+	  strcpy (dep, trim (riga));
+	  break;
+	}
+      }
+    }
+    if (strlen (dep) > 0) {
+      char tmp[MASSIMO];
+      strcpy (dep, sed (dep, " ", ","));
+      while (strlen (dep) > 0) {
+	if (strstr (dep, ",")) {
+	  strcpy (tmp, strstr (dep, ","));
+	  strcpy (tmp, mid (dep, 0, strlen (dep) - strlen (tmp)));
+	  strcpy (dep, mid (strstr (dep, ","), 1, FINE));
+	} else {
+	  strcpy (tmp, dep);
+	  strcpy (dep, "");
+	}
+	strcpy (tmp, trim (tmp));
+	if(strlen(tmp)>0)
+	  dipendenze=inserisci_elemento_inverso(tmp,"", il_piu_aggiornato(tmp, ports),
+						dipendenze);
+	strcpy (riga, trim (riga));
+      }
+    }
+  } else {
+    dipendenze=inserisci_elemento(pacchetto, "", "non trovato", dipendenze);
+  }
+  return(dipendenze);
+}
 
-					strcpy (tmp, trim (tmp));
-					if ((!(cerca (tmp, d)))&&strlen(tmp))
-					/*
-					{
-						d = rimuovi_elemento (tmp, d);
+struct db * cerca_dipendenze(struct db *pacchetti, struct db *ports)
+{
+  struct db *dipendenze=NULL;
+  while(pacchetti!=NULL){
+    struct db *d=NULL;
+    d=dipendenze_pacchetto(pacchetti->nome, pacchetti->collezione, ports);
+    d=inserisci_elemento_inverso(pacchetti->nome, "", pacchetti->collezione, d);
+    //print_db(d);
+    while(d!=NULL){
+      if(!(cerca(d->nome, dipendenze)))
+	dipendenze=inserisci_elemento_inverso(d->nome, "", d->collezione,dipendenze);
+      d=d->prossimo;
+    }
+    pacchetti=pacchetti->prossimo;
+  }
+  return(dipendenze);
+}
 
-					}*/
+
+struct db * _cerca_dipendenze (struct db *p, struct db *s)
+{
+  struct db *d = NULL;
+  FILE *file;
+  char pkgfile[255];
+  d = p;
+  while (p != NULL)   {
+    strcpy (pkgfile, "/usr/ports/");
+    strcat (pkgfile, p->collezione);
+    strcat (pkgfile, "/");
+    strcat (pkgfile, p->nome);
+    strcat (pkgfile, "/Pkgfile");
+    if ((file = fopen (pkgfile, "r")))	{
+      char riga[255] = "";
+      char dep[255] = "";
+      while (fgets (riga, 255, file)) {
+	if (riga[0] == '#') {
+	  strcpy (riga, mid (riga, 1, FINE));
+	  strcpy (riga, trim (riga));
+	  if (strncasecmp (riga, "Depends", 7) == 0) {
+	    strcpy (riga, mid (strstr (riga, ":"), 1, FINE));
+	    strcpy (dep, trim (riga));
+	    break;
+	  }
+	}
+      }
+      if (strlen (dep) > 0) {
+	char tmp[255];
+	strcpy (dep, sed (dep, " ", ","));
+	while (strlen (dep) > 0) {
+	  if (strstr (dep, ",")) {
+	    strcpy (tmp, strstr (dep, ","));
+	    strcpy (tmp, mid (dep, 0, strlen (dep) - strlen (tmp)));
+	    strcpy (dep, mid (strstr (dep, ","), 1, FINE));
+	  } else {
+	    strcpy (tmp, dep);
+	    strcpy (dep, "");
+	  }
+	  strcpy (tmp, trim (tmp));
+	  if ((!(cerca (tmp, d)))&&strlen(tmp))
+	    /*
+	      {
+	      d = rimuovi_elemento (tmp, d);
+	      }*/
 					
-					d = inserisci_elemento_inverso (tmp,
-								"a",
-								il_piu_aggiornato
-								(tmp, s), d);
-//printf("%s\n", tmp);
-							
-
-					strcpy (riga, trim (riga));
-				}
-			}
-		}
-		p = p->prossimo;
+	    d = inserisci_elemento_inverso (tmp, "a", il_piu_aggiornato	(tmp, s), d);
+	  //printf("%s\n", tmp);
+	  strcpy (riga, trim (riga));
 	}
-
-	return (d);
+      }
+    }
+    p = p->prossimo;
+  }
+  return (d);
 }
 
-struct db *
-dipendenze (char *pacchetto)
+struct db * dipendenze (char *pacchetto)
 {
-	//struct db *p = NULL;
-	struct db *s = NULL;
-	struct db *d = NULL;
-	char collezione[255];
-	s = lsports ();
-	strcpy (collezione, il_piu_aggiornato (pacchetto, s));
-	d = inserisci_elemento_inverso (pacchetto, "", collezione, d);
-	int i;
-	while (i != conta (d))
-	{
-		i = conta (d);
-		d = cerca_dipendenze (d, s);
-		//print_db(d);
-	}
-	//print_db(d);
-	//d = rimuovi_duplicati (d);
-	return (d);
+  //struct db *p = NULL;
+  struct db *s = NULL;
+  struct db *d = NULL;
+  char collezione[255];
+  s = lsports ();
+  int i=-10;
+  strcpy (collezione, il_piu_aggiornato (pacchetto, s));
+  d = inserisci_elemento_inverso (pacchetto, "", collezione, d);
+
+  while (i != conta (d)) {
+    i = conta (d);
+    d = cerca_dipendenze (d, s);
+    //print_db(d);
+   
+  }
+  //strcpy (collezione, il_piu_aggiornato (pacchetto, s));
+  //d = inserisci_elemento_inverso (pacchetto, "", collezione, d);
+  //print_db(d);
+  //d = rimuovi_duplicati (d);
+  return (d);
 }
 
-void
-stampa_dipendenze (char *pacchetto)
+void stampa_dipendenze (char *pacchetto)
 {
-	struct db *p = NULL;
-	struct db *d = NULL;
-	d = dipendenze (pacchetto);
-	p = lspacchetti ();
-	while (d != NULL)
-	{
-		printf ("%s [", d->nome);
-		if (!(cerca (d->nome, p)))
-			printf ("installa]\n");
-		else
-			printf ("installato]\n");
-		d = d->prossimo;
-	}
+  struct db *p = NULL;
+  struct db *d = NULL;
+  d = dipendenze (pacchetto);
+  p = lspacchetti ();
+  while (d != NULL) {
+    if(strcmp(d->collezione, "non trovato")!=0) {
+      printf ("%s [", d->nome);
+      if (!(cerca (d->nome, p)))
+	printf (" ]\n");
+      else
+	printf ("installato]\n");
+    } else {
+      printf("%s [non trovato]\n", d->nome);
+    }
+    d = d->prossimo;
+  }
 }

@@ -34,174 +34,142 @@
 #include "confronto.h"
 #include "dipendenze.h"
 
-int
-esegui_script (char *script)
+int esegui_script (char *script) 
 {
-	pid_t pid = fork ();
-	int stato;
-	if (pid == 0)
-	{
-		execl ("/bin/bash", "", script, 0);
-	}
-	else if (pid < 0)
-	{
-		stato = -1;
-	}
-	else
-	{
-		while ((waitpid (pid, &stato, WNOHANG) == 0))
-		{
-		}
-	}
-	return (stato);
+  pid_t pid = fork ();
+  int stato;
+  if (pid == 0){
+    execl ("/bin/bash", "", script, 0);
+  } else if (pid < 0) {
+    stato = -1;
+  } else {
+    while ((waitpid (pid, &stato, WNOHANG) == 0))
+      {
+      }
+  }
+  return (stato);
 }
 
-int
-compila_e (int aggiorna, char *port)
+int compila_e (int aggiorna, char *port)
 {
-	int stato;
-	char azione[255];
-	char install_script[255];
-	FILE *file;
-	if (aggiorna)
-	{
-		strcpy (azione, "-u");
-	}
-	else
-	{
-		strcpy (azione, "-i");
-	}
-	/* pre-install */
-	strcpy (install_script, port);
-	strcat (install_script, "/pre-install");
-	if ((file = fopen (install_script, "r")))
-	{
-		fclose (file);
-		if (esegui_script (install_script) != 0)
-			return (-1);
-	}
-	pid_t pid = fork ();
-	if (pid == 0)
-	{
-		chdir (port);
-		execl ("/usr/bin/pkgmk", "", "-d", azione, 0);
-	}
-	else if (pid < 0)
-	{
-		stato = -1;
-	}
-	else
-	{
-		while ((waitpid (pid, &stato, WNOHANG) == 0))
-		{
-		}
-	}
-	/* post-install */
-	strcpy (install_script, port);
-	strcat (install_script, "/post-install");
-	if ((file = fopen (install_script, "r")))
-	{
-		fclose (file);
-		if (esegui_script (install_script) != 0)
-			return (-1);
-	}
-	return (stato);
+  int stato;
+  char azione[255];
+  char install_script[255];
+  FILE *file;
+  if (aggiorna) {
+    strcpy (azione, "-u");
+  } else {
+    strcpy (azione, "-i");
+  }
+  /* pre-install */
+  strcpy (install_script, port);
+  strcat (install_script, "/pre-install");
+  if ((file = fopen (install_script, "r"))) {
+    fclose (file);
+    if (esegui_script (install_script) != 0)
+      return (-1);
+  }
+  
+  pid_t pid = fork ();
+  if (pid == 0) {
+    chdir (port);
+    execl ("/usr/bin/pkgmk", "", "-d", azione, 0);
+  } else if (pid < 0) {
+    stato = -1;
+  } else {
+    while ((waitpid (pid, &stato, WNOHANG) == 0))
+      {
+      }
+  }
+  /* post-install */
+  strcpy (install_script, port);
+  strcat (install_script, "/post-install");
+  if ((file = fopen (install_script, "r"))) {
+    fclose (file);
+    if (esegui_script (install_script) != 0)
+      return (-1);
+  }
+  return (stato);
 }
 
-int
-aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
+int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
 {
-	int aggiornare = 0;
-	char collezione[255];
-	char port[255];
-	struct db *p;
-	struct db *i = lspacchetti ();
-	struct db *s = lsports ();
-	/* aggiornare o installare?! */
-	if (cerca (pacchetto, i))
-		aggiornare = 1;
+  int aggiornare = 0;
+  char collezione[255];
+  char port[255];
+  struct db *p;
+  struct db *i = lspacchetti ();
+  struct db *s = lsports ();
+  /* aggiornare o installare?! */
+  if (cerca (pacchetto, i))
+    aggiornare = 1;
+  
+  /* prendiamo il più aggiornato */
+  strcpy (collezione, il_piu_aggiornato (pacchetto, s));
 
-	/* prendiamo il più aggiornato */
-	strcpy (collezione, il_piu_aggiornato (pacchetto, s));
-
-
-	/* è controllato da favoriterepo?! */
-	if (opzioni_confronto != NO_REPO && opzioni_confronto != NO_FAVORITE)
-	{
-		p = prendi_favorite (REPO);
-		if ((p = cerca (pacchetto, p)))
-		{
-			strcpy (collezione, p->collezione);
-		}
-	}
-
-	/* è controllato da favoriteversion?! */
-	if (opzioni_confronto != NO_VERSION
-	    && opzioni_confronto != NO_FAVORITE)
-	{
-		p = prendi_favorite (VERSIONE);
-		if ((p = cerca (pacchetto, p)))
-		{
-			/* adesso devo vedere quale repo ha quel pacchetto con quella 
-			 * versione */
-			strcpy (collezione,
-				questa_versione (pacchetto, p->versione, s));
-		}
-	}
-
-	strcpy (port, "/usr/ports/");
-	strcat (port, collezione);
-	strcat (port, "/");
-	strcat (port, pacchetto);
-	return (compila_e (aggiornare, port));
+  /* è controllato da favoriterepo?! */
+  if (opzioni_confronto != NO_REPO && opzioni_confronto != NO_FAVORITE) {
+    p = prendi_favorite (REPO);
+    if ((p = cerca (pacchetto, p))) {
+      strcpy (collezione, p->collezione);
+    }
+  }
+  
+  /* è controllato da favoriteversion?! */
+  if (opzioni_confronto != NO_VERSION && opzioni_confronto != NO_FAVORITE) {
+    p = prendi_favorite (VERSIONE);
+    if ((p = cerca (pacchetto, p))) {
+      /* adesso devo vedere quale repo ha quel pacchetto con quella 
+       * versione */
+      strcpy (collezione, questa_versione (pacchetto, p->versione, s));
+    }
+  }
+  
+  strcpy (port, "/usr/ports/");
+  strcat (port, collezione);
+  strcat (port, "/");
+  strcat (port, pacchetto);
+  return (compila_e (aggiornare, port));
 }
 
 
-
-
-
-int
-aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
+int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 {
-	struct db *d = NULL;
-	struct db *p = NULL;
-	p = lspacchetti ();
-	d = dipendenze (pacchetto);
-	while (d->prossimo != NULL)
-	{
-		printf ("%s [", d->nome);
-		if (!(cerca (d->nome, p)))
-		{
-			//aggiorna_pacchetto_(opzioni_confronto, d->nome);
-			printf ("installa]\n");
-			if (aggiorna_pacchetto_ (opzioni_confronto, d->nome)
-			    != 0)
-				return (-1);
-		}
-		else
-		{
-			printf ("installato]\n");
-		}
-		d = d->prossimo;
-	}
+  struct db *d = NULL;
+  struct db *p = NULL;
+  p = lspacchetti ();
+  d = dipendenze (pacchetto);
+  while (d->prossimo != NULL) {
+    printf ("%s [", d->nome);
+    if(strcmp(d->collezione, "non trovato")!=0){
+      if (!(cerca (d->nome, p))) {
+	//aggiorna_pacchetto_(opzioni_confronto, d->nome);
+	printf ("installa]\n");
 	if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
-		return (-1);
-	return (0);
+	  return (-1);
+      } else {
+	printf ("installato]\n");
+      }
+    } else {
+      printf("non trovato]\n");
+    }
+    d = d->prossimo;
+  }
+  if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
+    return (-1);
+  return (0);
 }
 
 
-int
-aggiorna_pacchetti (int opzioni_confronto)
+int aggiorna_pacchetti (int opzioni_confronto)
 {
-	struct db *p = NULL;
-	p = confronta (lspacchetti (), lsports (), AGGIORNATI,
-		       opzioni_confronto, 0);
-	while (p != NULL)
-	{
-		printf ("%s\n", p->nome);
-		if (aggiorna_pacchetto_ (opzioni_confronto, p->nome) != 0)
-			return (-1);
-		p = p->prossimo;
-	}
-	return (0);
+  struct db *p = NULL;
+  p = confronta (lspacchetti (), lsports (), AGGIORNATI, opzioni_confronto, 0);
+  while (p != NULL) {
+    printf ("%s\n", p->nome);
+    if (aggiorna_pacchetto_ (opzioni_confronto, p->nome) != 0)
+      return (-1);
+    p = p->prossimo;
+  }
+  return (0);
 }

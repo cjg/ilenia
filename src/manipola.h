@@ -23,6 +23,8 @@
  */
 
 #define FINE -1
+#define MASSIMO 2555
+
 char *trim (char *s);
 char *tab2spazi (char *s);
 char *mid (char *stringa, int inizio, int lunghezza);
