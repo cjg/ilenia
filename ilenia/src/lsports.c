@@ -181,7 +181,6 @@ struct db * parse_cvs (char *percorso){
     char riga[255];
     char prefix[255];
     char collezione[255];
-    char pre_collezione[255];
     while (fgets (riga, 255, file)) {
       strcpy(riga, trim(riga));
       if(strncmp(riga, "LOCAL_PATH=", 11)==0){
@@ -251,7 +250,7 @@ struct db * lsports_acrux_way () {
 	p=parsa_httpup(nome_file);
 	ports=leggi_dir(p->versione, p->nome, ports);
       }
-      // supporto per crux ppc
+      // supporting crux ppc
       else if (strcmp (estensione, "cvs")== 0) {
 	p=parse_cvs(nome_file);
 	ports=leggi_dir(p->versione, p->nome, ports);

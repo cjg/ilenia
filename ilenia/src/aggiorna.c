@@ -82,6 +82,21 @@ int httpup (char *nome_file) {
   return (-1);
 }
 
+int cvs (char *filepath){
+  int state;
+  pid_t pid = fork ();
+  if (pid == 0) {
+    execl ("/etc/ports/driver/cvs", "", filepath, 0);
+  } else if (pid < 0) {
+    state = -1;
+  } else {
+    while ((waitpid (pid, &state, WNOHANG)== 0)) {
+    }
+  }
+  return (state);
+}
+
+
 int aggiorna_collezione (char *collezione) {
   if (getuid () != 0) {
     printf ("ilenia: only root can update the ports tree\n\n");
@@ -104,6 +119,15 @@ int aggiorna_collezione (char *collezione) {
   strcpy (nome_file, "/etc/ports/");
   strcat (nome_file, collezione);
   strcat (nome_file, ".httpup");
+  if ((file = fopen (nome_file, "r"))) {
+    fclose (file);
+    httpup (nome_file);
+    return (0);
+  }
+  // supporting crux ppc
+  strcpy (nome_file, "/etc/ports/");
+  strcat (nome_file, collezione);
+  strcat (nome_file, ".cvs");
   if ((file = fopen (nome_file, "r"))) {
     fclose (file);
     httpup (nome_file);
@@ -138,6 +162,10 @@ int aggiorna_ports () {
 	cvsup (nome_file);
       }	else if (strcmp (estensione, "httpup") == 0) {
 	httpup (nome_file);
+      }
+      // supporting crux ppc
+      else if (strcmp (estensione, "cvs")==0) {
+	cvs (nome_file);
       }
     }
   }
