@@ -391,19 +391,20 @@ build_repolist ()
 }
 
 struct db *
-lsports_acrux_way ()
+lsports_acrux_way (struct repolist *r)
 {
   struct db *ports = NULL;
   if (!(cachefile = fopen (CACHE, "w")))
     {
       return ports;
     }
-  while (repository != NULL)
+  while (r != NULL)
     {
-      //printf("repository: %s path: %s\n", repository->repository, repository->path);
-      ports = leggi_dir (repository->repository, repository->path, ports);
-      repository = repository->next;
+      ports = leggi_dir (r->repository, r->path, ports);
+      r = r->next;
     }
+  fclose (cachefile);
+  chmod (CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   return (ports);
 }
 
@@ -439,6 +440,6 @@ lsports ()
 	}
     }
   printf ("Building cache!\n");
-  p = lsports_acrux_way ();
+  p = lsports_acrux_way (repository);
   return (p);
 }
