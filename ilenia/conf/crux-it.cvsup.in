@@ -1,0 +1,25 @@
+#
+# /etc/ports/crux-it.cvsup: crux-it ports (http://www.crux-it.org/)
+#
+
+# Default settings
+*default host=khazad-dum.orson.it
+*default release=cvs
+*default delete
+*default use-rel-suffix
+*default compress
+*default base=/usr/ports
+*default prefix=/usr/ports
+
+gnome           tag=GNOME-#CRUX_VERSION#
+devel           tag=DEVEL-#CRUX_VERSION#
+multimedia      tag=MULTIMEDIA-#CRUX_VERSION#
+office          tag=OFFICE-#CRUX_VERSION#
+system          tag=SYSTEM-#CRUX_VERSION#
+games           tag=GAMES-#CRUX_VERSION#
+kde             tag=KDE-#CRUX_VERSION#
+network         tag=NETWORK-#CRUX_VERSION#
+science         tag=SCIENCE-#CRUX_VERSION#
+x11             tag=X11-#CRUX_VERSION#
+
+# End of file
