@@ -1,0 +1,7 @@
+1.1:
+	- feature: -R remove packages checking dependents
+	- feature: -T shows dependents package of the specified package
+	- feature: flexible way of storing ports 
+	- change:  now ilenia has only a cache file in /var/cache/ilenia
+	- change:  a better support for dependencies
+	- various bugfixes

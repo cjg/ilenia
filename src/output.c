@@ -46,7 +46,7 @@ void print_db (struct db *p) {
 }
 
 void aiuto() {
-  printf("usage: ilenia [options] [collection ...] [packages]\n");
+  printf("usage: ilenia [options] [collections] [packages]\n");
   printf("options:\n");
   printf("\t-u, --update           update ports\n");
   printf("\t-l, --list             list ports\n");
@@ -61,9 +61,9 @@ void aiuto() {
   printf("\t--no-favorite-repo     ignore the user's favorite repos\n");
   printf("\t--no-favorite-version  ignore the user's favorite versions\n");
   printf("\t--no-deps              do not check dependencies, install or remove only\n");
-  printf("\t--all                  shows or remove all dependents pacckages (sometime requires some minutes)\n");
+  printf("\t--all                  shows or remove all dependents packages (sometime requires some minutes)\n");
 }
 
 void versione() {
-  printf("ilenia (ports) version %s\n", VERSION);
+  printf("ilenia version %s\n", VERSION);
 }
