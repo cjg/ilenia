@@ -24,6 +24,7 @@
 
 struct db *ports;
 struct db *pacchetti;
+struct repolist *repository;
 char *post_pkgadd;
 
 #define CACHE "/var/cache/ilenia"

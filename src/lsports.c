@@ -31,6 +31,7 @@
 #include "manipola.h"
 #include "db.h"
 #include "deplist.h"
+#include "repolist.h"
 #include "ilenia.h"
 
 FILE *cachefile;
@@ -143,11 +144,10 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
   return (p);
 }
 
-struct db *
-parsa_cvsup (char *percorso)
+struct repolist *
+parsa_cvsup (char *percorso, struct repolist *p)
 {
   FILE *file;
-  struct db *p = NULL;
   if ((file = fopen (percorso, "r")))
     {
       char riga[255];
@@ -190,9 +190,7 @@ parsa_cvsup (char *percorso)
 		  else
 		    strcpy (collezione, riga);
 		  strcpy (collezione, strtok (collezione, " "));
-		  p =
-		    inserisci_elemento_ordinato (prefix, collezione, "", NULL,
-						 p);
+		  p = repolist_add (collezione, prefix, p);
 		}
 	    }
 	}
@@ -200,11 +198,10 @@ parsa_cvsup (char *percorso)
   return (p);
 }
 
-struct db *
-parsa_httpup (char *percorso)
+struct repolist *
+parsa_httpup (char *percorso, struct repolist *p)
 {
   FILE *file;
-  struct db *p = NULL;
   if ((file = fopen (percorso, "r")))
     {
       char riga[255];
@@ -237,9 +234,7 @@ parsa_httpup (char *percorso)
 		      collezione = strcat (mad_prefix, collezione);
 		    }
 
-		  p =
-		    inserisci_elemento_ordinato (prefix, collezione, "", NULL,
-						 p);
+		  p = repolist_add (collezione, prefix, p);
 		}
 	    }
 	}
@@ -247,11 +242,10 @@ parsa_httpup (char *percorso)
   return (p);
 }
 
-struct db *
-parse_cvs (char *percorso)
+struct repolist *
+parse_cvs (char *percorso, struct repolist *p)
 {
   FILE *file;
-  struct db *p = NULL;
   if ((file = fopen (percorso, "r")))
     {
       char riga[255];
@@ -291,8 +285,7 @@ parse_cvs (char *percorso)
 	    {
 	      if (strlen (mad_prefix) > 0)
 		collezione = strcat (mad_prefix, collezione);
-	      p =
-		inserisci_elemento_ordinato (prefix, collezione, "", NULL, p);
+	      p = repolist_add (collezione, prefix, p);
 	      return (p);
 	    }
 	}
@@ -300,11 +293,10 @@ parse_cvs (char *percorso)
   return (p);
 }
 
-struct db *
-parse_local (char *path)
+struct repolist *
+parse_local (char *path, struct repolist *p)
 {
   FILE *file;
-  struct db *p = NULL;
   if ((file = fopen (path, "r")))
     {
       char row[255];
@@ -330,7 +322,7 @@ parse_local (char *path)
 	     strlen (collezione) - strlen (index (collezione, '.')));
       mad_prefix = strdup ("local");
       collezione = strcat (mad_prefix, strdup (collezione));
-      p = inserisci_elemento_ordinato (prefix, collezione, "", NULL, p);
+      p = repolist_add (collezione, prefix, p);
     }
   return (p);
 }
@@ -368,57 +360,50 @@ leggi_dir (char *collezione, char *prefix, struct db *p)
   return (p);
 }
 
-struct db *
-lsports_acrux_way ()
+struct repolist *
+build_repolist ()
 {
+  struct repolist *p = NULL;
   DIR *etc_ports;
   struct dirent *info_file;
-  struct db *p = NULL;
-  struct db *ports = NULL;
-  char nome_file[255];
-  char estensione[255];
-  if (!(cachefile = fopen (CACHE, "w")))
-    {
-      return ports;
-    }
+  char filename[255];
+  char extension[255];
   etc_ports = opendir ("/etc/ports");
   while ((info_file = readdir (etc_ports)))
     {
       if (strstr (info_file->d_name, "."))
 	{
-	  strcpy (estensione, strstr (info_file->d_name, "."));
-	  strcpy (estensione, mid (estensione, 1, FINE));
-	  strcpy (nome_file, "/etc/ports/");
-	  strcat (nome_file, info_file->d_name);
-	  if (strcmp (estensione, "cvsup") == 0)
-	    {
-	      p = parsa_cvsup (nome_file);
-	      while (p != NULL)
-		{
-		  ports = leggi_dir (p->versione, p->nome, ports);
-		  p = p->prossimo;
-		}
-	    }
-	  else if (strcmp (estensione, "httpup") == 0)
-	    {
-	      p = parsa_httpup (nome_file);
-	      ports = leggi_dir (p->versione, p->nome, ports);
-	    }
-	  // supporting crux ppc
-	  else if (strcmp (estensione, "cvs") == 0)
-	    {
-	      p = parse_cvs (nome_file);
-	      ports = leggi_dir (p->versione, p->nome, ports);
-	    }
-	  else if (strcmp (estensione, "local") == 0)
-	    {
-	      p = parse_local (nome_file);
-	      ports = leggi_dir (p->versione, p->nome, ports);
-	    }
+	  strcpy (extension, strstr (info_file->d_name, "."));
+	  strcpy (extension, mid (extension, 1, FINE));
+	  strcpy (filename, "/etc/ports/");
+	  strcat (filename, info_file->d_name);
+	  if (strcmp (extension, "cvsup") == 0)
+	    p = parsa_cvsup (filename, p);
+	  else if (strcmp (extension, "httpup") == 0)
+	    p = parsa_httpup (filename, p);
+	  else if (strcmp (extension, "cvs") == 0)
+	    p = parse_cvs (filename, p);
+	  else if (strcmp (extension, "local") == 0)
+	    p = parse_local (filename, p);
 	}
     }
-  fclose (cachefile);
-  chmod (CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  return (p);
+}
+
+struct db *
+lsports_acrux_way ()
+{
+  struct db *ports = NULL;
+  if (!(cachefile = fopen (CACHE, "w")))
+    {
+      return ports;
+    }
+  while (repository != NULL)
+    {
+      //printf("repository: %s path: %s\n", repository->repository, repository->path);
+      ports = leggi_dir (repository->repository, repository->path, ports);
+      repository = repository->next;
+    }
   return (ports);
 }
 

@@ -1,8 +1,8 @@
 /***************************************************************************
- *            lsports.h
+ *            repolist.h
  *
- *  Sat Jul 10 12:55:46 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Sun Mar 20 12:00:25 2005
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -22,5 +22,14 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct db *lsports ();
-struct repolist *build_repolist ();
+struct repolist
+{
+  char repository[255];
+  char path[255];
+  struct repolist *next;
+};
+
+struct repolist *repolist_add (char *repository, char *path,
+			       struct repolist *p);
+int repolist_exists (char *delim, struct repolist *p);
+struct repolist *repolist_find (char *delim, struct repolist *p);
