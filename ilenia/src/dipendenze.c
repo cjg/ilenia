@@ -75,6 +75,7 @@ struct db * dipendenze_pacchetto(char * pacchetto, char * collezione)
 	strcpy (riga, trim (riga));
       }
     }
+    fclose(file);
   } else {
     dipendenze=inserisci_elemento(pacchetto, "", "not found", dipendenze);
   }
@@ -113,6 +114,40 @@ struct db * dipendenze (char *pacchetto)
   return (d);
 }
 
+struct db * cerca_dipendenti(struct db *_pacchetti)
+{
+  struct db *dipendenti=_pacchetti;
+  while(_pacchetti!=NULL){
+    struct db *p=pacchetti;
+    while(p!=NULL){
+      char collezione[255];
+      strcpy(collezione, il_piu_aggiornato(p->nome, ports));
+      if(cerca(_pacchetti->nome, dipendenze_pacchetto(p->nome, collezione)) && 
+	 cerca(p->nome, dipendenti)==NULL){
+	dipendenti=inserisci_elemento(p->nome, "", collezione, dipendenti);
+      }
+      p=p->prossimo;
+    }
+    _pacchetti=_pacchetti->prossimo;
+  }
+  return(dipendenti);
+}
+
+struct db * dipendenti (char *pacchetto)
+{
+  struct db *d = NULL;
+  char collezione[255];
+  int i=-10;
+  strcpy(collezione, il_piu_aggiornato(pacchetto, ports));
+  d = inserisci_elemento(pacchetto, "", collezione, d);
+
+  while(i != conta(d)){
+    i=conta(d);
+    d=cerca_dipendenti(d);
+  }
+  return(d);
+}
+ 
 void stampa_dipendenze (char *pacchetto)
 {
   struct db *d = NULL;
@@ -126,6 +161,18 @@ void stampa_dipendenze (char *pacchetto)
 	printf ("installed]\n");
     } else {
       printf("%s [not found]\n", d->nome);
+    }
+    d = d->prossimo;
+  }
+}
+
+void stampa_dipendenti (char *pacchetto)
+{
+  struct db *d = NULL;
+  d = dipendenti (pacchetto);
+  while (d != NULL) {
+    if(strcmp(d->collezione, "not found")!=0) {
+      printf ("%s\n", d->nome);
     }
     d = d->prossimo;
   }
