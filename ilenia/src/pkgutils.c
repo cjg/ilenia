@@ -137,7 +137,6 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
     d = dipendenze (pacchetto);
     while (d->prossimo != NULL) {
       printf ("%s [", d->nome);
-      printf ("%s [\n", d->collezione);
       if(strcmp(d->collezione, "not found")!=0){
 	if (esiste (d->nome, pacchetti)!=0) {
 	  printf ("install now]\n");
