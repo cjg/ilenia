@@ -45,7 +45,7 @@ int esegui_script (char *path, char *script)
   } else if (pid < 0) {
     stato = -1;
   } else {
-    while ((waitpid (pid, &stato, WNOHANG) == 0))
+    while ((waitpid (pid, &stato, 0) == 0))
       {
       }
   }
@@ -78,7 +78,7 @@ int compila_e (int aggiorna, char *port)
   } else if (pid < 0) {
     stato = -1;
   } else {
-    while ((waitpid (pid, &stato, WNOHANG) == 0))
+    while ((waitpid (pid, &stato, 0) == 0))
       {
       }
   }
@@ -199,7 +199,7 @@ int do_pkgrm (char *pkg)
   } else if (pid < 0) {
     stato = -1;
   } else {
-    while ((waitpid (pid, &stato, WNOHANG) == 0))
+    while ((waitpid (pid, &stato, 0) == 0))
       {
       }
   }
