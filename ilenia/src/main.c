@@ -78,6 +78,11 @@ int main (int argc, char *argv[])
     }
   }
 
+  if(azioni<0){
+    aiuto();
+    return(0);
+  }
+  
   ports=lsports();
   pacchetti=lspacchetti();
 

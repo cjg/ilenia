@@ -82,6 +82,8 @@ int compila_e (int aggiorna, char *port)
       {
       }
   }
+  if(stato!=0)
+    return(stato);
   /* post-install */
   strcpy (install_script, port);
   strcat (install_script, "/post-install");
@@ -90,7 +92,7 @@ int compila_e (int aggiorna, char *port)
     if (esegui_script (install_script) != 0)
       return (-1);
   }
-  return (stato);
+  return (0);
 }
 
 int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
@@ -103,10 +105,10 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   if (esiste (pacchetto, pacchetti)==0)
     aggiornare = 1;
   
-  /* prendiamo il piÃ¹ aggiornato */
+  /* prendiamo il più aggiornato */
   strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
 
-  /* Ã¨ controllato da favoriterepo?! */
+  /* è controllato da favoriterepo?! */
   if (opzioni_confronto != NO_REPO && opzioni_confronto != NO_FAVORITE) {
     p = prendi_favorite (REPO);
     if ((p = cerca (pacchetto, p))) {
@@ -114,7 +116,7 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
     }
   }
   
-  /* Ã¨ controllato da favoriteversion?! */
+  /* è controllato da favoriteversion?! */
   if (opzioni_confronto != NO_VERSION && opzioni_confronto != NO_FAVORITE) {
     p = prendi_favorite (VERSIONE);
     if ((p = cerca (pacchetto, p))) {
@@ -143,17 +145,17 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
     d = dipendenze (pacchetto);
     while (d->prossimo != NULL) {
       printf ("%s [", d->nome);
-      if(strcmp(d->collezione, "non trovato")!=0){
+      if(strcmp(d->collezione, "not found")!=0){
 	if (esiste (d->nome, pacchetti)!=0) {
 	  //aggiorna_pacchetto_(opzioni_confronto, d->nome);
-	  printf ("installa]\n");
+	  printf ("install now]\n");
 	  if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
 	    return (-1);
 	} else {
-	  printf ("installato]\n");
+	  printf ("installed]\n");
 	}
       } else {
-	printf("non trovato]\n");
+	printf("not found]\n");
       }
       d = d->prossimo;
     }
