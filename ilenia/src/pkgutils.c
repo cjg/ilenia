@@ -34,6 +34,7 @@
 #include "ilenia.h"
 #include "lsports.h"
 #include "lspacchetti.h"
+#include "repolist.h"
 
 int
 esegui_script (char *path, char *script)
@@ -169,8 +170,9 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
 	}
     }
 
-  strcpy (port, "/usr/ports/");
-  strcat (port, collezione);
+  strcpy (port, repolist_find (collezione, repository)->path);
+  if (strncmp (collezione, "local", 5) != 0)
+    strcat (port, collezione);
   strcat (port, "/");
   strcat (port, pacchetto);
   return (compila_e (aggiornare, port));

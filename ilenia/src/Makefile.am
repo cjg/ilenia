@@ -37,7 +37,9 @@ ilenia_SOURCES = \
 	ilenia.h\
 	deplist.c\
 	deplist.h\
-	ileniarc.c
+	ileniarc.c\
+	repolist.h\
+	repolist.c
 
 ilenia_LDFLAGS = 
 

@@ -9,6 +9,7 @@
 #include "output.h"
 #include "pkgutils.h"
 #include "dipendenze.h"
+#include "repolist.h"
 #include "ilenia.h"
 
 #define AGGIORNA	1
@@ -158,6 +159,12 @@ main (int argc, char *argv[])
   if (parse_ileniarc () != 0)
     return (1);
 
+  repository = build_repolist ();
+  /*while(repository!=NULL){
+     printf("%s %s\n", repository->repository, repository->path);
+     repository=repository->next;
+     }
+     return(0); */
   ports = lsports ();
   pacchetti = lspacchetti ();
 
