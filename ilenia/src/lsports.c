@@ -35,6 +35,8 @@
 
 FILE *cachefile;
 
+#define PORTS_LOCATION "/usr/ports/"
+
 struct deplist *
 deplist_from_deprow (char *deprow)
 {
@@ -151,35 +153,9 @@ parsa_cvsup (char *percorso)
     {
       char riga[255];
       char *prefix = "";
-      char collezione[255];
-      char pre_collezione[255];
+      char *mad_prefix = "";
       while (fgets (riga, 255, file))
 	{
-	  /*
-	     strcpy (riga, trim (riga));
-	     if (strncmp (riga, "*default prefix=", 16) == 0)
-	     {
-	     strcpy (prefix, mid (riga, 16, FINE));
-	     if (strncmp (prefix, "/usr/ports/", 11) == 0)
-	     {
-	     strcpy (pre_collezione, mid (prefix, 11, FINE));
-	     strcpy (prefix, "/usr/ports/");
-	     if (pre_collezione[strlen (pre_collezione)] != '/')
-	     strcat (pre_collezione, "/");
-	     }
-	     }
-	     if (riga[0] != '#' && riga[0] != '*' && strlen (riga) > 0)
-	     {
-	     if (strstr (riga, " "))
-	     strcpy (riga,
-	     mid (riga, 0,
-	     strlen (riga) - strlen (strstr (riga, " "))));
-	     strcpy (collezione, pre_collezione);
-	     strcat (collezione, riga);
-	     p = inserisci_elemento_ordinato (prefix, collezione, "",
-	     NULL, p);
-	     }
-	   */
 	  char *value = "";
 	  strcpy (riga, trim (riga));
 	  if (riga[0] != '#')
@@ -187,10 +163,33 @@ parsa_cvsup (char *percorso)
 	      if (riga[0] == '*')
 		{
 		  if (strlen (value = get_value (riga, "*default prefix")))
-		    prefix = strdup (value);
+		    {
+		      prefix = strdup (value);
+		      if (strncmp
+			  (prefix, PORTS_LOCATION,
+			   strlen (PORTS_LOCATION)) == 0
+			  && strlen (prefix) > strlen (PORTS_LOCATION))
+			{
+			  mad_prefix =
+			    mid (prefix, strlen (PORTS_LOCATION), FINE);
+			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
+			    mad_prefix = strcat (mad_prefix, "/");
+			  prefix = strdup (PORTS_LOCATION);
+			}
+
+		    }
 		}
-	      else
-		p = inserisci_elemento_ordinato (prefix, riga, "", NULL, p);
+	      else if (strlen (riga) > 0)
+		{
+		  char *collezione = "";
+		  if (strlen (mad_prefix) > 0)
+		    collezione = strcat (mad_prefix, riga);
+		  else
+		    collezione = strdup (riga);
+		  p =
+		    inserisci_elemento_ordinato (prefix, collezione, "", NULL,
+						 p);
+		}
 	    }
 	}
     }
@@ -205,46 +204,39 @@ parsa_httpup (char *percorso)
   if ((file = fopen (percorso, "r")))
     {
       char riga[255];
-      char prefix[255];
-      char collezione[255];
-      char pre_collezione[255];
       while (fgets (riga, 255, file))
 	{
 	  strcpy (riga, trim (riga));
-	  /*
-	     if (strncmp (riga, "ROOT_DIR=", 9) == 0)
-	     {
-	     strcpy (prefix, mid (riga, 9, FINE));
-	     strcpy (prefix,
-	     mid (prefix, 0,
-	     strlen (prefix) - strlen (rindex (prefix, '/'))));
-	     if (strncmp (prefix, "/usr/ports/", 11) == 0)
-	     {
-	     strcpy (pre_collezione, mid (prefix, 11, FINE));
-	     strcpy (prefix, "/usr/ports/");
-	     if (pre_collezione[strlen (pre_collezione)] != '/')
-	     strcat (pre_collezione, "/");
-	     }
-	     strcpy (riga, rindex (riga, '/'));
-	     strcpy (riga, mid (riga, 1, FINE));
-	     strcpy (collezione, pre_collezione);
-	     strcat (collezione, riga);
-	     p = inserisci_elemento_ordinato (prefix, collezione, "",
-	     NULL, p);
-	     }
-	   */
 	  char *value = "";
-	  char *root_dir = "";
+	  char *collezione = "";
+	  char *prefix = "";
+	  char *mad_prefix = "";
 	  if (riga[0] != '#')
 	    {
 	      if (strlen (value = get_value (riga, "ROOT_DIR")) > 0)
-		p =
-		  inserisci_elemento_ordinato (mid
-					       (value, 0,
-						strlen (value) -
-						strlen (rindex (value, '/'))),
-					       mid (rindex (value, '/'), 1,
-						    FINE), "", NULL, p);
+		{
+		  collezione = strdup (value);
+		  collezione = strdup (rindex (collezione, '/'));
+		  collezione = strdup (mid (collezione, 1, FINE));
+		  prefix = strdup (value);
+		  prefix =
+		    mid (prefix, 0, strlen (prefix) - strlen (collezione));
+		  if (strncmp
+		      (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)) == 0
+		      && strlen (prefix) > strlen (PORTS_LOCATION))
+		    {
+		      mad_prefix =
+			mid (prefix, strlen (PORTS_LOCATION), FINE);
+		      if (mad_prefix[strlen (mad_prefix) - 1] != '/')
+			mad_prefix = strcat (mad_prefix, "/");
+		      prefix = strdup (PORTS_LOCATION);
+		      collezione = strcat (mad_prefix, collezione);
+		    }
+
+		  p =
+		    inserisci_elemento_ordinato (prefix, collezione, "", NULL,
+						 p);
+		}
 	    }
 	}
     }
@@ -260,6 +252,7 @@ parse_cvs (char *percorso)
     {
       char riga[255];
       char *prefix = "";
+      char *mad_prefix = "";
       char *collezione = "";
       char *value = "";
       while (fgets (riga, 255, file))
@@ -268,23 +261,36 @@ parse_cvs (char *percorso)
 	  if (riga[0] != '#')
 	    {
 	      if (strncmp (riga, "LOCAL_PATH", 10) == 0)
-		if (strlen (value = get_value (riga, "LOCAL_PATH")))
-		  prefix = strdup (value);
-	      /*
-	         strcpy (prefix, mid (riga, 12, FINE));
-	         strcpy (prefix, mid (prefix, 0, strlen (prefix) - 1));
-	         }
-	       */
+		{
+		  if (strlen (value = get_value (riga, "LOCAL_PATH")))
+		    {
+		      prefix = strdup (value);
+		      if (strncmp
+			  (prefix, PORTS_LOCATION,
+			   strlen (PORTS_LOCATION)) == 0
+			  && strlen (prefix) > strlen (PORTS_LOCATION))
+			{
+			  mad_prefix =
+			    mid (prefix, strlen (PORTS_LOCATION), FINE);
+			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
+			    mad_prefix = strcat (mad_prefix, "/");
+			  mad_prefix = strdup (mad_prefix);
+			  prefix = strdup (PORTS_LOCATION);
+			}
+		    }
+		}
 	      if (strncmp (riga, "LOCAL_DIR", 9) == 0)
 		if (strlen (value = get_value (riga, "LOCAL_DIR")))
 		  collezione = strdup (value);
-	      /*
-	         strcpy (collezione, mid (riga, 11, FINE));
-	         strcpy (collezione,
-	         mid (collezione, 0, strlen (collezione) - 1));
-	         } */
 	    }
-	  p = inserisci_elemento_ordinato (prefix, collezione, "", NULL, p);
+	  if ((strlen (prefix) * strlen (collezione)) > 0)
+	    {
+	      if (strlen (mad_prefix) > 0)
+		collezione = strcat (mad_prefix, collezione);
+	      p =
+		inserisci_elemento_ordinato (prefix, collezione, "", NULL, p);
+	      return (p);
+	    }
 	}
     }
   return (p);
