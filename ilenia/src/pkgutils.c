@@ -186,3 +186,37 @@ int aggiorna_pacchetti (int opzioni_confronto)
   }
   return (0);
 }
+
+int do_pkgrm (char *pkg)
+{
+  printf("pkgrm %s\n", pkg);
+  return(0);
+}
+
+int pkgrm (char *pkg, int nocheckdeps, int removeall)
+{
+  if (getuid () != 0) {
+    printf ("ilenia: only root can remove packages\n\n");
+    return(-1);
+  }
+  struct db *p = NULL; 
+  p=dipendenti(pkg);
+  if(removeall){
+    while(p!=NULL){
+      do_pkgrm(p->nome);
+      p=p->prossimo;
+    }
+    return(0);
+  }
+  if(conta(p)>1){
+    if(nocheckdeps){
+      do_pkgrm(pkg);
+      return(0);
+    } else {
+      printf("ilenia: there are some packages that depends from %s, use --remove-all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk\n", pkg, pkg);
+      return(-1);
+    }
+  }
+  do_pkgrm(pkg);
+  return(0);
+} 

@@ -38,6 +38,7 @@ int main (int argc, char *argv[])
   int opzioni_r = -1;
   int opzioni_confronto = 0;
   int controlla_dipendenze=0;
+  int removeall=0;
   for (i = 1; i < argc; i++) {
     if (strcmp (argv[i], "-u") == 0 || strcmp (argv[i], "--update") == 0) {
       azioni++;
@@ -63,6 +64,8 @@ int main (int argc, char *argv[])
       opzioni_confronto += NO_VERSION;
     } else if (strcmp (argv[i], "--no-deps") == 0) {
       controlla_dipendenze = NODEPS;
+    } else if (strcmp (argv[i], "--remove-all") == 0) {
+      removeall = 1;
     } else if (strcmp (argv[i], "-U") == 0) {
       azioni++;
       azione[azioni] = AGGIORNA_P;
@@ -161,7 +164,8 @@ int main (int argc, char *argv[])
       if (opzioni_r != -1) {
 	int j;
 	for (j = 0; j <= opzioni_r; j++) {
-	  stampa_dipendenti (opzione_r[j]);
+	  //stampa_dipendenti (opzione_r[j]);
+	  pkgrm (opzione_r[j], controlla_dipendenze, removeall);
 	}
       }	else {
 	printf("pacchetto\n");

@@ -32,15 +32,15 @@
 void print_formattato (char *str1, char *str2, char *str3, char *str4) {
   char tmp[255];
   strcpy (tmp, str1);
-  strcat (tmp, spazi (19 - strlen (str1)));
+  strcat (tmp, spazi (21 - strlen (str1)));
   strcat (tmp, spazi (2));
-  strcat (tmp, spazi (19 - strlen (str2)));
+  strcat (tmp, spazi (17 - strlen (str2)));
   strcat (tmp, str2);
   strcat (tmp, spazi (2));
   strcat (tmp, str3);
-  strcat (tmp, spazi (12 - strlen (str3)));
+  strcat (tmp, spazi (19 - strlen (str3)));
   strcat (tmp, spazi (2));
-  strcat (tmp, spazi (12 - strlen (str4)));
+  strcat (tmp, spazi (16 - strlen (str4)));
   strcat (tmp, str4);
   printf ("%s\n", tmp);
 }
@@ -50,7 +50,7 @@ struct db *confronta (struct db *pacchetti_db, struct db *ports_db, int tipo,
   struct db *p = NULL;
   struct db *c = NULL;
   if (stampa)
-    printf ("Name                   Installed Version  Repository    Port Version \n");
+    printf ("Name                   Installed Version  Repository               Port Version \n");
   while (pacchetti_db != NULL) {
     p = ports_db;
     while (p != NULL) {
