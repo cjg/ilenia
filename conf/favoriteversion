@@ -1,0 +1,11 @@
+#
+# /etc/ports/favoriteversion: ports-evolution(8) configuration for CRUX-Evolution ports system
+#
+# Use:
+# port	version
+#
+# like:
+# xchat	2.0.7-1
+
+
+# End of file
