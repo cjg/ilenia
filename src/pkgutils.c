@@ -228,7 +228,7 @@ int pkgrm (char *pkg, int nocheckdeps, int removeall)
       do_pkgrm(pkg);
       return(0);
     } else {
-      printf("ilenia: there are some packages that depends from %s, use --remove-all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T %s to see a list of the packages that need %s.\n", pkg, pkg, pkg, pkg);
+      printf("ilenia: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T %s to see a list of the packages that need %s.\n", pkg, pkg, pkg, pkg);
       return(-1);
     }
   }
