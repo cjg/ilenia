@@ -35,10 +35,13 @@ specified, ilenia updates all packages.
 Show ths dependencies of the specified package.
 .TP
 .B "\-\-no\-favorite\-repo"
-Used with \-d option. Ignore the user's favorite repository for ports listed in /etc/ports/favoriterepo
+Used with \-d \-p and \-U options. Ignore the user's favorite repository for ports listed in /etc/ports/favoriterepo
 .TP
 .B "\-\-no\-favorite\-version"
-Used with \-d option. Ignore the user's favorite version for ports listed in /etc/ports/favoriteversion
+Used with \-d \-p and \-U options. Ignore the user's favorite version for ports listed in /etc/ports/favoriteversion
+.TP
+.B "\-\-no--deps"
+Used with \-U option, do not check dependencies
 .TP
 .B "\-v, \-\-version"
 Print version and exit.
