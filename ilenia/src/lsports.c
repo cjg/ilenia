@@ -137,59 +137,47 @@ lsports_classico ()
 	return p;
 }
 
-struct db *
-lsports ()
+struct db * lsports ()
 {
-	FILE *cachefile;
-	struct db *p = NULL;
-	int update, cache;
-	char riga[255];
+  FILE *cachefile;
+  struct db *p = NULL;
+  int update, cache;
+  char riga[255];
 
-	if ((cachefile = fopen ("/var/cache/ilenia", "r")))
-	{
-		fgets (riga, 255, cachefile);
-		fclose (cachefile);
-		update = atoi (riga);
-	}
-	else
-	{
-		p = lsports_classico ();
-		return p;
-	}
+  if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
+    fgets (riga, 255, cachefile);
+    fclose (cachefile);
+    update = atoi (riga);
+  } else {
+    p = lsports_classico ();
+    return p;
+  }
 
-	if ((cachefile = fopen ("/tmp/ilenia.cache", "r")))
-	{
-		fgets (riga, 255, cachefile);
-		cache = atoi (riga);
-		if (cache >= update)
-		{
-			while (fgets (riga, 255, cachefile))
-			{
-				char nome[255];
-				char versione[255];
-				char collezione[255];
-				strcpy (nome, riga);
-				strtok (nome, " ");
-				strcpy (riga,
-					mid (riga, strlen (nome), FINE));
-				strcpy (riga, trim (riga));
+  if ((cachefile = fopen ("/tmp/ilenia.cache", "r"))) {
+    fgets (riga, 255, cachefile);
+    cache = atoi (riga);
+    if (cache >= update) {
+      while (fgets (riga, 255, cachefile)) {
+	char nome[255];
+	char versione[255];
+	char collezione[255];
+	strcpy (nome, riga);
+	strtok (nome, " ");
+	strcpy (riga, mid (riga, strlen (nome), FINE));
+	strcpy (riga, trim (riga));
 
-				strcpy (versione, riga);
-				strtok (versione, " ");
-				strcpy (riga,
-					mid (riga, strlen (versione), -1));
-				strcpy (riga, trim (riga));
-				strcpy (collezione, riga);
+	strcpy (versione, riga);
+	strtok (versione, " ");
+	strcpy (riga, mid (riga, strlen (versione), -1));
+	strcpy (riga, trim (riga));
+	strcpy (collezione, riga);
 				//printf("%s %s %s \n", nome, versione, collezione);
-				p = inserisci_elemento_ordinato (nome,
-								 versione,
-								 collezione,
-								 p);
-			}
-		}
-		fclose (cachefile);
-	}
-
-	p = lsports_classico ();
-	return p;
+	p = inserisci_elemento_ordinato (nome, versione, collezione, p);
+      }
+    }
+    fclose (cachefile);
+  } else {
+    p = lsports_classico ();
+  }
+  return p;
 }
