@@ -137,6 +137,7 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
     d = dipendenze (pacchetto);
     while (d->prossimo != NULL) {
       printf ("%s [", d->nome);
+      printf ("%s [\n", d->collezione);
       if(strcmp(d->collezione, "not found")!=0){
 	if (esiste (d->nome, pacchetti)!=0) {
 	  printf ("install now]\n");
@@ -150,12 +151,22 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
       }
       d = d->prossimo;
     }
-    if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
-      return (-1);
+    if (strcmp(d->collezione, "not found")!=0) {
+      if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
+	return (-1);
+    } else {
+      printf("%s [not found]\n", d->nome);
+      return(-1);
+    }
   } else {
     opzioni_confronto*=-1;
-    if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
-      return (-1);
+    if (strcmp(d->collezione, "not found")!=0) {
+      if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
+	return (-1);
+    } else {
+      printf("%s [not found]\n", d->nome);
+      return(-1);
+    }
   }
   return (0);
 }
