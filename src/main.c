@@ -32,7 +32,7 @@ int main (int argc, char *argv[])
   int opzioni_p = -1;
   int opzioni_d = -1;
   int opzioni_confronto = 0;
-  int controlla_dipendenze=1;
+  int controlla_dipendenze=0;
   for (i = 1; i < argc; i++) {
     if (strcmp (argv[i], "-u") == 0 || strcmp (argv[i], "--update") == 0) {
       azioni++;

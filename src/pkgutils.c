@@ -156,6 +156,7 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
     if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
       return (-1);
   } else {
+    opzioni_confronto*=-1;
     if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
       return (-1);
   }
