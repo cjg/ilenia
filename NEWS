@@ -1,3 +1,9 @@
+25/03/2005 - ilenia-1.3 released
+The more obvious innovation in this release are the 
+introduction of local repositories and POST_PKGADD commands
+definables in /etc/ilenia.rc. But the are many innovation's
+in the code that renders ilenia more powerfull and secure.
+
 29/01/2005 - ilenia-1.2 released
 A little bugfix release for x86's users, a great release for
 ppc's users: from this release ilenia has the full support
