@@ -27,10 +27,12 @@ int main (int argc, char *argv[])
   char opzione[argc][255];
   char opzione_p[argc][255];
   char opzione_d[argc][255];
+  char opzione_l[argc][255];
   int azioni = -1;
   int opzioni = -1;
   int opzioni_p = -1;
   int opzioni_d = -1;
+  int opzioni_l = -1;
   int opzioni_confronto = 0;
   int controlla_dipendenze=0;
   for (i = 1; i < argc; i++) {
@@ -74,8 +76,11 @@ int main (int argc, char *argv[])
       } else if (azione[azioni] == DIPENDENZE) {
 	opzioni_d++;
 	strcpy (opzione_d[opzioni_d], argv[i]);
+      } else if (azione[azioni] == LSPORTS) {
+	opzioni_l++;
+	strcpy (opzione_l[opzioni_l], argv[i]);
       }
-    }
+    } 
   }
 
   if(azioni<0){
@@ -129,7 +134,16 @@ int main (int argc, char *argv[])
       }
       break;
     case LSPORTS:
-      print_db (ports);
+      if(opzioni_l==-1)
+	print_db (ports);
+      else {
+	struct db *p=NULL;
+	int j;
+	for (j = 0; j <= opzioni_l; j++) {
+	  p=cerca(opzione_l[j], ports);
+	  print_db(p);
+	}
+      }
       break;
     case DIFFERENZE:
       confronta (pacchetti, ports, DIFFERENZE, opzioni_confronto, 1);
