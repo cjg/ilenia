@@ -36,7 +36,7 @@
 
 FILE *cachefile;
 
-#define PORTS_LOCATION "/usr/ports/"
+#define PORTS_LOCATION "/usr/ports"
 
 struct deplist *
 deplist_from_deprow (char *deprow)
@@ -140,7 +140,7 @@ parsa_cvsup (char *percorso, struct repolist *p)
     {
       char riga[255];
       char prefix[255];
-      char mad_prefix[255];
+      char mad_prefix[255]="";
       char collezione[255];
       while (fgets (riga, 255, file))
 	{
@@ -159,8 +159,9 @@ parsa_cvsup (char *percorso, struct repolist *p)
 			  && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  strcpy (mad_prefix,
-				  mid (prefix, strlen (PORTS_LOCATION),
+				  mid (prefix, strlen (PORTS_LOCATION)+1,
 				       FINE));
+			  strcpy(mad_prefix, trim(mad_prefix));
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			    strcat (mad_prefix, "/");
 			  strcpy (prefix, PORTS_LOCATION);
@@ -212,10 +213,10 @@ parsa_httpup (char *percorso, struct repolist *p)
 		    mid (prefix, 0, strlen (prefix) - strlen (collezione));
 		  if (strncmp
 		      (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)) == 0
-		      && strlen (prefix) > strlen (PORTS_LOCATION))
+		      && strlen (prefix) > strlen (PORTS_LOCATION)+1)
 		    {
 		      mad_prefix =
-			mid (prefix, strlen (PORTS_LOCATION), FINE);
+			mid (prefix, strlen (PORTS_LOCATION)+1, FINE);
 		      if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			mad_prefix = strcat (mad_prefix, "/");
 		      prefix = strdup (PORTS_LOCATION);
@@ -257,7 +258,7 @@ parse_cvs (char *percorso, struct repolist *p)
 			  && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  mad_prefix =
-			    mid (prefix, strlen (PORTS_LOCATION), FINE);
+			    mid (prefix, strlen (PORTS_LOCATION)+1, FINE);
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			    mad_prefix = strcat (mad_prefix, "/");
 			  mad_prefix = strdup (mad_prefix);
