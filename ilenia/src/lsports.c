@@ -44,26 +44,12 @@ deplist_from_deprow (char *deprow)
   struct deplist *d = NULL;
   if (strlen (deprow) > 0)
     {
-      char tmp[MASSIMO];
-      strcpy (deprow, sed (deprow, " ", ","));
-      while (strlen (deprow) > 0)
-	{
-	  if (strstr (deprow, ","))
-	    {
-	      strcpy (tmp, strstr (deprow, ","));
-	      strcpy (tmp, mid (deprow, 0, strlen (deprow) - strlen (tmp)));
-	      strcpy (deprow, mid (strstr (deprow, ","), 1, FINE));
-	    }
-	  else
-	    {
-	      strcpy (tmp, deprow);
-	      strcpy (deprow, "");
-	    }
-	  strcpy (tmp, trim (tmp));
-	  if (strlen (trim (tmp)) > 0)
-	    d = add (trim (tmp), d);
-	  strcpy (deprow, trim (deprow));
-	}
+      char deps[255][MASSIMO];
+      int how_many_deps, i;
+      deprow=sed (deprow, ",", " ") ;
+      how_many_deps=split(deprow, " ",deps);
+      for(i=0;i<how_many_deps;i++)
+	  d=add(trim(deps[i]),d);
     }
   return (d);
 }
@@ -98,17 +84,17 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 		    }
 		}
 	    }
-	  if (strncmp (riga, "name", 4) == 0)
+	  else if (strncmp (riga, "name", 4) == 0)
 	    {
 	      if (strlen (value = get_value (riga, "name")))
 		nome = strdup (value);
 	    }
-	  if (strncmp (riga, "version", 7) == 0)
+	  else if (strncmp (riga, "version", 7) == 0)
 	    {
 	      if (strlen (value = get_value (riga, "version")))
 		strcpy (versione, value);
 	    }
-	  if (strncmp (riga, "release", 7) == 0)
+	  else if (strncmp (riga, "release", 7) == 0)
 	    {
 	      if (strlen (value = get_value (riga, "release")))
 		{
@@ -121,8 +107,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    {
 	      p = inserisci_elemento_ordinato (nome, versione, collezione,
 					       d, p);
-	      char dependencies[MASSIMO];
-	      strcpy (dependencies, "");
+	      char dependencies[MASSIMO]="";
 	      if (d != NULL)
 		{
 		  while (d != NULL)
@@ -132,11 +117,14 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 		      d = d->next;
 		    }
 		}
+	      
 	      fprintf (cachefile, "%s %s %s %s\n", nome, versione,
 		       collezione, dependencies);
 	      strcpy (nome, "");
 	      strcpy (versione, "");
 	      release = 0;
+	      fclose(pkgfile);
+	      return(p);
 	    }
 	}
       fclose (pkgfile);

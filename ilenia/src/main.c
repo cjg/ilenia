@@ -19,6 +19,7 @@
 #define DIPENDENZE      8
 #define RIMUOVI         9
 #define DEPENDENT      10
+#define REPOLIST       11
 
 int
 main (int argc, char *argv[])
@@ -80,6 +81,11 @@ main (int argc, char *argv[])
 	{
 	  azioni++;
 	  azione[azioni] = AIUTO;
+	}
+      else if (strcmp (argv[i], "--repository-list") == 0 )
+	{
+	  azioni++;
+	  azione[azioni] = REPOLIST;
 	}
       else if (strcmp (argv[i], "--no-favorite-repo") == 0)
 	{
@@ -179,6 +185,13 @@ main (int argc, char *argv[])
     {
       switch (azione[i])
 	{
+	case REPOLIST:
+	  while(repository!=NULL)
+	    {
+	      printf("%s\n", repository->repository);
+	      repository=repository->next;
+	    }
+	  break;
 	case DIPENDENZE:
 	  if (opzioni_d != -1)
 	    {
