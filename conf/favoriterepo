@@ -1,11 +1,11 @@
 #
-# /etc/ports/favoriterepo: ports-evolution(8) configuration for CRUX-Evolution ports system
+# /etc/ports/favoriterepo: ilenia(8) configuration for CRUX Evolution ports system
 #
 # Use:
 # port	repository
 #
 # like:
-# xchat	contrib
+# x11	opt
 
 
 # End of file
