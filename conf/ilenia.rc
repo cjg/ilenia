@@ -1,0 +1,7 @@
+#
+# /etc/ilenia.rc: ilenia (8) configuration 
+#
+
+# POST_PKGADD=""
+
+# End of file
