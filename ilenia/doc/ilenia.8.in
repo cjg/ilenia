@@ -83,6 +83,15 @@ File where are stored the information about favorite repository.
 .TP
 .B "/etc/ports/favoriteversion"
 File where are stored the information about favorite version.
+.TP
+.B "/etc/ilenia.rc"
+File contening optional features like "POST_PKGADD"
+.SH POST_PKGADD
+.TP
+You can specify in your ilenia.rc a command, or some commands, to be executed after each installation of packages; the commands are executed in the, just compiled and installed, ports dir. 
+For example, I use:
+
+POST_PKGADD  = "pkgmk \-c; aplay /home/slash/sounds/grolsch_plop.wav"
 .SH SEE ALSO
 pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1), httpup(8)
 .SH AUTHOR
