@@ -171,13 +171,13 @@ struct db * lsports ()
 	strcpy (riga, mid (riga, strlen (versione), -1));
 	strcpy (riga, trim (riga));
 	strcpy (collezione, riga);
-				//printf("%s %s %s \n", nome, versione, collezione);
+	//printf("%s %s %s \n", nome, versione, collezione);
 	p = inserisci_elemento_ordinato (nome, versione, collezione, p);
       }
+    } else {
+      p = lsports_classico ();
     }
     fclose (cachefile);
-  } else {
-    p = lsports_classico ();
   }
   return p;
 }
