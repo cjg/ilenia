@@ -23,5 +23,6 @@
  */
 
 struct db *dipendenze (char *pacchetto);
+struct db *dipendenti (char *pacchetto);
 void stampa_dipendenze (char *pacchetto);
 void stampa_dipendenti (char *pacchetto);
