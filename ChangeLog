@@ -1,3 +1,7 @@
+1.2:
+	- feature: support for crux ppc's .cvs supfile
+	- change: a better support for pre and post install scripts
+	- bugfix: fixed segfaults when trying to install non existent ports
 1.1:
 	- feature: -R remove packages checking dependents
 	- feature: -T shows dependents package of the specified package

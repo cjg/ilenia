@@ -1,3 +1,8 @@
+29/01/2005 - ilenia-1.2 released
+A little bugfix release for x86's users, a great release for
+ppc's users: from this release ilenia has the full support
+for .cvs supfiles of crux ppc.
+
 30/12/2004 - ilenia-1.1 released
 Ilenia now with some new features like the secure removing 
 of packages ("secure" means "with dependencies check").
