@@ -22,13 +22,21 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct db {
-  char nome[255];
-  char versione[255];
-  char collezione[255];
-  struct db *prossimo;
+struct db
+{
+	char nome[255];
+	char versione[255];
+	char collezione[255];
+	struct db *prossimo;
 };
 
-struct db *inserisci_elemento_ordinato (char *_nome, char *_versione, char *_collezione, 
-					struct db *p);
-struct db * cerca (char *parametro, struct db *p);
+struct db *inserisci_elemento (char *_nome, char *_versione,
+			       char *_collezione, struct db *p);
+struct db *inserisci_elemento_ordinato (char *_nome, char *_versione,
+					char *_collezione, struct db *p);
+struct db *cerca (char *parametro, struct db *p);
+int conta(struct db *p);
+struct db *rimuovi_elemento(char *nome, struct db *p);
+struct db *rimuovi_duplicati(struct db *p);
+struct db *inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
+			    struct db *p);
