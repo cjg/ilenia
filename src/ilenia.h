@@ -24,8 +24,9 @@
 
 struct db *ports;
 struct db *pacchetti;
-char * post_pkgadd;
+char *post_pkgadd;
 
 #define CACHE "/var/cache/ilenia"
 
-int parse_ileniarc();
+int parse_ileniarc ();
+char *get_value (char *s, char *var);

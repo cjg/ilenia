@@ -108,18 +108,19 @@ compila_e (int aggiorna, char *port)
       if (esegui_script (port, "post-install") != 0)
 	return (-1);
     }
-  if(strlen(post_pkgadd)>0)
+  if (strlen (post_pkgadd) > 0)
     {
-      FILE * post_pkgadd_sh;
-      if((post_pkgadd_sh=fopen("/tmp/post_pkgadd.sh", "w")))
+      FILE *post_pkgadd_sh;
+      if ((post_pkgadd_sh = fopen ("/tmp/post_pkgadd.sh", "w")))
 	{
-	  fprintf(post_pkgadd_sh, "#!/bin/sh\n\n%s\n\n# End of file", post_pkgadd);
-	  fclose(post_pkgadd_sh);
-	
+	  fprintf (post_pkgadd_sh, "#!/bin/sh\n\n%s\n\n# End of file",
+		   post_pkgadd);
+	  fclose (post_pkgadd_sh);
+
 	  pid = fork ();
 	  if (pid == 0)
 	    {
-	      chdir(port);
+	      chdir (port);
 	      execl ("/bin/sh", "", "/tmp/post_pkgadd.sh", 0);
 	    }
 	  else if (pid < 0)
