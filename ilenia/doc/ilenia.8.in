@@ -7,8 +7,8 @@ ilenia \- update/list ports collection and compile-install/update packages with 
 \fBilenia\fP was a replacement of the standard CRUX ports tool.
 \fBilenia\fP connects to one or more master repositories and updates the local copy of a
 ports collection. If no collections are specified then all collections will be updated.
-\fBilenia\fP, now can also update or install a package (or all packages that need to be 
-updated) with relatives dependencies; \fBilenia\fP chooses which port (with same name) to 
+\fBilenia\fP, now can also update, install and remove a packages with relatives 
+dependencies; \fBilenia\fP chooses which port (with same name) to 
 compile and install in the "ilenia --updated" way: she, if there is the same port in 
 different repos, and if the port/package isn't controlled by favoriterepo or 
 favoriteversion, compile and install the one with newer version.
@@ -34,6 +34,12 @@ specified, ilenia updates all packages.
 .B "\-D"
 Show ths dependencies of the specified package.
 .TP
+.B "\-T"
+Show the dependents packages of the specified package.
+.TP
+.B "\-R"
+Remove the specified package checking if there is installed any didepent package.
+.TP
 .B "\-\-no\-favorite\-repo"
 Used with \-d \-p and \-U options. Ignore the user's favorite repository for ports listed in /etc/ports/favoriterepo
 .TP
@@ -41,7 +47,10 @@ Used with \-d \-p and \-U options. Ignore the user's favorite repository for por
 Used with \-d \-p and \-U options. Ignore the user's favorite version for ports listed in /etc/ports/favoriteversion
 .TP
 .B "\-\-no--deps"
-Used with \-U option, do not check dependencies
+Used with \-U and \-R options, do not check dependencies
+.TP
+.B "\-\-all"
+Used with \-T and \-R options, show or removes all dipendents packages
 .TP
 .B "\-v, \-\-version"
 Print version and exit.

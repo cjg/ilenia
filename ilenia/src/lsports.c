@@ -31,8 +31,32 @@
 #include <time.h>
 #include "manipola.h"
 #include "db.h"
+#include "deplist.h"
 
 FILE *cachefile;
+
+struct deplist *deplist_from_deprow(char *deprow){
+  struct deplist *d=NULL;
+  if (strlen (deprow) > 0) {
+    char tmp[MASSIMO];
+    strcpy (deprow, sed (deprow, " ", ","));
+    while (strlen (deprow) > 0) {
+      if (strstr (deprow, ",")) {
+	strcpy (tmp, strstr (deprow, ","));
+	strcpy (tmp, mid (deprow, 0, strlen (deprow) - strlen (tmp)));
+	strcpy (deprow, mid (strstr (deprow, ","), 1, FINE));
+      } else {
+	strcpy (tmp, deprow);
+	strcpy (deprow, "");
+      }
+      strcpy (tmp, trim (tmp));
+      if(strlen(trim(tmp))>0)
+	d=add (trim(tmp), d);
+      strcpy (deprow, trim (deprow));
+    }
+  }
+  return(d);    
+}
 
 struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
   FILE *pkgfile;
@@ -41,8 +65,23 @@ struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
     char nome[255] = "";
     char versione[255] = "";
     int release = 0;
+    struct deplist *d=NULL;
     while (fgets (riga, 255, pkgfile)) {
       strcpy (riga, trim (riga));
+      /* dipendenze */
+      if (riga[0] == '#') {
+	strcpy (riga, mid (riga, 1, FINE));
+	strcpy (riga, trim (riga));
+	if (strncasecmp (riga, "Depends", 7) == 0) {
+	  char deprow[MASSIMO];
+	  if(strstr(riga, ":")){
+	    strcpy (riga, mid (strstr (riga, ":"), 1, FINE));
+	    strcpy (deprow, trim (riga));
+	    d=deplist_from_deprow(deprow);
+	  }
+	}
+      }
+      /* /dipendenze */
       if (strncmp (riga, "name", 4) == 0) {
 	strcpy (nome, mid (riga, 5, strlen (riga) - 5));
       }
@@ -55,8 +94,17 @@ struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
 	release = 1;
       }
       if (strlen (nome) && strlen (versione) && release) {
-	p = inserisci_elemento_ordinato (nome, versione, collezione, p);
-	fprintf (cachefile, "%s %s %s \n", nome, versione, collezione);
+	p = inserisci_elemento_ordinato (nome, versione, collezione, d, p);
+	char dependencies[MASSIMO];
+	strcpy(dependencies, "");
+	if(d!=NULL){
+	  while(d!=NULL){
+	    strcat(dependencies, d->pkg);
+	    strcat(dependencies, " ");
+	    d=d->next;
+	  }
+	}
+	fprintf (cachefile, "%s %s %s %s\n", nome, versione, collezione, dependencies);
 	strcpy (nome, "");
 	strcpy (versione, "");
 	release = 0;
@@ -91,7 +139,7 @@ struct db * parsa_cvsup (char *percorso) {
 	  strcpy(riga, mid(riga, 0, strlen(riga)-strlen(strstr(riga, " "))));
 	strcpy(collezione, pre_collezione);
 	strcat(collezione, riga);
-	p=inserisci_elemento_ordinato(prefix, collezione, "", p);
+	p=inserisci_elemento_ordinato(prefix, collezione, "", NULL, p);
       }
     }
   }
@@ -121,7 +169,7 @@ struct db * parsa_httpup (char *percorso){
 	strcpy(riga, mid(riga, 1, FINE));
 	strcpy(collezione, pre_collezione);
 	strcat(collezione, riga);
-	p=inserisci_elemento_ordinato(prefix, collezione, "", p);
+	p=inserisci_elemento_ordinato(prefix, collezione, "", NULL, p);
       }
     }
   }
@@ -204,26 +252,22 @@ struct db * lsports ()
     p = lsports_acrux_way ();
     return p;
   }
-
   if ((cachefile = fopen ("/tmp/ilenia.cache", "r"))) {
     fgets (riga, 255, cachefile);
     cache = atoi (riga);
     if (cache >= update) {
       while (fgets (riga, 255, cachefile)) {
-	char nome[255];
-	char versione[255];
-	char collezione[255];
-	strcpy (nome, riga);
-	strtok (nome, " ");
-	strcpy (riga, mid (riga, strlen (nome), FINE));
-	strcpy (riga, trim (riga));
-
-	strcpy (versione, riga);
-	strtok (versione, " ");
-	strcpy (riga, mid (riga, strlen (versione), -1));
-	strcpy (riga, trim (riga));
-	strcpy (collezione, riga);
-	p = inserisci_elemento_ordinato (nome, versione, collezione, p);
+	int len;
+	char splitted_row[MASSIMO][MASSIMO];
+	len = split(riga, " ", splitted_row);
+	int i;
+	struct deplist * d=NULL;
+	for(i=3;i<len;i++){
+	  if(strlen(trim(splitted_row[i]))>0)
+	    d=add(trim(splitted_row[i]), d);
+	}
+	p = inserisci_elemento_ordinato (trim(splitted_row[0]), trim(splitted_row[1]), 
+					 trim(splitted_row[2]), d, p);
       }
     } else {
       p = lsports_acrux_way ();

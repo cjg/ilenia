@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "db.h"
+#include "deplist.h"
 #include "lspacchetti.h"
 #include "lsports.h"
 #include "confronto.h"
@@ -16,6 +17,7 @@
 #define AGGIORNA_P	7
 #define DIPENDENZE      8
 #define RIMUOVI         9
+#define DEPENDENT      10
 
 int main (int argc, char *argv[])
 {
@@ -30,15 +32,17 @@ int main (int argc, char *argv[])
   char opzione_d[argc][255];
   char opzione_l[argc][255];
   char opzione_r[argc][255];
+  char opzione_t[argc][255];
   int azioni = -1;
   int opzioni = -1;
   int opzioni_p = -1;
   int opzioni_d = -1;
   int opzioni_l = -1;
-  int opzioni_r = -1;
+  int opzioni_r = -1; 
+  int opzioni_t = -1;
   int opzioni_confronto = 0;
   int controlla_dipendenze=0;
-  int removeall=0;
+  int all=0;
   for (i = 1; i < argc; i++) {
     if (strcmp (argv[i], "-u") == 0 || strcmp (argv[i], "--update") == 0) {
       azioni++;
@@ -64,8 +68,8 @@ int main (int argc, char *argv[])
       opzioni_confronto += NO_VERSION;
     } else if (strcmp (argv[i], "--no-deps") == 0) {
       controlla_dipendenze = NODEPS;
-    } else if (strcmp (argv[i], "--remove-all") == 0) {
-      removeall = 1;
+    } else if (strcmp (argv[i], "--all") == 0) {
+      all = 1;
     } else if (strcmp (argv[i], "-U") == 0) {
       azioni++;
       azione[azioni] = AGGIORNA_P;
@@ -75,6 +79,9 @@ int main (int argc, char *argv[])
     } else if (strcmp (argv[i], "-R") == 0) {
       azioni++;
       azione[azioni]=RIMUOVI;
+    } else if (strcmp (argv[i], "-T") == 0) {
+      azioni++;
+      azione[azioni]=DEPENDENT;
     } else {
       if (azione[azioni] == AGGIORNA) {
 	opzioni++;
@@ -91,6 +98,9 @@ int main (int argc, char *argv[])
       } else if (azione[azioni] == RIMUOVI) {
 	opzioni_r++;
 	strcpy (opzione_r[opzioni_r], argv[i]);
+      } else if (azione[azioni] == DEPENDENT) {
+	opzioni_t++;
+	strcpy (opzione_t[opzioni_t], argv[i]);
       }
     } 
   }
@@ -165,7 +175,17 @@ int main (int argc, char *argv[])
 	int j;
 	for (j = 0; j <= opzioni_r; j++) {
 	  //stampa_dipendenti (opzione_r[j]);
-	  pkgrm (opzione_r[j], controlla_dipendenze, removeall);
+	  pkgrm (opzione_r[j], controlla_dipendenze, all);
+	}
+      }	else {
+	printf("pacchetto\n");
+      }
+      break;
+    case DEPENDENT:
+      if (opzioni_t != -1) {
+	int j;
+	for (j = 0; j <= opzioni_t; j++) {
+	  stampa_dipendenti (opzione_t[j], all);
 	}
       }	else {
 	printf("pacchetto\n");

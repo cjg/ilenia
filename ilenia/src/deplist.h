@@ -1,7 +1,7 @@
 /***************************************************************************
- *            manipola.h
+ *            deplist.h
  *
- *  Sat Jul 10 12:49:03 2004
+ *  Mon Dec 20 13:55:35 2004
  *  Copyright  2004  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
@@ -22,14 +22,18 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#define FINE -1
-#define MASSIMO 2555
+struct deplist
+{
+	char pkg[255];
+	struct deplist *next;
+};
 
-char *trim (char *s);
-char *tab2spazi (char *s);
-char *mid (char *stringa, int inizio, int lunghezza);
-char *mid_ (char *stringa, int inizio);
-char *spazi (int n);
-char *sedchr (char *s, int trova, int sostituisci);
-char *sed (char *s, char *trova, char *sostituisci);
-int split (char *s, char *delim, char splitted[][MASSIMO]);
+struct deplist *add(char *pkg, struct deplist *p);
+int exists(char *delim, struct deplist *p);
+//struct deplist *cerca (char *parametro, struct db *p);
+//int conta(struct db *p);
+//struct db *rimuovi_elemento(char *nome, struct db *p);
+//struct db *rimuovi_duplicati(struct db *p);
+//struct db *inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
+//			    struct db *p);
+//int exists(char *qualcosa, struct db *p);

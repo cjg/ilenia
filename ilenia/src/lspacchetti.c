@@ -63,7 +63,7 @@ prendi_favorite (int quale)
 				p = inserisci_elemento_ordinato (nome,
 								 favorite_opzioni,
 								 favorite_opzioni,
-								 p);
+								 NULL, p);
 			}
 		}
 	}
@@ -109,7 +109,7 @@ lspacchetti ()
 			{
 				strcpy (tmp, "installato");
 			}
-			p = inserisci_elemento_ordinato (nome, riga, tmp, p);
+			p = inserisci_elemento_ordinato (nome, riga, tmp, NULL, p);
 			strcpy (nome, "");
 			nuovo_record = 0;
 		}

@@ -75,7 +75,7 @@ struct db *confronta (struct db *pacchetti_db, struct db *ports_db, int tipo,
 	}
 	if (test != 0 && skip != 1) {
 	  c = inserisci_elemento_ordinato (pacchetti_db->nome, p->versione, p->collezione,
-					   c);
+					   NULL, c);
 	  if (stampa)
 	    print_formattato(pacchetti_db->nome, pacchetti_db->versione, p->collezione,
 			     p->versione);
