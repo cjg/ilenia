@@ -32,77 +32,150 @@
 #include "manipola.h"
 #include "db.h"
 
+FILE *cachefile;
 
-struct db * lsports_classico ()
-{
-  DIR *ports_dir, *repo_dir;
-  FILE *pkgfile, *cachefile;
-  struct dirent *info_file;
-  struct stat tipo_file;
-  struct db *p = NULL;
-  char nome_file[255] = "";
-  char nome_dir[255] = "";
-  char collezione[255] = "";
-  int conta;
-  if (!(cachefile = fopen ("/tmp/ilenia.cache", "w"))) {
-    return p;
+struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
+  FILE *pkgfile;
+  //printf("%s\n", percorso);
+  if ((pkgfile = fopen (percorso, "r"))) {
+    char riga[255] = "";
+    char nome[255] = "";
+    char versione[255] = "";
+    int release = 0;
+    while (fgets (riga, 255, pkgfile)) {
+      strcpy (riga, trim (riga));
+      if (strncmp (riga, "name", 4) == 0) {
+	strcpy (nome, mid (riga, 5, strlen (riga) - 5));
+      }
+      if (strncmp (riga, "version", 7) == 0) {
+	strcpy (versione, mid (riga, 8, strlen (riga) - 8));
+      }
+      if (strncmp (riga, "release", 7) == 0) {
+	strcat (versione, "-");
+	strcat (versione, mid (riga, 8, strlen (riga) - 8));
+	release = 1;
+      }
+      if (strlen (nome) && strlen (versione) && release) {
+	p = inserisci_elemento_ordinato (nome, versione, collezione, p);
+	fprintf (cachefile, "%s %s %s \n", nome, versione, collezione);
+	strcpy (nome, "");
+	strcpy (versione, "");
+	release = 0;
+      }
+    }
+    fclose (pkgfile);
   }
-  fprintf (cachefile, "%ld \n", time (NULL));
-  ports_dir = opendir ("/usr/ports");
-  while ((info_file = readdir (ports_dir))) {
-    strcpy (nome_file, "/usr/ports/");
+  //print_db(p);
+  return(p);
+}
+
+struct db * parsa_cvsup (char *percorso) {
+  FILE *file;
+  struct db * p=NULL;
+  if((file=fopen(percorso, "r"))){
+    char riga[255];
+    char prefix[255];
+    while (fgets (riga, 255, file)) {
+      strcpy(riga, trim(riga));
+      if(strncmp(riga, "*default prefix=", 16)==0){
+	strcpy(prefix, mid(riga, 16, FINE));
+      }
+      if(riga[0]!='#' && riga[0]!='*' && strlen(riga)>0){
+	if(strstr(riga, " "))
+	  strcpy(riga, mid(riga, 0, strlen(riga)-strlen(strstr(riga, " "))));
+	p=inserisci_elemento_ordinato(prefix, riga, "", p);
+      }
+    }
+  }
+  return(p);
+}
+
+struct db * parsa_httpup (char *percorso){
+  FILE *file;
+  struct db * p=NULL;
+  if((file=fopen(percorso, "r"))){
+    char riga[255];
+    char prefix[255];
+    while (fgets (riga, 255, file)) {
+      strcpy(riga, trim(riga));
+      if(strncmp(riga, "ROOT_DIR=", 9)==0){
+	strcpy(prefix, mid(riga, 9, FINE));
+	//printf("%s\n", prefix);
+	strcpy(prefix, mid(prefix, 0, strlen(prefix)-strlen(rindex(prefix, '/'))));
+	//printf("%s\n", prefix);
+	strcpy(riga, rindex(riga, '/'));
+	strcpy(riga, mid(riga, 1, FINE));
+	p=inserisci_elemento_ordinato(prefix, riga, "", p);
+      }
+    }
+  }
+  return(p);
+}
+
+struct db * leggi_dir(char *collezione, char *prefix, struct db *p){
+  DIR *dir;
+  struct dirent *info_file;
+  struct stat tipo_file; 
+  char percorso[255];
+  char nome_file[255];
+  strcpy(percorso, prefix);
+  strcat(percorso, "/");
+  strcat(percorso, collezione);
+  dir=opendir(percorso);
+  while ((info_file = readdir (dir))) {
+    //printf("%s\n", info_file->d_name);
+    strcpy (nome_file, prefix);
+    strcat (nome_file, "/");
+    strcat (nome_file, collezione);
+    strcat (nome_file, "/");
     strcat (nome_file, info_file->d_name);
     stat (nome_file, &tipo_file);
     if (S_ISDIR (tipo_file.st_mode) && info_file->d_name[0] != '.') {
-      strcpy (collezione, info_file->d_name);
-      strcpy (nome_dir, "/usr/ports/");
-      strcat (nome_dir, info_file->d_name);
-      repo_dir = opendir (nome_dir);
-      while ((info_file = readdir (repo_dir))) {
-	strcpy (nome_file, nome_dir);
-	strcat (nome_file, "/");
-	strcat (nome_file, info_file->d_name);
-	stat (nome_file, &tipo_file);
-	if (S_ISDIR (tipo_file.st_mode) && info_file->d_name[0] != '.') {
-	  strcat (nome_file, "/Pkgfile");
-	  if ((pkgfile = fopen (nome_file, "r"))) {
-	    char riga[255] = "";
-	    char nome[255] = "";
-	    char versione[255] = "";
-	    int release = 0;
-	    while (fgets (riga, 255, pkgfile)) {
-	      strcpy (riga, trim (riga));
-	      if (strncmp (riga, "name", 4) == 0) {
-		strcpy (nome, mid (riga, 5, strlen (riga) - 5));
-	      }
-	      if (strncmp (riga, "version", 7) == 0) {
-		strcpy (versione, mid (riga, 8, strlen (riga) - 8));
-	      }
-	      if (strncmp (riga, "release", 7) == 0) {
-		strcat (versione, "-");
-		strcat (versione, mid (riga, 8, strlen (riga) - 8));
-		release = 1;
-	      }
-	      if (strlen (nome) && strlen (versione) && release) {
-		p = inserisci_elemento_ordinato (nome, versione, collezione, p);
-		fprintf (cachefile, "%s %s %s \n", nome, versione, collezione);
-		conta++;
-		strcpy (nome, "");
-		strcpy (versione, "");
-		release = 0;
-	      }
-	    }
-	    fclose (pkgfile);
-	  }
-	}
-      }
-      closedir (repo_dir);
+      strcat(nome_file, "/Pkgfile");
+      p=parsa_pkgfile(nome_file, collezione, p);
     }
   }
-  closedir (ports_dir);
-  fclose (cachefile);
-  chmod("/tmp/ilenia.cache", S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-  return p;
+  //print_db(p);
+  return(p);
+}
+
+struct db * lsports_acrux_way () {
+  DIR *etc_ports;
+  struct dirent *info_file;
+  struct db *p=NULL;
+  struct db *ports=NULL;
+  char nome_file[255];
+  char estensione[255];
+  char prefix[255];
+  FILE *file;
+  if (!(cachefile = fopen ("/tmp/ilenia.cache", "w"))) {
+    return ports;
+  }
+  fprintf (cachefile, "%ld \n", time (NULL));
+  etc_ports = opendir ("/etc/ports");
+  while ((info_file = readdir (etc_ports))) {
+    if (strstr (info_file->d_name, ".")) {
+      strcpy (estensione, strstr (info_file->d_name, "."));
+      strcpy (estensione, mid (estensione, 1, FINE));
+      strcpy (nome_file, "/etc/ports/");
+      strcat (nome_file, info_file->d_name);
+      if (strcmp (estensione, "cvsup") == 0) {
+	p=parsa_cvsup(nome_file);
+	while(p!=NULL){
+	  //printf("%s %s\n", p->versione, p->nome);
+	  ports=leggi_dir(p->versione, p->nome, ports);
+	  p=p->prossimo;
+	}
+	//printf("%s\n", prefix);
+      }	else if (strcmp (estensione, "httpup") == 0) {
+	p=parsa_httpup(nome_file);
+	//printf("%s %s\n", p->versione, p->nome);
+	ports=leggi_dir(p->versione, p->nome, ports);
+      }
+    }
+  }
+  fclose(cachefile);
+  return(ports);
 }
 
 struct db * lsports ()
@@ -111,6 +184,9 @@ struct db * lsports ()
   struct db *p = NULL;
   int update, cache;
   char riga[255];
+
+  p=lsports_acrux_way();
+  return p;
 
   if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
     fgets (riga, 255, cachefile);
@@ -150,4 +226,4 @@ struct db * lsports ()
     p= lsports_classico();
   }
   return p;
-}
+ }
