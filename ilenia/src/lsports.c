@@ -75,15 +75,25 @@ struct db * parsa_cvsup (char *percorso) {
   if((file=fopen(percorso, "r"))){
     char riga[255];
     char prefix[255];
+    char collezione[255];
+    char pre_collezione[255];
     while (fgets (riga, 255, file)) {
       strcpy(riga, trim(riga));
       if(strncmp(riga, "*default prefix=", 16)==0){
 	strcpy(prefix, mid(riga, 16, FINE));
+	if(strncmp(prefix,"/usr/ports/",11)==0){
+	  strcpy(pre_collezione, mid(prefix, 11,FINE));
+	  strcpy(prefix, "/usr/ports/");
+	  if(pre_collezione[strlen(pre_collezione)]!='/')
+	    strcat(pre_collezione, "/");
+	}
       }
       if(riga[0]!='#' && riga[0]!='*' && strlen(riga)>0){
 	if(strstr(riga, " "))
 	  strcpy(riga, mid(riga, 0, strlen(riga)-strlen(strstr(riga, " "))));
-	p=inserisci_elemento_ordinato(prefix, riga, "", p);
+	strcpy(collezione, pre_collezione);
+	strcat(collezione, riga);
+	p=inserisci_elemento_ordinato(prefix, collezione, "", p);
       }
     }
   }
@@ -116,7 +126,7 @@ struct db * leggi_dir(char *collezione, char *prefix, struct db *p){
   DIR *dir;
   struct dirent *info_file;
   struct stat tipo_file; 
-  printf("%s\n", collezione);
+  //printf("%s\n", collezione);
   char percorso[255];
   char nome_file[255];
   strcpy(percorso, prefix);
@@ -148,8 +158,6 @@ struct db * lsports_acrux_way () {
   struct db *ports=NULL;
   char nome_file[255];
   char estensione[255];
-  char prefix[255];
-  FILE *file;
   if (!(cachefile = fopen ("/tmp/ilenia.cache", "w"))) {
     return ports;
   }
@@ -187,15 +195,15 @@ struct db * lsports ()
   int update, cache;
   char riga[255];
 
-  p=lsports_acrux_way();
-  return p;
+  //p=lsports_acrux_way();
+  //return p;
 
   if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
     fgets (riga, 255, cachefile);
     fclose (cachefile);
     update = atoi (riga);
   } else {
-    p = lsports_classico ();
+    p = lsports_acrux_way ();
     return p;
   }
 
@@ -221,11 +229,11 @@ struct db * lsports ()
 	p = inserisci_elemento_ordinato (nome, versione, collezione, p);
       }
     } else {
-      p = lsports_classico ();
+      p = lsports_acrux_way ();
     }
     fclose (cachefile);
   } else {
-    p= lsports_classico();
+    p= lsports_acrux_way();
   }
   return p;
  }
