@@ -91,7 +91,7 @@ int aggiorna_collezione (char *collezione) {
   /* parte nuova */
   strcpy (nome_file, "/var/cache/ilenia");
   if ((file = fopen (nome_file, "w"))) {
-    fprintf(file, "%ld\n", time(NULL));
+    fprintf(file, " ");
     fclose (file);
   }
   /* fine parte nuova*/
@@ -128,7 +128,7 @@ int aggiorna_ports () {
   /* parte nuova */
   strcpy (nome_file, "/var/cache/ilenia");
   if ((file = fopen (nome_file, "w"))) {
-    fprintf(file, "%ld\n", time(NULL));
+    fprintf(file, " ");
     fclose (file);
   }
   /* fine parte nuova */

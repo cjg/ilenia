@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include <time.h>
+//#include <time.h>
 #include "manipola.h"
 #include "db.h"
 #include "deplist.h"
@@ -209,10 +209,10 @@ struct db * lsports_acrux_way () {
   struct db *ports=NULL;
   char nome_file[255];
   char estensione[255];
-  if (!(cachefile = fopen ("/tmp/ilenia.cache", "w"))) {
+  if (!(cachefile = fopen ("/var/cache/ilenia", "w"))) {
     return ports;
   }
-  fprintf (cachefile, "%ld \n", time (NULL));
+  //fprintf (cachefile, "%ld \n", time (NULL));
   etc_ports = opendir ("/etc/ports");
   while ((info_file = readdir (etc_ports))) {
     if (strstr (info_file->d_name, ".")) {
@@ -233,7 +233,7 @@ struct db * lsports_acrux_way () {
     }
   }
   fclose(cachefile);
-  chmod("/tmp/ilenia.cache", S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  chmod("/var/cache/ilenia", S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   return(ports);
 }
 
@@ -241,21 +241,11 @@ struct db * lsports ()
 {
   FILE *cachefile;
   struct db *p = NULL;
-  int update, cache;
+  //int update, cache;
   char riga[255];
 
   if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
-    fgets (riga, 255, cachefile);
-    fclose (cachefile);
-    update = atoi (riga);
-  } else {
-    p = lsports_acrux_way ();
-    return p;
-  }
-  if ((cachefile = fopen ("/tmp/ilenia.cache", "r"))) {
-    fgets (riga, 255, cachefile);
-    cache = atoi (riga);
-    if (cache >= update) {
+    if(strlen(trim(fgets (riga, 255, cachefile)))>0){
       while (fgets (riga, 255, cachefile)) {
 	int len;
 	char splitted_row[MASSIMO][MASSIMO];
@@ -269,12 +259,10 @@ struct db * lsports ()
 	p = inserisci_elemento_ordinato (trim(splitted_row[0]), trim(splitted_row[1]), 
 					 trim(splitted_row[2]), d, p);
       }
-    } else {
-      p = lsports_acrux_way ();
+      fclose(cachefile);
+      return(p);
     }
-    fclose (cachefile);
-  } else {
-    p= lsports_acrux_way();
   }
-  return p;
+  p = lsports_acrux_way ();
+  return(p);
 }
