@@ -46,6 +46,7 @@ main (int argc, char *argv[])
   int opzioni_confronto = 0;
   int controlla_dipendenze = 0;
   int all = 0;
+  int rebuild_cache = 0;
   for (i = 1; i < argc; i++)
     {
       if (strcmp (argv[i], "-u") == 0 || strcmp (argv[i], "--update") == 0)
@@ -116,6 +117,11 @@ main (int argc, char *argv[])
 	  azioni++;
 	  azione[azioni] = DEPENDENT;
 	}
+      else if (strcmp (argv[i], "--cache") == 0)
+	{
+	  azioni++;
+	  rebuild_cache = 1;
+	}
       else
 	{
 	  if (azione[azioni] == AGGIORNA)
@@ -160,10 +166,16 @@ main (int argc, char *argv[])
     return (1);
 
   repository = build_repolist ();
+  if (rebuild_cache)
+    {
+      FILE *file;
+      if ((file = fopen (CACHE, "w")))
+	fclose (file);
+    }
   ports = lsports ();
   pacchetti = lspacchetti ();
 
-  for (i = 0; i <= azioni; i++)
+  for (i = 0; i <= (azioni + rebuild_cache); i++)
     {
       switch (azione[i])
 	{
@@ -241,7 +253,7 @@ main (int argc, char *argv[])
 	    }
 	  else
 	    {
-	      printf ("pacchetto\n");
+	      printf ("package(s)\n");
 	    }
 	  break;
 	case DEPENDENT:
@@ -255,7 +267,7 @@ main (int argc, char *argv[])
 	    }
 	  else
 	    {
-	      printf ("pacchetto\n");
+	      printf ("package(s)\n");
 	    }
 	  break;
 	case AGGIORNATI:

@@ -72,6 +72,7 @@ aiuto ()
     ("\t--no-deps              do not check dependencies, install or remove only\n");
   printf
     ("\t--all                  shows or remove all dependents packages (sometime requires some minutes)\n");
+  printf ("\t--cache                rebuild the cache\n");
 }
 
 void

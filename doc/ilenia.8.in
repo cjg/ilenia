@@ -52,11 +52,24 @@ Used with \-U and \-R options, do not check dependencies
 .B "\-\-all"
 Used with \-T and \-R options, show or removes all dipendents packages
 .TP
+.B "\-\-cache"
+Forces ilenia to rebuild her cachefile, usefull when you modify ports in a local repository 
+.TP
 .B "\-v, \-\-version"
 Print version and exit.
 .TP
 .B "\-h, \-\-help"
 Print help and exit.
+.SH LOCAL REPOSITORY
+.TP
+You can use local repository on your machine. For make ilenia known them you have to create a file in "/etc/ports/" with ".local" extension (for example: my.local); in this file must be only a row, where is specified the fullpath of the local repository.
+For example:
+
+# my.local
+
+PATH="/home/ports"
+
+# End of file
 .SH FILES
 .TP
 .B "/usr/ports/"  
