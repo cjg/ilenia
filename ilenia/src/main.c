@@ -91,7 +91,8 @@ main (int argc, char *argv[])
 			//a=rimuovi_elemento("xchat",a);
 			//print_db(a);
 			stampa_dipendenze(argv[i+1]);
-			return (0);
+		  //printf("%s\n", il_piu_aggiornato(argv[i+1], lsports()));
+		  return (0);
 		}
 		else
 		{
