@@ -89,7 +89,7 @@ struct db * cerca_dipendenze(struct db *_pacchetti)
     d=dipendenze_pacchetto(_pacchetti->nome, _pacchetti->collezione);
     d=inserisci_elemento_inverso(_pacchetti->nome, "", _pacchetti->collezione, d);
     while(d!=NULL){
-      if(!(cerca(d->nome, dipendenze)))
+      if(esiste(d->nome, dipendenze)!=0)
 	dipendenze=inserisci_elemento_inverso(d->nome, "", d->collezione,dipendenze);
       d=d->prossimo;
     }
@@ -120,7 +120,7 @@ void stampa_dipendenze (char *pacchetto)
   while (d != NULL) {
     if(strcmp(d->collezione, "non trovato")!=0) {
       printf ("%s [", d->nome);
-      if (!(cerca (d->nome, pacchetti)))
+      if (esiste(d->nome, pacchetti)!=0)
 	printf (" ]\n");
       else
 	printf ("installato]\n");

@@ -27,182 +27,151 @@
 #include <string.h>
 #include "db.h"
 
-struct db *
-rimuovi_elemento (char *nome, struct db *p)
+int esiste (char *qualcosa, struct db *p)
 {
-	struct db *canc = NULL;
-	struct db *temp = NULL;
-	struct db *paz = NULL;
-	temp = p;
-	while (temp->prossimo && strcmp (temp->prossimo->nome, nome) != 0)
-	{
-		paz = inserisci_elemento_inverso (temp->nome, temp->versione,
-						  temp->collezione, paz);
-		temp = temp->prossimo;
-	}
-	paz = inserisci_elemento_inverso (temp->nome, temp->versione,
-					  temp->collezione, paz);
-	if (strcmp (temp->prossimo->nome, nome) == 0)
-	{
-		canc = temp->prossimo->prossimo;
-	}
-	while (canc != NULL)
-	{
-		paz = inserisci_elemento_inverso (canc->nome, canc->versione,
-						  canc->collezione, paz);
-		canc = canc->prossimo;
-	}
-	return (paz);
+  while(p!=NULL){
+    if(strcmp(p->nome, qualcosa)==0 || strcmp(p->versione, qualcosa)==0 || 
+       strcmp(p->collezione, qualcosa)==0)
+      return(0);
+    p=p->prossimo;
+  }
+  return(-1);
 }
 
-struct db *
-inserisci_elemento (char *_nome, char *_versione, char *_collezione,
-		    struct db *p)
+struct db * rimuovi_elemento (char *nome, struct db *p) 
 {
-	struct db *paus = NULL;
-	paus = (struct db *) malloc (sizeof (struct db));
-	strcpy (paus->nome, _nome);
-	strcpy (paus->versione, _versione);
-	strcpy (paus->collezione, _collezione);
-	if (p == NULL)
-	{
-		p = paus;
-		p->prossimo = NULL;
-	}
+  struct db *canc = NULL;
+  struct db *temp = NULL;
+  struct db *paz = NULL;
+  temp = p;
+  while (temp->prossimo && strcmp (temp->prossimo->nome, nome) != 0) {
+    paz = inserisci_elemento_inverso (temp->nome, temp->versione, temp->collezione, paz);
+    temp = temp->prossimo;
+  }
+  paz = inserisci_elemento_inverso (temp->nome, temp->versione, temp->collezione, paz);
+  if (strcmp (temp->prossimo->nome, nome) == 0) {
+    canc = temp->prossimo->prossimo;
+  }
+  while (canc != NULL) {
+    paz = inserisci_elemento_inverso (canc->nome, canc->versione, canc->collezione, paz);
+    canc = canc->prossimo;
+  }
+  return (paz);
+}
+
+struct db * inserisci_elemento (char *_nome, char *_versione, char *_collezione,
+				struct db *p)
+{
+  struct db *paus = NULL;
+  paus = (struct db *) malloc (sizeof (struct db));
+  strcpy (paus->nome, _nome);
+  strcpy (paus->versione, _versione);
+  strcpy (paus->collezione, _collezione);
+  if (p == NULL) {
+    p = paus;
+    p->prossimo = NULL;
+  } else {
+    paus->prossimo = p;
+    p = paus;
+  }
+  return (p);
+}
+
+struct db * inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
+					struct db *p)
+{
+  struct db *paus = NULL;
+  paus = (struct db *) malloc (sizeof (struct db));
+  strcpy (paus->nome, _nome);
+  strcpy (paus->versione, _versione);
+  strcpy (paus->collezione, _collezione);
+  if (p == NULL) {
+    p = paus;
+    p->prossimo = NULL;
+  } else {
+    struct db *paz = NULL;
+    /*while (p->prossimo)
+      p = p->prossimo;
+    */
+    paz=p;
+    while (paz->prossimo!=NULL)
+      paz = paz->prossimo;	
+    paus->prossimo=NULL;
+    paz->prossimo=paus;
+  }
+  return (p);
+}
+
+struct db * inserisci_elemento_ordinato (char *_nome, char *_versione, char *_collezione,
+					 struct db *p)
+{
+  struct db *paus = NULL;
+  struct db *paux = NULL;
+  int posizione;
+  paus = (struct db *) malloc (sizeof (struct db));
+  strcpy (paus->nome, _nome);
+  strcpy (paus->versione, _versione);
+  strcpy (paus->collezione, _collezione);
+  if (p == NULL) {
+    p = paus;
+    p->prossimo = NULL;
+  } else {
+    if (strcmp (p->nome, paus->nome) > 0) {
+      paus->prossimo = p;
+      p = paus;
+    } else {
+      paux = p;
+      posizione = 0;
+      while (paux->prossimo != NULL && posizione != 1) {
+	if (strcmp (paux->prossimo->nome, paus->nome) < 0)
+	  paux = paux->prossimo;
 	else
-	{
-		paus->prossimo = p;
-		p = paus;
-
-	}
-	return (p);
+	  posizione = 1;
+      }
+      paus->prossimo = paux->prossimo;
+      paux->prossimo = paus;
+    }
+  }
+  return (p);
 }
 
-struct db *
-inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
-			    struct db *p)
+struct db * cerca (char *parametro, struct db *p)
 {
-	struct db *paus = NULL;
-	paus = (struct db *) malloc (sizeof (struct db));
-	strcpy (paus->nome, _nome);
-	strcpy (paus->versione, _versione);
-	strcpy (paus->collezione, _collezione);
-	if (p == NULL)
-	{
-		p = paus;
-		p->prossimo = NULL;
-	}
-	else
-	{
-		struct db *paz = NULL;
-		/*while (p->prossimo)
-			p = p->prossimo;
-		*/
-		paz=p;
-		while (paz->prossimo!=NULL)
-		paz = paz->prossimo;	
-		paus->prossimo=NULL;
-		paz->prossimo=paus;
-	
-	}
-	return (p);
+  struct db *paus = NULL;
+  while (p != NULL) {
+    if ((strcmp (p->nome, parametro) == 0) || (strcmp (p->collezione, parametro) == 0)
+	|| (strcmp (p->versione, parametro) == 0)) {
+      paus = inserisci_elemento_ordinato (p->nome, p->versione, p->collezione, paus);
+    }
+    p = p->prossimo;
+  }
+  return (paus);
 }
 
-struct db *
-inserisci_elemento_ordinato (char *_nome, char *_versione, char *_collezione,
-			     struct db *p)
-{
-	struct db *paus = NULL;
-	struct db *paux = NULL;
-	int posizione;
-	paus = (struct db *) malloc (sizeof (struct db));
-	strcpy (paus->nome, _nome);
-	strcpy (paus->versione, _versione);
-	strcpy (paus->collezione, _collezione);
-	if (p == NULL)
-	{
-		p = paus;
-		p->prossimo = NULL;
-	}
-	else
-	{
-		if (strcmp (p->nome, paus->nome) > 0)
-		{
-			paus->prossimo = p;
-			p = paus;
-		}
-		else
-		{
-			paux = p;
-			posizione = 0;
-			while (paux->prossimo != NULL && posizione != 1)
-			{
-				if (strcmp (paux->prossimo->nome, paus->nome)
-				    < 0)
-					paux = paux->prossimo;
-				else
-					posizione = 1;
-			}
-			paus->prossimo = paux->prossimo;
-			paux->prossimo = paus;
-		}
-	}
-	return (p);
+int conta (struct db *p) {
+  int i;
+  struct db *paus;
+  for (paus = p, i = 0; paus; paus = paus->prossimo, i++) ;
+  return (i);
 }
 
-struct db *
-cerca (char *parametro, struct db *p)
-{
-	struct db *paus = NULL;
-	while (p != NULL)
-	{
-		if ((strcmp (p->nome, parametro) == 0)
-		    || (strcmp (p->collezione, parametro) == 0)
-		    || (strcmp (p->versione, parametro) == 0))
-		{
-			paus = inserisci_elemento_ordinato (p->nome,
-							    p->versione,
-							    p->collezione,
-							    paus);
-		}
-		p = p->prossimo;
-	}
-	return (paus);
-}
-
-int
-conta (struct db *p)
-{
-	int i;
-	struct db *paus;
-
-	for (paus = p, i = 0; paus; paus = paus->prossimo, i++) ;
-	return (i);
-}
-
-struct db *
-rimuovi_duplicati (struct db *p)
-{
-	struct db *paus = NULL;
-	struct db *paux = NULL;
-	while (p != NULL)
-	{
-		paus = inserisci_elemento (p->nome, p->versione,
-					   p->collezione, paus);
-		p = p->prossimo;
-	}
-	while (paus != NULL)
-	{
-		if (!cerca (paus->nome, paux))
-			paux = inserisci_elemento (paus->nome, paus->versione,
-						   paus->collezione, paux);
-		paus = paus->prossimo;
-	}
-	/*while (paus != NULL)
-	 * {
-	 * paux = inserisci_elemento (paus->nome, paus->versione,
-	 * paus->collezione, paux);
-	 * paus = paus->prossimo;
-	 * } */
-	return (paux);
+struct db * rimuovi_duplicati (struct db *p) {
+  struct db *paus = NULL;
+  struct db *paux = NULL;
+  while (p != NULL) {
+    paus = inserisci_elemento (p->nome, p->versione, p->collezione, paus);
+    p = p->prossimo;
+  }
+  while (paus != NULL) {
+    if (!cerca (paus->nome, paux))
+      paux = inserisci_elemento (paus->nome, paus->versione,  paus->collezione, paux);
+    paus = paus->prossimo;
+  }
+  /*while (paus != NULL)
+   * {
+   * paux = inserisci_elemento (paus->nome, paus->versione,
+   * paus->collezione, paux);
+   * paus = paus->prossimo;
+   * } */
+  return (paux);
 }

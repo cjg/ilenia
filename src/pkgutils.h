@@ -22,5 +22,6 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
  
+#define NODEPS -1
 int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto);
 int aggiorna_pacchetti (int opzioni_confronto);

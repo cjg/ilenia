@@ -74,7 +74,7 @@ int compila_e (int aggiorna, char *port)
   pid_t pid = fork ();
   if (pid == 0) {
     chdir (port);
-    execl ("/usr/bin/pkgmk", "", "-d", azione, 0);
+    execl ("/usr/bin/pkgmk", "", "-d", "-f",azione, 0);
   } else if (pid < 0) {
     stato = -1;
   } else {
@@ -100,7 +100,7 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   char port[255];
   struct db *p;
   /* aggiornare o installare?! */
-  if (cerca (pacchetto, pacchetti))
+  if (esiste (pacchetto, pacchetti)==0)
     aggiornare = 1;
   
   /* prendiamo il più aggiornato */
@@ -135,25 +135,30 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
 int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 {
   struct db *d = NULL;
-  d = dipendenze (pacchetto);
-  while (d->prossimo != NULL) {
-    printf ("%s [", d->nome);
-    if(strcmp(d->collezione, "non trovato")!=0){
-      if (!(cerca (d->nome, pacchetti))) {
-	//aggiorna_pacchetto_(opzioni_confronto, d->nome);
-	printf ("installa]\n");
-	if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
-	  return (-1);
+  if(opzioni_confronto>=0){
+    d = dipendenze (pacchetto);
+    while (d->prossimo != NULL) {
+      printf ("%s [", d->nome);
+      if(strcmp(d->collezione, "non trovato")!=0){
+	if (esiste (d->nome, pacchetti)!=0) {
+	  //aggiorna_pacchetto_(opzioni_confronto, d->nome);
+	  printf ("installa]\n");
+	  if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
+	    return (-1);
+	} else {
+	  printf ("installato]\n");
+	}
       } else {
-	printf ("installato]\n");
+	printf("non trovato]\n");
       }
-    } else {
-      printf("non trovato]\n");
+      d = d->prossimo;
     }
-    d = d->prossimo;
+    if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
+      return (-1);
+  } else {
+    if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
+      return (-1);
   }
-  if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
-    return (-1);
   return (0);
 }
 
