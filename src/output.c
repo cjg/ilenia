@@ -45,7 +45,7 @@ void print_db (struct db *p) {
 }
 
 void aiuto() {
-  printf("usage: ports [options] [collection ...] [packages]\n");
+  printf("usage: ilenia [options] [collection ...] [packages]\n");
   printf("options:\n");
   printf("\t-u, --update           update ports\n");
   printf("\t-l, --list             list ports\n");
