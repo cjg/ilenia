@@ -108,7 +108,7 @@ compila_e (int aggiorna, char *port)
       if (esegui_script (port, "post-install") != 0)
 	return (-1);
     }
-  if (strlen (post_pkgadd) > 0)
+  if (post_pkgadd)
     {
       FILE *post_pkgadd_sh;
       if ((post_pkgadd_sh = fopen ("/tmp/post_pkgadd.sh", "w")))
