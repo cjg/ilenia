@@ -99,7 +99,6 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    }
 	  if (strncmp (riga, "name", 4) == 0)
 	    {
-	      //strcpy (nome, get_value (riga, "name"));
 	      if (strlen (value = get_value (riga, "name")))
 		nome = strdup (value);
 	    }
@@ -152,8 +151,9 @@ parsa_cvsup (char *percorso)
   if ((file = fopen (percorso, "r")))
     {
       char riga[255];
-      char *prefix = "";
-      char *mad_prefix = "";
+      char prefix[255];
+      char mad_prefix[255];
+      char collezione[255];
       while (fgets (riga, 255, file))
 	{
 	  char *value = "";
@@ -164,28 +164,32 @@ parsa_cvsup (char *percorso)
 		{
 		  if (strlen (value = get_value (riga, "*default prefix")))
 		    {
-		      prefix = strdup (value);
+		      strcpy (prefix, value);
 		      if (strncmp
 			  (prefix, PORTS_LOCATION,
 			   strlen (PORTS_LOCATION)) == 0
 			  && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
-			  mad_prefix =
-			    mid (prefix, strlen (PORTS_LOCATION), FINE);
+			  strcpy (mad_prefix,
+				  mid (prefix, strlen (PORTS_LOCATION),
+				       FINE));
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
-			    mad_prefix = strcat (mad_prefix, "/");
-			  prefix = strdup (PORTS_LOCATION);
+			    strcat (mad_prefix, "/");
+			  strcpy (prefix, PORTS_LOCATION);
 			}
 
 		    }
 		}
 	      else if (strlen (riga) > 0)
 		{
-		  char *collezione = "";
 		  if (strlen (mad_prefix) > 0)
-		    collezione = strcat (mad_prefix, riga);
+		    {
+		      strcpy (collezione, mad_prefix);
+		      strcat (collezione, riga);
+		    }
 		  else
-		    collezione = strdup (riga);
+		    strcpy (collezione, riga);
+		  strcpy (collezione, strtok (collezione, " "));
 		  p =
 		    inserisci_elemento_ordinato (prefix, collezione, "", NULL,
 						 p);
@@ -297,6 +301,42 @@ parse_cvs (char *percorso)
 }
 
 struct db *
+parse_local (char *path)
+{
+  FILE *file;
+  struct db *p = NULL;
+  if ((file = fopen (path, "r")))
+    {
+      char row[255];
+      char *prefix = "";
+      char *mad_prefix = "";
+      char *collezione = "";
+      char *value = "";
+      while (fgets (row, 255, file))
+	{
+	  strcpy (row, trim (row));
+	  if (row[0] != '#')
+	    {
+	      if (strncmp (row, "PATH", 4) == 0)
+		{
+		  if (strlen (value = get_value (row, "PATH")))
+		    prefix = strdup (value);
+		}
+	    }
+	}
+      collezione = rindex (path, '/');
+      collezione =
+	mid (collezione, 0,
+	     strlen (collezione) - strlen (index (collezione, '.')));
+      mad_prefix = strdup ("local");
+      collezione = strcat (mad_prefix, strdup (collezione));
+      p = inserisci_elemento_ordinato (prefix, collezione, "", NULL, p);
+    }
+  return (p);
+}
+
+
+struct db *
 leggi_dir (char *collezione, char *prefix, struct db *p)
 {
   DIR *dir;
@@ -305,15 +345,16 @@ leggi_dir (char *collezione, char *prefix, struct db *p)
   char percorso[255];
   char nome_file[255];
   strcpy (percorso, prefix);
-  strcat (percorso, "/");
-  strcat (percorso, collezione);
+  if (strncmp (collezione, "local", 5) != 0)
+    {
+      strcat (percorso, "/");
+      strcat (percorso, collezione);
+    }
   if ((dir = opendir (percorso)))
     {
       while ((info_file = readdir (dir)))
 	{
-	  strcpy (nome_file, prefix);
-	  strcat (nome_file, "/");
-	  strcat (nome_file, collezione);
+	  strcpy (nome_file, percorso);
 	  strcat (nome_file, "/");
 	  strcat (nome_file, info_file->d_name);
 	  stat (nome_file, &tipo_file);
@@ -367,6 +408,11 @@ lsports_acrux_way ()
 	  else if (strcmp (estensione, "cvs") == 0)
 	    {
 	      p = parse_cvs (nome_file);
+	      ports = leggi_dir (p->versione, p->nome, ports);
+	    }
+	  else if (strcmp (estensione, "local") == 0)
+	    {
+	      p = parse_local (nome_file);
 	      ports = leggi_dir (p->versione, p->nome, ports);
 	    }
 	}
