@@ -253,13 +253,26 @@ aggiorna_pacchetti (int opzioni_confronto)
       return (-1);
     }
   struct db *p = NULL;
+  struct db *q = NULL;
   p = confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 0);
   while (p != NULL)
     {
-      printf ("%s\n", p->nome);
-      if (aggiorna_pacchetto_ (opzioni_confronto, p->nome) != 0)
-	return (-1);
+      if (esiste (p->nome, q) != 0)
+	{
+	  char *repo = il_piu_aggiornato (p->nome, p);
+	  q =
+	    inserisci_elemento_ordinato (p->nome,
+					 questa_collezione (p->nome, repo, p),
+					 repo, NULL, q);
+	}
       p = p->prossimo;
+    }
+  while (q != NULL)
+    {
+      printf ("%s\n", q->nome);
+      if (aggiorna_pacchetto_ (opzioni_confronto, q->nome) != 0)
+	return (-1);
+      q = q->prossimo;
     }
   return (0);
 }
