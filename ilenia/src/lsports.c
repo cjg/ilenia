@@ -104,14 +104,24 @@ struct db * parsa_httpup (char *percorso){
   if((file=fopen(percorso, "r"))){
     char riga[255];
     char prefix[255];
+    char collezione[255];
+    char pre_collezione[255];
     while (fgets (riga, 255, file)) {
       strcpy(riga, trim(riga));
       if(strncmp(riga, "ROOT_DIR=", 9)==0){
 	strcpy(prefix, mid(riga, 9, FINE));
 	strcpy(prefix, mid(prefix, 0, strlen(prefix)-strlen(rindex(prefix, '/'))));
+	if(strncmp(prefix,"/usr/ports/",11)==0){
+	  strcpy(pre_collezione, mid(prefix, 11,FINE));
+	  strcpy(prefix, "/usr/ports/");
+	  if(pre_collezione[strlen(pre_collezione)]!='/')
+	    strcat(pre_collezione, "/");
+	}
 	strcpy(riga, rindex(riga, '/'));
 	strcpy(riga, mid(riga, 1, FINE));
-	p=inserisci_elemento_ordinato(prefix, riga, "", p);
+	strcpy(collezione, pre_collezione);
+	strcat(collezione, riga);
+	p=inserisci_elemento_ordinato(prefix, collezione, "", p);
       }
     }
   }
