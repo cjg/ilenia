@@ -40,3 +40,4 @@ struct db *rimuovi_elemento(char *nome, struct db *p);
 struct db *rimuovi_duplicati(struct db *p);
 struct db *inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
 			    struct db *p);
+int esiste(char *qualcosa, struct db *p);

@@ -57,6 +57,7 @@ void aiuto() {
   printf("\t-h, --help             print help and exit\n");
   printf("\t--no-favorite-repo     ignore the user's favorite repos\n");
   printf("\t--no-favorite-version  ignore the user's favorite versions\n");
+  printf("\t--no-deps              do not check dependencies, install only\n");
 }
 
 void versione() {
