@@ -36,7 +36,6 @@ FILE *cachefile;
 
 struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
   FILE *pkgfile;
-  //printf("%s\n", percorso);
   if ((pkgfile = fopen (percorso, "r"))) {
     char riga[255] = "";
     char nome[255] = "";
@@ -65,7 +64,6 @@ struct db * parsa_pkgfile(char *percorso, char *collezione, struct db *p){
     }
     fclose (pkgfile);
   }
-  //print_db(p);
   return(p);
 }
 
@@ -110,9 +108,7 @@ struct db * parsa_httpup (char *percorso){
       strcpy(riga, trim(riga));
       if(strncmp(riga, "ROOT_DIR=", 9)==0){
 	strcpy(prefix, mid(riga, 9, FINE));
-	//printf("%s\n", prefix);
 	strcpy(prefix, mid(prefix, 0, strlen(prefix)-strlen(rindex(prefix, '/'))));
-	//printf("%s\n", prefix);
 	strcpy(riga, rindex(riga, '/'));
 	strcpy(riga, mid(riga, 1, FINE));
 	p=inserisci_elemento_ordinato(prefix, riga, "", p);
@@ -126,7 +122,6 @@ struct db * leggi_dir(char *collezione, char *prefix, struct db *p){
   DIR *dir;
   struct dirent *info_file;
   struct stat tipo_file; 
-  //printf("%s\n", collezione);
   char percorso[255];
   char nome_file[255];
   strcpy(percorso, prefix);
@@ -134,7 +129,6 @@ struct db * leggi_dir(char *collezione, char *prefix, struct db *p){
   strcat(percorso, collezione);
   if((dir=opendir(percorso))){
     while ((info_file = readdir (dir))) {
-      //printf("%s\n", info_file->d_name);
       strcpy (nome_file, prefix);
       strcat (nome_file, "/");
       strcat (nome_file, collezione);
@@ -147,7 +141,6 @@ struct db * leggi_dir(char *collezione, char *prefix, struct db *p){
       }
     }
   }
-  //print_db(p);
   return(p);
 }
 
@@ -172,14 +165,11 @@ struct db * lsports_acrux_way () {
       if (strcmp (estensione, "cvsup") == 0) {
 	p=parsa_cvsup(nome_file);
 	while(p!=NULL){
-	  //printf("%s %s\n", p->versione, p->nome);
 	  ports=leggi_dir(p->versione, p->nome, ports);
 	  p=p->prossimo;
 	}
-	//printf("%s\n", prefix);
       }	else if (strcmp (estensione, "httpup") == 0) {
 	p=parsa_httpup(nome_file);
-	//printf("%s %s\n", p->versione, p->nome);
 	ports=leggi_dir(p->versione, p->nome, ports);
       }
     }
@@ -194,9 +184,6 @@ struct db * lsports ()
   struct db *p = NULL;
   int update, cache;
   char riga[255];
-
-  //p=lsports_acrux_way();
-  //return p;
 
   if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
     fgets (riga, 255, cachefile);
@@ -225,7 +212,6 @@ struct db * lsports ()
 	strcpy (riga, mid (riga, strlen (versione), -1));
 	strcpy (riga, trim (riga));
 	strcpy (collezione, riga);
-	//printf("%s %s %s \n", nome, versione, collezione);
 	p = inserisci_elemento_ordinato (nome, versione, collezione, p);
       }
     } else {
@@ -236,4 +222,4 @@ struct db * lsports ()
     p= lsports_acrux_way();
   }
   return p;
- }
+}
