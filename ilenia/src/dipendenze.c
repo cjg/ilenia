@@ -78,12 +78,16 @@ struct db * dipendenze (char *pacchetto)
   struct db *d = NULL;
   char collezione[255];
   int i=-10;
-  strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
-  d = inserisci_elemento_inverso (pacchetto, "", collezione, NULL, d);
+  if(esiste(pacchetto, ports)==0){
+    strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
+    d = inserisci_elemento_inverso (pacchetto, "", collezione, NULL, d);
 
-  while (i != conta (d)) {
-    i = conta (d);
-    d = cerca_dipendenze (d);
+    while (i != conta (d)) {
+      i = conta (d);
+      d = cerca_dipendenze (d);
+    }
+  } else {
+    d = inserisci_elemento(pacchetto, "", "not found", NULL, d);
   }
   return (d);
 }
@@ -132,7 +136,9 @@ struct db * dipendenti (char *pacchetto, int all)
 void stampa_dipendenze (char *pacchetto)
 {
   struct db *d = NULL;
+  printf("entrato\n");
   d = dipendenze (pacchetto);
+  printf("tornato\n");
   while (d != NULL) {
     if(strcmp(d->collezione, "not found")!=0) {
       printf("%s [", d->nome);
