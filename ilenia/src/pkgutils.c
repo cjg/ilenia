@@ -35,11 +35,12 @@
 #include "lsports.h"
 #include "lspacchetti.h"
 
-int esegui_script (char *script) 
+int esegui_script (char *path, char *script) 
 {
   pid_t pid = fork ();
   int stato;
   if (pid == 0){
+    chdir(path);
     execl ("/bin/bash", "", script, 0);
   } else if (pid < 0) {
     stato = -1;
@@ -66,7 +67,7 @@ int compila_e (int aggiorna, char *port)
   strcat (install_script, "/pre-install");
   if ((file = fopen (install_script, "r"))) {
     fclose (file);
-    if (esegui_script (install_script) != 0)
+    if (esegui_script (port, "pre-install") != 0)
       return (-1);
   }
   
@@ -87,7 +88,7 @@ int compila_e (int aggiorna, char *port)
   strcat (install_script, "/post-install");
   if ((file = fopen (install_script, "r"))) {
     fclose (file);
-    if (esegui_script (install_script) != 0)
+    if (esegui_script (port, "post-install") != 0)
       return (-1);
   }
   return (0);
