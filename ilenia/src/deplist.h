@@ -28,5 +28,5 @@ struct deplist
   struct deplist *next;
 };
 
-struct deplist *add(char *pkg, struct deplist *p);
-int exists(char *delim, struct deplist *p);
+struct deplist *add (char *pkg, struct deplist *p);
+int exists (char *delim, struct deplist *p);

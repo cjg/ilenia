@@ -29,7 +29,9 @@
 #include "vercmp.h"
 #include "confronto.h"
 
-void print_formattato (char *str1, char *str2, char *str3, char *str4) {
+void
+print_formattato (char *str1, char *str2, char *str3, char *str4)
+{
   char tmp[255];
   strcpy (tmp, str1);
   strcat (tmp, spazi (21 - strlen (str1)));
@@ -45,93 +47,128 @@ void print_formattato (char *str1, char *str2, char *str3, char *str4) {
   printf ("%s\n", tmp);
 }
 
-struct db *confronta (struct db *pacchetti_db, struct db *ports_db, int tipo, 
-		      int opzioni, int stampa) {
+struct db *
+confronta (struct db *pacchetti_db, struct db *ports_db,
+	   int tipo, int opzioni, int stampa)
+{
   struct db *p = NULL;
   struct db *c = NULL;
   if (stampa)
-    printf ("Name                   Installed Version  Repository               Port Version \n");
-  while (pacchetti_db != NULL) {
-    p = ports_db;
-    while (p != NULL) {
-      if (strcmp (p->nome, pacchetti_db->nome) == 0) {
-	int test;
-	int skip = 0;
-	if (tipo == DIFFERENZE) {
-	  test = strcmp (pacchetti_db->versione, p->versione);
-	} else {
-	  test = vercmp (pacchetti_db->versione, p->versione);
+    printf
+      ("Name                   Installed Version  Repository               Port Version \n");
+  while (pacchetti_db != NULL)
+    {
+      p = ports_db;
+      while (p != NULL)
+	{
+	  if (strcmp (p->nome, pacchetti_db->nome) == 0)
+	    {
+	      int test;
+	      int skip = 0;
+	      if (tipo == DIFFERENZE)
+		{
+		  test = strcmp (pacchetti_db->versione, p->versione);
+		}
+	      else
+		{
+		  test = vercmp (pacchetti_db->versione, p->versione);
+		}
+	      if ((pacchetti_db->collezione[0] == 'R')
+		  && (opzioni != NO_REPO && opzioni != NO_FAVORITE))
+		{
+		  if (strcmp
+		      (mid (pacchetti_db->collezione, 2, FINE),
+		       p->collezione) != 0)
+		    skip = 1;
+		}
+	      if ((pacchetti_db->collezione[0] == 'V')
+		  && (opzioni != NO_VERSION && opzioni != NO_FAVORITE))
+		{
+		  if (strcmp
+		      (mid (pacchetti_db->collezione, 2, FINE),
+		       pacchetti_db->versione) == 0)
+		    skip = 1;
+		}
+	      if (test != 0 && skip != 1)
+		{
+		  c = inserisci_elemento_ordinato (pacchetti_db->nome,
+						   p->versione,
+						   p->collezione, NULL, c);
+		  if (stampa)
+		    print_formattato (pacchetti_db->nome,
+				      pacchetti_db->versione,
+				      p->collezione, p->versione);
+		}
+	    }
+	  p = p->prossimo;
 	}
-	if ((pacchetti_db->collezione[0] == 'R') && (opzioni != NO_REPO
-						     && opzioni != NO_FAVORITE)) {
-	  if (strcmp (mid (pacchetti_db->collezione, 2, FINE), p->collezione) != 0)
-	    skip = 1;
-	}
-	if ((pacchetti_db->collezione[0] == 'V') && (opzioni != NO_VERSION
-						     && opzioni != NO_FAVORITE)) {
-	  if (strcmp (mid (pacchetti_db->collezione, 2, FINE),
-		      pacchetti_db->versione) == 0)
-	    skip = 1;
-	}
-	if (test != 0 && skip != 1) {
-	  c = inserisci_elemento_ordinato (pacchetti_db->nome, p->versione, p->collezione,
-					   NULL, c);
-	  if (stampa)
-	    print_formattato(pacchetti_db->nome, pacchetti_db->versione, p->collezione,
-			     p->versione);
-	}
-      }
-      p = p->prossimo;
+      pacchetti_db = pacchetti_db->prossimo;
     }
-    pacchetti_db = pacchetti_db->prossimo;
-  }
   return (c);
 }
 
-char * il_piu_aggiornato (char *pacchetto, struct db *p) {
+char *
+il_piu_aggiornato (char *pacchetto, struct db *p)
+{
   char _versione[255] = "";
   static char _collezione[255] = "";
-  while (p != NULL) {
-    if (strcmp (pacchetto, p->nome) == 0) {
-      if (strcmp (_versione, "") == 0) {
-	strcpy (_versione, p->versione);
-	strcpy (_collezione, p->collezione);
-      }	else {
-	if (vercmp (_versione, p->versione)) {
-	  strcpy (_versione, p->versione);
-	  strcpy (_collezione, p->collezione);
+  while (p != NULL)
+    {
+      if (strcmp (pacchetto, p->nome) == 0)
+	{
+	  if (strcmp (_versione, "") == 0)
+	    {
+	      strcpy (_versione, p->versione);
+	      strcpy (_collezione, p->collezione);
+	    }
+	  else
+	    {
+	      if (vercmp (_versione, p->versione))
+		{
+		  strcpy (_versione, p->versione);
+		  strcpy (_collezione, p->collezione);
+		}
+	    }
 	}
-      }
+      p = p->prossimo;
     }
-    p = p->prossimo;
-  }
   return ((char *) _collezione);
 }
 
-char * questa_versione (char *nome, char *versione, struct db *p) {
+char *
+questa_versione (char *nome, char *versione, struct db *p)
+{
   static char collezione[255] = "";
-  while (p != NULL) {
-    if (strcmp (nome, p->nome) == 0) {
-      if (strcmp (versione, p->versione) == 0) {
-	strcpy (collezione, p->collezione);
-	return (p->collezione);
-      }
+  while (p != NULL)
+    {
+      if (strcmp (nome, p->nome) == 0)
+	{
+	  if (strcmp (versione, p->versione) == 0)
+	    {
+	      strcpy (collezione, p->collezione);
+	      return (p->collezione);
+	    }
+	}
+      p = p->prossimo;
     }
-    p = p->prossimo;
-  }
   return ((char *) collezione);
 }
 
-char * questa_collezione (char *nome, char *collezione, struct db *p) {
+char *
+questa_collezione (char *nome, char *collezione, struct db *p)
+{
   static char versione[255] = "";
-  while (p != NULL) {
-    if (strcmp (nome, p->nome) == 0) {
-      if (strcmp (collezione, p->collezione) == 0) {
-	strcpy (versione, p->versione);
-	return (p->versione);
-      }
+  while (p != NULL)
+    {
+      if (strcmp (nome, p->nome) == 0)
+	{
+	  if (strcmp (collezione, p->collezione) == 0)
+	    {
+	      strcpy (versione, p->versione);
+	      return (p->versione);
+	    }
+	}
+      p = p->prossimo;
     }
-    p = p->prossimo;
-  }
   return ((char *) versione);
 }

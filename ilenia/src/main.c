@@ -19,12 +19,14 @@
 #define RIMUOVI         9
 #define DEPENDENT      10
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
-  if (argc < 2) {
-    aiuto ();
-    return (0);
-  }
+  if (argc < 2)
+    {
+      aiuto ();
+      return (0);
+    }
   int i;
   int azione[argc];
   char opzione[argc][255];
@@ -38,162 +40,232 @@ int main (int argc, char *argv[])
   int opzioni_p = -1;
   int opzioni_d = -1;
   int opzioni_l = -1;
-  int opzioni_r = -1; 
+  int opzioni_r = -1;
   int opzioni_t = -1;
   int opzioni_confronto = 0;
-  int controlla_dipendenze=0;
-  int all=0;
-  for (i = 1; i < argc; i++) {
-    if (strcmp (argv[i], "-u") == 0 || strcmp (argv[i], "--update") == 0) {
-      azioni++;
-      azione[azioni] = AGGIORNA;
-    } else if (strcmp (argv[i], "-l") == 0 || strcmp (argv[i], "--list") == 0) {
-      azioni++;
-      azione[azioni] = LSPORTS;
-    } else if (strcmp (argv[i], "-d") == 0 || strcmp (argv[i], "--diff") == 0) {
-      azioni++;
-      azione[azioni] = DIFFERENZE;
-    } else if (strcmp (argv[i], "-p") == 0 || strcmp (argv[i], "--updated") == 0) {
-      azioni++;
-      azione[azioni] = AGGIORNATI;
-    } else if (strcmp (argv[i], "-v") == 0 || strcmp (argv[i], "--version") == 0) {
-      azioni++;
-      azione[azioni] = VERSIONE;
-    } else if (strcmp (argv[i], "-h") == 0 || strcmp (argv[i], "--help") == 0) {
-      azioni++;
-      azione[azioni] = AIUTO;
-    } else if (strcmp (argv[i], "--no-favorite-repo") == 0) {
-      opzioni_confronto += NO_REPO;
-    } else if (strcmp (argv[i], "--no-favorite-version") == 0) {
-      opzioni_confronto += NO_VERSION;
-    } else if (strcmp (argv[i], "--no-deps") == 0) {
-      controlla_dipendenze = NODEPS;
-    } else if (strcmp (argv[i], "--all") == 0) {
-      all = 1;
-    } else if (strcmp (argv[i], "-U") == 0) {
-      azioni++;
-      azione[azioni] = AGGIORNA_P;
-    } else if (strcmp (argv[i], "-D") == 0) {
-      azioni++;
-      azione[azioni]=DIPENDENZE;
-    } else if (strcmp (argv[i], "-R") == 0) {
-      azioni++;
-      azione[azioni]=RIMUOVI;
-    } else if (strcmp (argv[i], "-T") == 0) {
-      azioni++;
-      azione[azioni]=DEPENDENT;
-    } else {
-      if (azione[azioni] == AGGIORNA) {
-	opzioni++;
-	strcpy (opzione[opzioni], argv[i]);
-      } else if (azione[azioni] == AGGIORNA_P) {
-	opzioni_p++;
-	strcpy (opzione_p[opzioni_p], argv[i]);
-      } else if (azione[azioni] == DIPENDENZE) {
-	opzioni_d++;
-	strcpy (opzione_d[opzioni_d], argv[i]);
-      } else if (azione[azioni] == LSPORTS) {
-	opzioni_l++;
-	strcpy (opzione_l[opzioni_l], argv[i]);
-      } else if (azione[azioni] == RIMUOVI) {
-	opzioni_r++;
-	strcpy (opzione_r[opzioni_r], argv[i]);
-      } else if (azione[azioni] == DEPENDENT) {
-	opzioni_t++;
-	strcpy (opzione_t[opzioni_t], argv[i]);
-      }
-    } 
-  }
-
-  if(azioni<0){
-    aiuto();
-    return(0);
-  }
-  
-  ports=lsports();
-  pacchetti=lspacchetti();
-
-  for (i = 0; i <= azioni; i++)	{
-    switch (azione[i]) {
-    case DIPENDENZE:
-      if (opzioni_d != -1) {
-	int j;
-	for (j = 0; j <= opzioni_d; j++) {
-	  stampa_dipendenze (opzione_d[j]);
+  int controlla_dipendenze = 0;
+  int all = 0;
+  for (i = 1; i < argc; i++)
+    {
+      if (strcmp (argv[i], "-u") == 0 || strcmp (argv[i], "--update") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = AGGIORNA;
 	}
-      }	else {
-	printf("pacchetto\n");
-      }
-      break;
-    case AGGIORNA_P:
-      if(opzioni_confronto)
-	opzioni=opzioni_confronto*controlla_dipendenze;
+      else if (strcmp (argv[i], "-l") == 0 || strcmp (argv[i], "--list") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = LSPORTS;
+	}
+      else if (strcmp (argv[i], "-d") == 0 || strcmp (argv[i], "--diff") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = DIFFERENZE;
+	}
+      else if (strcmp (argv[i], "-p") == 0
+	       || strcmp (argv[i], "--updated") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = AGGIORNATI;
+	}
+      else if (strcmp (argv[i], "-v") == 0
+	       || strcmp (argv[i], "--version") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = VERSIONE;
+	}
+      else if (strcmp (argv[i], "-h") == 0 || strcmp (argv[i], "--help") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = AIUTO;
+	}
+      else if (strcmp (argv[i], "--no-favorite-repo") == 0)
+	{
+	  opzioni_confronto += NO_REPO;
+	}
+      else if (strcmp (argv[i], "--no-favorite-version") == 0)
+	{
+	  opzioni_confronto += NO_VERSION;
+	}
+      else if (strcmp (argv[i], "--no-deps") == 0)
+	{
+	  controlla_dipendenze = NODEPS;
+	}
+      else if (strcmp (argv[i], "--all") == 0)
+	{
+	  all = 1;
+	}
+      else if (strcmp (argv[i], "-U") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = AGGIORNA_P;
+	}
+      else if (strcmp (argv[i], "-D") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = DIPENDENZE;
+	}
+      else if (strcmp (argv[i], "-R") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = RIMUOVI;
+	}
+      else if (strcmp (argv[i], "-T") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = DEPENDENT;
+	}
       else
-	opzioni=controlla_dipendenze;
-      if (opzioni_p != -1) {
-	int j;
-	for (j = 0; j <= opzioni_p; j++) {
-	  aggiorna_pacchetto (opzioni, opzione_p[j]);
+	{
+	  if (azione[azioni] == AGGIORNA)
+	    {
+	      opzioni++;
+	      strcpy (opzione[opzioni], argv[i]);
+	    }
+	  else if (azione[azioni] == AGGIORNA_P)
+	    {
+	      opzioni_p++;
+	      strcpy (opzione_p[opzioni_p], argv[i]);
+	    }
+	  else if (azione[azioni] == DIPENDENZE)
+	    {
+	      opzioni_d++;
+	      strcpy (opzione_d[opzioni_d], argv[i]);
+	    }
+	  else if (azione[azioni] == LSPORTS)
+	    {
+	      opzioni_l++;
+	      strcpy (opzione_l[opzioni_l], argv[i]);
+	    }
+	  else if (azione[azioni] == RIMUOVI)
+	    {
+	      opzioni_r++;
+	      strcpy (opzione_r[opzioni_r], argv[i]);
+	    }
+	  else if (azione[azioni] == DEPENDENT)
+	    {
+	      opzioni_t++;
+	      strcpy (opzione_t[opzioni_t], argv[i]);
+	    }
 	}
-      }	else {
-	aggiorna_pacchetti (opzioni);
-      }
-      break;
-    case AGGIORNA:
-      if (opzioni < 0) {
-	aggiorna_ports ();
-      }	else {
-	int j;
-	for (j = 0; j <= opzioni; j++) {
-	  aggiorna_collezione (opzione[j]);
-	}
-      }
-      break;
-    case LSPORTS:
-      if(opzioni_l==-1)
-	print_db (ports);
-      else {
-	struct db *p=NULL;
-	int j;
-	for (j = 0; j <= opzioni_l; j++) {
-	  p=cerca(opzione_l[j], ports);
-	  print_db(p);
-	}
-      }
-      break;
-    case DIFFERENZE:
-      confronta (pacchetti, ports, DIFFERENZE, opzioni_confronto, 1);
-      break;
-    case RIMUOVI:
-      if (opzioni_r != -1) {
-	int j;
-	for (j = 0; j <= opzioni_r; j++) {
-	  pkgrm (opzione_r[j], controlla_dipendenze, all);
-	}
-      }	else {
-	printf("pacchetto\n");
-      }
-      break;
-    case DEPENDENT:
-      if (opzioni_t != -1) {
-	int j;
-	for (j = 0; j <= opzioni_t; j++) {
-	  stampa_dipendenti (opzione_t[j], all);
-	}
-      }	else {
-	printf("pacchetto\n");
-      }
-      break;
-    case AGGIORNATI:
-      confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 1);
-      break;
-    case VERSIONE:
-      versione ();
-      break;
-    case AIUTO:
-      aiuto ();
-      break;
     }
-  }
+
+  if (azioni < 0)
+    {
+      aiuto ();
+      return (0);
+    }
+  if(parse_ileniarc()!=0)
+    return(1);
+
+  ports = lsports ();
+  pacchetti = lspacchetti ();
+
+  for (i = 0; i <= azioni; i++)
+    {
+      switch (azione[i])
+	{
+	case DIPENDENZE:
+	  if (opzioni_d != -1)
+	    {
+	      int j;
+	      for (j = 0; j <= opzioni_d; j++)
+		{
+		  stampa_dipendenze (opzione_d[j]);
+		}
+	    }
+	  else
+	    {
+	      printf ("pacchetto\n");
+	    }
+	  break;
+	case AGGIORNA_P:
+	  if (opzioni_confronto)
+	    opzioni = opzioni_confronto * controlla_dipendenze;
+	  else
+	    opzioni = controlla_dipendenze;
+	  if (opzioni_p != -1)
+	    {
+	      int j;
+	      for (j = 0; j <= opzioni_p; j++)
+		{
+		  aggiorna_pacchetto (opzioni, opzione_p[j]);
+		}
+	    }
+	  else
+	    {
+	      aggiorna_pacchetti (opzioni);
+	    }
+	  break;
+	case AGGIORNA:
+	  if (opzioni < 0)
+	    {
+	      aggiorna_ports ();
+	    }
+	  else
+	    {
+	      int j;
+	      for (j = 0; j <= opzioni; j++)
+		{
+		  aggiorna_collezione (opzione[j]);
+		}
+	    }
+	  break;
+	case LSPORTS:
+	  if (opzioni_l == -1)
+	    print_db (ports);
+	  else
+	    {
+	      struct db *p = NULL;
+	      int j;
+	      for (j = 0; j <= opzioni_l; j++)
+		{
+		  p = cerca (opzione_l[j], ports);
+		  print_db (p);
+		}
+	    }
+	  break;
+	case DIFFERENZE:
+	  confronta (pacchetti, ports, DIFFERENZE, opzioni_confronto, 1);
+	  break;
+	case RIMUOVI:
+	  if (opzioni_r != -1)
+	    {
+	      int j;
+	      for (j = 0; j <= opzioni_r; j++)
+		{
+		  pkgrm (opzione_r[j], controlla_dipendenze, all);
+		}
+	    }
+	  else
+	    {
+	      printf ("pacchetto\n");
+	    }
+	  break;
+	case DEPENDENT:
+	  if (opzioni_t != -1)
+	    {
+	      int j;
+	      for (j = 0; j <= opzioni_t; j++)
+		{
+		  stampa_dipendenti (opzione_t[j], all);
+		}
+	    }
+	  else
+	    {
+	      printf ("pacchetto\n");
+	    }
+	  break;
+	case AGGIORNATI:
+	  confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 1);
+	  break;
+	case VERSIONE:
+	  versione ();
+	  break;
+	case AIUTO:
+	  aiuto ();
+	  break;
+	}
+    }
   return (0);
 }

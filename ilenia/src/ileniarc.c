@@ -1,7 +1,7 @@
 /***************************************************************************
- *            deplist.c
+ *            aggiorna.c
  *
- *  Mon Dec 20 13:58:12 2004
+ *  Tue Feb 15 19:02:36 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
@@ -20,39 +20,40 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
  */
 
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include "deplist.h"
+#include "manipola.h"
+#include "ilenia.h"
 
-struct deplist *
-add (char *pkg, struct deplist *p)
-{
-  struct deplist *paus = NULL;
-  paus = (struct deplist *) malloc (sizeof (struct deplist));
-  strcpy (paus->pkg, pkg);
-  if (p == NULL)
-    {
-      p = paus;
-      p->next = NULL;
-    }
-  else
-    {
-      paus->next = p;
-      p = paus;
-    }
-  return (p);
-}
 
 int
-exists (char *delim, struct deplist *p)
+parse_ileniarc()
 {
-  while (p != NULL)
+  FILE * rc;
+  if((rc=fopen("/etc/ilenia.rc", "r")))
     {
-      if (strcmp (p->pkg, delim) == 0)
-	return (1);
-      p = p->next;
+      char row[MASSIMO];
+      while (fgets (row, MASSIMO, rc))
+	{
+	  strcpy(row, trim (row));
+	  if (row[0] != '#')
+	    {
+	      if(strncmp(row, "POST_PKGADD", 11)==0)
+		{
+		  char splitted_row[2][MASSIMO];
+		  split(row, "=", splitted_row);
+		  strcpy(row, mid(splitted_row[1],1,FINE));
+		  strcpy(row, trim(row));
+		  strcpy(row, mid(row, 1, strlen(row)-2));
+		  post_pkgadd=strdup(row);
+		}
+	    }
+	}
     }
-  return (0);
+  else
+    return(1);
+  return(0);
 }
