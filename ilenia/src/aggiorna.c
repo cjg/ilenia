@@ -86,7 +86,7 @@ int cvs (char *filepath){
   int state;
   pid_t pid = fork ();
   if (pid == 0) {
-    execl ("/etc/ports/driver/cvs", "", filepath, 0);
+    execl ("/etc/ports/drivers/cvs", "", filepath, 0);
   } else if (pid < 0) {
     state = -1;
   } else {
