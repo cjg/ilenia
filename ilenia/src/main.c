@@ -132,12 +132,6 @@ int main (int argc, char *argv[])
 	opzioni=controlla_dipendenze;
       if (opzioni_p != -1) {
 	int j;
-	/*int opz;
-	if(opzioni_confronto)
-	  opz=opzioni_confronto*controlla_dipendenze;
-	else
-	  opz=controlla_dipendenze;
-	*/
 	for (j = 0; j <= opzioni_p; j++) {
 	  aggiorna_pacchetto (opzioni, opzione_p[j]);
 	}
@@ -174,7 +168,6 @@ int main (int argc, char *argv[])
       if (opzioni_r != -1) {
 	int j;
 	for (j = 0; j <= opzioni_r; j++) {
-	  //stampa_dipendenti (opzione_r[j]);
 	  pkgrm (opzione_r[j], controlla_dipendenze, all);
 	}
       }	else {

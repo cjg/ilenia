@@ -2,7 +2,7 @@
  *            db.c
  *
  *  Sat Jul 10 12:04:21 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -101,9 +101,6 @@ struct db * inserisci_elemento_inverso (char *_nome, char *_versione, char *_col
     p->prossimo = NULL;
   } else {
     struct db *paz = NULL;
-    /*while (p->prossimo)
-      p = p->prossimo;
-    */
     paz=p;
     while (paz->prossimo!=NULL)
       paz = paz->prossimo;	
@@ -184,11 +181,5 @@ struct db * rimuovi_duplicati (struct db *p) {
     }
     paus = paus->prossimo;
   }
-  /*while (paus != NULL)
-   * {
-   * paux = inserisci_elemento (paus->nome, paus->versione,
-   * paus->collezione, paux);
-   * paus = paus->prossimo;
-   * } */
   return (paux);
 }

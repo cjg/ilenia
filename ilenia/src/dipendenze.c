@@ -2,7 +2,7 @@
  *            dipendenze.c
  *
  *  Sat Sep 11 18:04:21 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -35,62 +35,20 @@
 
 struct db * dipendenze_pacchetto(char * pacchetto, char * collezione)
 {
-  /*
-  char pkgfile[255];
-  struct db * dipendenze=NULL;
-  FILE * file;
-  strcpy (pkgfile, "/usr/ports/");
-  strcat (pkgfile, collezione);
-  strcat (pkgfile, "/");
-  strcat (pkgfile, pacchetto);
-  strcat (pkgfile, "/Pkgfile");
-  if ((file = fopen (pkgfile, "r")))	{
-    char riga[MASSIMO] = "";
-    char dep[MASSIMO] = "";
-    while (fgets (riga, MASSIMO, file)) {
-      if (riga[0] == '#') {
-	strcpy (riga, mid (riga, 1, FINE));
-	strcpy (riga, trim (riga));
-	if (strncasecmp (riga, "Depends", 7) == 0) {
-	  strcpy (riga, mid (strstr (riga, ":"), 1, FINE));
-	  strcpy (dep, trim (riga));
-	  break;
-	}
-      }
-    }
-    if (strlen (dep) > 0) {
-      char tmp[MASSIMO];
-      strcpy (dep, sed (dep, " ", ","));
-      while (strlen (dep) > 0) {
-	if (strstr (dep, ",")) {
-	  strcpy (tmp, strstr (dep, ","));
-	  strcpy (tmp, mid (dep, 0, strlen (dep) - strlen (tmp)));
-	  strcpy (dep, mid (strstr (dep, ","), 1, FINE));
-	} else {
-	  strcpy (tmp, dep);
-	  strcpy (dep, "");
-	}
-	strcpy (tmp, trim (tmp));
-	if(strlen(tmp)>0)
-	  dipendenze=inserisci_elemento_inverso(tmp,"", il_piu_aggiornato(tmp, ports),
-						NULL, dipendenze);
-	strcpy (riga, trim (riga));
-      }
-    }
-    fclose(file);
-  } else {
-    dipendenze=inserisci_elemento(pacchetto, "", "not found", NULL, dipendenze);
-  }
-  return(dipendenze);
-  */
   struct db * thispkg = NULL;
   struct db * dependencies = NULL;
   thispkg = cerca (pacchetto, ports);
   thispkg = cerca (collezione, thispkg);
   while (thispkg->depends!=NULL){
-    dependencies=inserisci_elemento_inverso(thispkg->depends->pkg, "",
-					    il_piu_aggiornato(thispkg->depends->pkg, 
-							      ports), NULL, dependencies);
+    char collection[255];
+    if(esiste(thispkg->depends->pkg, ports)==0)
+      dependencies=inserisci_elemento_inverso(thispkg->depends->pkg, "", 
+					      il_piu_aggiornato(thispkg->depends->pkg, 
+								ports), 
+					      NULL, dependencies);
+    else
+      dependencies=inserisci_elemento_inverso(thispkg->depends->pkg, "", "not found", 
+					      NULL, dependencies);
     thispkg->depends=thispkg->depends->next;
   }
   return(dependencies);
@@ -100,14 +58,16 @@ struct db * cerca_dipendenze(struct db *_pacchetti)
 {
   struct db *dipendenze=NULL;
   while(_pacchetti!=NULL){
-    struct db *d=NULL;
-    d=dipendenze_pacchetto(_pacchetti->nome, _pacchetti->collezione);
-    d=inserisci_elemento_inverso(_pacchetti->nome, "", _pacchetti->collezione, NULL, d);
-    while(d!=NULL){
-      if(esiste(d->nome, dipendenze)!=0)
-	dipendenze=inserisci_elemento_inverso(d->nome, "", d->collezione, NULL, 
-					      dipendenze);
-      d=d->prossimo;
+    if(strcmp(_pacchetti->collezione, "not found")!=0){
+      struct db *d=NULL;
+      d=dipendenze_pacchetto(_pacchetti->nome, _pacchetti->collezione);
+      d=inserisci_elemento_inverso(_pacchetti->nome, "", _pacchetti->collezione, NULL, d);
+      while(d!=NULL){
+	if(esiste(d->nome, dipendenze)!=0)
+	  dipendenze=inserisci_elemento_inverso(d->nome, "", d->collezione, NULL, 
+						dipendenze);
+	d=d->prossimo;
+      }
     }
     _pacchetti=_pacchetti->prossimo;
   }
@@ -136,12 +96,9 @@ struct db * cerca_dipendenti(struct db *_pacchetti)
   while(_pacchetti!=NULL){
     struct db * p=NULL;
     p=pacchetti;
-    //printf("_pacchetti %s\n", _pacchetti->nome);
     while(p!=NULL){
-      //printf("p %s\n", p->nome);
       char repo[255];
       strcpy(repo, il_piu_aggiornato(p->nome,  ports));
-      //printf("repo %s\n", repo);
       struct db * tmp=NULL;
       if((tmp=cerca(repo, cerca(p->nome, ports)))){
 	if(exists(_pacchetti->nome, tmp->depends)) {

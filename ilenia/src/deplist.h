@@ -2,7 +2,7 @@
  *            deplist.h
  *
  *  Mon Dec 20 13:55:35 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -24,16 +24,9 @@
 
 struct deplist
 {
-	char pkg[255];
-	struct deplist *next;
+  char pkg[255];
+  struct deplist *next;
 };
 
 struct deplist *add(char *pkg, struct deplist *p);
 int exists(char *delim, struct deplist *p);
-//struct deplist *cerca (char *parametro, struct db *p);
-//int conta(struct db *p);
-//struct db *rimuovi_elemento(char *nome, struct db *p);
-//struct db *rimuovi_duplicati(struct db *p);
-//struct db *inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
-//			    struct db *p);
-//int exists(char *qualcosa, struct db *p);

@@ -2,7 +2,7 @@
  *            pkgutils.c
  *
  *  Wed Sep  1 18:55:42 2004
- *  Copyright  2004  Coviello Giuseppe
+ *  Copyright  2004 - 2005  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -62,7 +62,6 @@ int compila_e (int aggiorna, char *port)
   } else {
     strcpy (azione, "-i");
   }
-  /* pre-install */
   strcpy (install_script, port);
   strcat (install_script, "/pre-install");
   if ((file = fopen (install_script, "r"))) {
@@ -84,7 +83,6 @@ int compila_e (int aggiorna, char *port)
   }
   if(stato!=0)
     return(stato);
-  /* post-install */
   strcpy (install_script, port);
   strcat (install_script, "/post-install");
   if ((file = fopen (install_script, "r"))) {
@@ -101,14 +99,11 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   char collezione[255];
   char port[255];
   struct db *p;
-  /* aggiornare o installare?! */
   if (esiste (pacchetto, pacchetti)==0)
     aggiornare = 1;
   
-  /* prendiamo il più aggiornato */
   strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
 
-  /* è controllato da favoriterepo?! */
   if (opzioni_confronto != NO_REPO && opzioni_confronto != NO_FAVORITE) {
     p = prendi_favorite (REPO);
     if ((p = cerca (pacchetto, p))) {
@@ -116,12 +111,9 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
     }
   }
   
-  /* è controllato da favoriteversion?! */
   if (opzioni_confronto != NO_VERSION && opzioni_confronto != NO_FAVORITE) {
     p = prendi_favorite (VERSIONE);
     if ((p = cerca (pacchetto, p))) {
-      /* adesso devo vedere quale repo ha quel pacchetto con quella 
-       * versione */
       strcpy (collezione, questa_versione (pacchetto, p->versione, ports));
     }
   }
@@ -147,7 +139,6 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
       printf ("%s [", d->nome);
       if(strcmp(d->collezione, "not found")!=0){
 	if (esiste (d->nome, pacchetti)!=0) {
-	  //aggiorna_pacchetto_(opzioni_confronto, d->nome);
 	  printf ("install now]\n");
 	  if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
 	    return (-1);
@@ -191,8 +182,8 @@ int do_pkgrm (char *pkg)
 {
   int stato;
   pid_t pid = fork ();
-  printf("Removing %s\n", pkg);
   if (pid == 0) {
+    printf("Removing %s\n", pkg);
     execl ("/usr/bin/pkgrm", "pkgrm", pkg, 0);
   } else if (pid < 0) {
     stato = -1;
