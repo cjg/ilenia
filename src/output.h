@@ -25,4 +25,4 @@
 
 void print_db (struct db *p);
 void aiuto ();
-void versione();
+void versione ();

@@ -29,41 +29,53 @@
 #include "../config.h"
 #include "deplist.h"
 
-void print_db (struct db *p) {
+void
+print_db (struct db *p)
+{
   char s[MASSIMO];
   printf ("Package                       Version  Repository\n");
-  while (p != NULL) {
-    strcpy (s, p->nome);
-    strcat (s, spazi (22 - strlen (p->nome)));
-    strcat (s, spazi (15 - strlen (p->versione)));
-    strcat (s, p->versione);
-    strcat (s, spazi(2));
-    strcat (s, p->collezione);
-    printf ("%s\n", s);
-    p = p->prossimo;
-  }
+  while (p != NULL)
+    {
+      strcpy (s, p->nome);
+      strcat (s, spazi (22 - strlen (p->nome)));
+      strcat (s, spazi (15 - strlen (p->versione)));
+      strcat (s, p->versione);
+      strcat (s, spazi (2));
+      strcat (s, p->collezione);
+      printf ("%s\n", s);
+      p = p->prossimo;
+    }
   printf ("\n");
 }
 
-void aiuto() {
-  printf("usage: ilenia [options] [collections] [packages]\n");
-  printf("options:\n");
-  printf("\t-u, --update           update ports\n");
-  printf("\t-l, --list             list ports\n");
-  printf("\t-d, --diff             list version differences\n");
-  printf("\t-p, --updated          list ports with version newer than the installed ones\n");
-  printf("\t-D                     shows dependencies of any package\n");
-  printf("\t-U                     update package(s) and relatives dependencied\n");
-  printf("\t-T                     shows dependents of any package\n");
-  printf("\t-R                     remove package(s) checking if is needed by other packages\n");
-  printf("\t-v, --version          print version and exit\n");
-  printf("\t-h, --help             print help and exit\n");
-  printf("\t--no-favorite-repo     ignore the user's favorite repos\n");
-  printf("\t--no-favorite-version  ignore the user's favorite versions\n");
-  printf("\t--no-deps              do not check dependencies, install or remove only\n");
-  printf("\t--all                  shows or remove all dependents packages (sometime requires some minutes)\n");
+void
+aiuto ()
+{
+  printf ("usage: ilenia [options] [collections] [packages]\n");
+  printf ("options:\n");
+  printf ("\t-u, --update           update ports\n");
+  printf ("\t-l, --list             list ports\n");
+  printf ("\t-d, --diff             list version differences\n");
+  printf
+    ("\t-p, --updated          list ports with version newer than the installed ones\n");
+  printf ("\t-D                     shows dependencies of any package\n");
+  printf
+    ("\t-U                     update package(s) and relatives dependencied\n");
+  printf ("\t-T                     shows dependents of any package\n");
+  printf
+    ("\t-R                     remove package(s) checking if is needed by other packages\n");
+  printf ("\t-v, --version          print version and exit\n");
+  printf ("\t-h, --help             print help and exit\n");
+  printf ("\t--no-favorite-repo     ignore the user's favorite repos\n");
+  printf ("\t--no-favorite-version  ignore the user's favorite versions\n");
+  printf
+    ("\t--no-deps              do not check dependencies, install or remove only\n");
+  printf
+    ("\t--all                  shows or remove all dependents packages (sometime requires some minutes)\n");
 }
 
-void versione() {
-  printf("ilenia version %s\n", VERSION);
+void
+versione ()
+{
+  printf ("ilenia version %s\n", VERSION);
 }

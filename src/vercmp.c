@@ -24,7 +24,9 @@
 
 #include <ctype.h>
 
-/* GNU's strverscmp() function, taken from glibc 2.3.2 sources */
+/*
+ * GNU's strverscmp() function, taken from glibc 2.3.2 sources 
+ */
 
 #define S_N	0x0
 #define S_I	0x4
@@ -33,7 +35,8 @@
 #define CMP	2
 #define LEN	3
 
-int strverscmp (s1, s2)
+int
+strverscmp (s1, s2)
      const char *s1;
      const char *s2;
 {
@@ -48,7 +51,7 @@ int strverscmp (s1, s2)
     S_N, S_F, S_F, S_F,
     S_N, S_F, S_Z, S_Z
   };
-  
+
   static const int result_type[] = {
     CMP, CMP, CMP, CMP, CMP, LEN, CMP, CMP,
     CMP, CMP, CMP, CMP, CMP, CMP, CMP, CMP,
@@ -59,44 +62,51 @@ int strverscmp (s1, s2)
     CMP, +1, +1, CMP, -1, CMP, CMP, CMP,
     -1, CMP, CMP, CMP
   };
-  
+
   if (p1 == p2)
     return 0;
   c1 = *p1++;
   c2 = *p2++;
   state = S_N | ((c1 == '0') + (isdigit (c1) != 0));
 
-  while ((diff = c1 - c2) == 0 && c1 != '\0') {
-    state = next_state[state];
-    c1 = *p1++;
-    c2 = *p2++;
-    state |= (c1 == '0') + (isdigit (c1) != 0);
-  }
+  while ((diff = c1 - c2) == 0 && c1 != '\0')
+    {
+      state = next_state[state];
+      c1 = *p1++;
+      c2 = *p2++;
+      state |= (c1 == '0') + (isdigit (c1) != 0);
+    }
 
   state = result_type[state << 2 | (((c2 == '0') + (isdigit (c2) != 0)))];
 
-  switch (state) {
-  case CMP:
-    return diff;
-  case LEN:
-    while (isdigit (*p1++))
-      if (!isdigit (*p2++))
-	return 1;
-    return isdigit (*p2) ? -1 : diff;
-  default:
-    return state;
-  }
+  switch (state)
+    {
+    case CMP:
+      return diff;
+    case LEN:
+      while (isdigit (*p1++))
+	if (!isdigit (*p2++))
+	  return 1;
+      return isdigit (*p2) ? -1 : diff;
+    default:
+      return state;
+    }
 }
 
-int vercmp (char *installato, char *port) {
+int
+vercmp (char *installato, char *port)
+{
   int i = strverscmp (installato, port);
-  if (i > 0) {
-    // La versione installata è più aggiornata
-    return (0);
-  } else if (i < 0) {
-    // Il pacchetto deve essere aggiornato
-    return (1);
-  }
+  if (i > 0)
+    {
+      // La versione installata è più aggiornata
+      return (0);
+    }
+  else if (i < 0)
+    {
+      // Il pacchetto deve essere aggiornato
+      return (1);
+    }
   // Stessa versione
   return 0;
 }

@@ -22,7 +22,10 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct db * ports;
-struct db * pacchetti;
+struct db *ports;
+struct db *pacchetti;
+char * post_pkgadd;
 
 #define CACHE "/var/cache/ilenia"
+
+int parse_ileniarc();

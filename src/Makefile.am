@@ -36,7 +36,8 @@ ilenia_SOURCES = \
 	dipendenze.h\
 	ilenia.h\
 	deplist.c\
-	deplist.h
+	deplist.h\
+	ileniarc.c
 
 ilenia_LDFLAGS = 
 

@@ -32,15 +32,17 @@ struct db
 };
 
 struct db *inserisci_elemento (char *_nome, char *_versione,
-			       char *_collezione, struct deplist *d, struct db *p);
+			       char *_collezione, struct deplist *d,
+			       struct db *p);
 struct db *inserisci_elemento_ordinato (char *_nome, char *_versione,
-					char *_collezione, struct deplist *d, 
-					struct db *p);
-struct db *inserisci_elemento_inverso (char *_nome, char *_versione, char *_collezione,
-				       struct deplist *d, struct db *p);
+					char *_collezione,
+					struct deplist *d, struct db *p);
+struct db *inserisci_elemento_inverso (char *_nome, char *_versione,
+				       char *_collezione, struct deplist *d,
+				       struct db *p);
 struct db *cerca (char *parametro, struct db *p);
-int conta(struct db *p);
-struct db *rimuovi_elemento(char *nome, struct db *p);
-struct db *rimuovi_duplicati(struct db *p);
-int esiste(char *qualcosa, struct db *p);
-struct db * add_deplist(struct deplist *d, struct db *p);
+int conta (struct db *p);
+struct db *rimuovi_elemento (char *nome, struct db *p);
+struct db *rimuovi_duplicati (struct db *p);
+int esiste (char *qualcosa, struct db *p);
+struct db *add_deplist (struct deplist *d, struct db *p);
