@@ -134,6 +134,10 @@ int aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
 
 int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 {
+  if (getuid () != 0) {
+    printf ("ilenia: only root can update or install packages\n\n");
+    return (-1);
+  }
   struct db *d = NULL;
   if(opzioni_confronto>=0){
     d = dipendenze (pacchetto);
@@ -166,6 +170,10 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 
 int aggiorna_pacchetti (int opzioni_confronto)
 {
+  if (getuid () != 0) {
+    printf ("ilenia: only root can update or install packages\n\n");
+    return (-1);
+  }
   struct db *p = NULL;
   p = confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 0);
   while (p != NULL) {
