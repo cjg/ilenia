@@ -159,11 +159,11 @@ int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
     }
   } else {
     opzioni_confronto*=-1;
-    if (strcmp(d->collezione, "not found")!=0) {
+    if (esiste(pacchetto, ports)==0) {
       if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
 	return (-1);
     } else {
-      printf("%s [not found]\n", d->nome);
+      printf("%s [not found]\n", pacchetto);
       return(-1);
     }
   }
