@@ -173,6 +173,26 @@ struct db * parsa_httpup (char *percorso){
   return(p);
 }
 
+struct db * parse_cvs (char *percorso){
+  FILE *file;
+  struct db * p=NULL;
+  if((file=fopen(percorso, "r"))){
+    char riga[255];
+    char prefix[255];
+    char collezione[255];
+    char pre_collezione[255];
+    while (fgets (riga, 255, file)) {
+      strcpy(riga, trim(riga));
+      if(strncmp(riga, "LOCAL_PATH=", 11)==0)
+	strcpy(prefix, mid(riga, 11, FINE));
+      if(strncmp(riga, "LOCAL_DIR=", 10)==0)
+	strcpy(collezione, mid(riga, 10, FINE));
+    }
+    p=inserisci_elemento_ordinato(prefix, collezione, "", NULL, p);
+  }
+  return(p);
+}
+
 struct db * leggi_dir(char *collezione, char *prefix, struct db *p){
   DIR *dir;
   struct dirent *info_file;
@@ -224,6 +244,11 @@ struct db * lsports_acrux_way () {
 	}
       }	else if (strcmp (estensione, "httpup") == 0) {
 	p=parsa_httpup(nome_file);
+	ports=leggi_dir(p->versione, p->nome, ports);
+      }
+      // supporto per crux ppc
+      else if (strcmp (estensione, "cvs")== 0) {
+	p=parse_cvs(nome_file);
 	ports=leggi_dir(p->versione, p->nome, ports);
       }
     }
