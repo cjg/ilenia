@@ -209,6 +209,7 @@ struct db * lsports_acrux_way () {
   struct db *ports=NULL;
   char nome_file[255];
   char estensione[255];
+  //printf("ehi ehi ehi\n");
   if (!(cachefile = fopen ("/var/cache/ilenia", "w"))) {
     return ports;
   }
@@ -243,9 +244,10 @@ struct db * lsports ()
   struct db *p = NULL;
   //int update, cache;
   char riga[255];
-
+  //printf("lsports\n");
+  
   if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
-    if(strlen(trim(fgets (riga, 255, cachefile)))>0){
+    if(fgets (riga, 255, cachefile)){
       while (fgets (riga, 255, cachefile)) {
 	int len;
 	char splitted_row[MASSIMO][MASSIMO];
@@ -263,6 +265,7 @@ struct db * lsports ()
       return(p);
     }
   }
+  printf("Building cache!\n");
   p = lsports_acrux_way ();
   return(p);
 }
