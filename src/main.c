@@ -14,7 +14,8 @@
 #define LSPORTS		2
 #define AIUTO		6
 #define AGGIORNA_P	7
-#define DIPENDENZE	8
+#define DIPENDENZE      8
+#define RIMUOVI         9
 
 int main (int argc, char *argv[])
 {
@@ -28,11 +29,13 @@ int main (int argc, char *argv[])
   char opzione_p[argc][255];
   char opzione_d[argc][255];
   char opzione_l[argc][255];
+  char opzione_r[argc][255];
   int azioni = -1;
   int opzioni = -1;
   int opzioni_p = -1;
   int opzioni_d = -1;
   int opzioni_l = -1;
+  int opzioni_r = -1;
   int opzioni_confronto = 0;
   int controlla_dipendenze=0;
   for (i = 1; i < argc; i++) {
@@ -66,6 +69,9 @@ int main (int argc, char *argv[])
     } else if (strcmp (argv[i], "-D") == 0) {
       azioni++;
       azione[azioni]=DIPENDENZE;
+    } else if (strcmp (argv[i], "-R") == 0) {
+      azioni++;
+      azione[azioni]=RIMUOVI;
     } else {
       if (azione[azioni] == AGGIORNA) {
 	opzioni++;
@@ -79,6 +85,9 @@ int main (int argc, char *argv[])
       } else if (azione[azioni] == LSPORTS) {
 	opzioni_l++;
 	strcpy (opzione_l[opzioni_l], argv[i]);
+      } else if (azione[azioni] == RIMUOVI) {
+	opzioni_r++;
+	strcpy (opzione_r[opzioni_r], argv[i]);
       }
     } 
   }
@@ -147,6 +156,16 @@ int main (int argc, char *argv[])
       break;
     case DIFFERENZE:
       confronta (pacchetti, ports, DIFFERENZE, opzioni_confronto, 1);
+      break;
+    case RIMUOVI:
+      if (opzioni_r != -1) {
+	int j;
+	for (j = 0; j <= opzioni_r; j++) {
+	  stampa_dipendenti (opzione_r[j]);
+	}
+      }	else {
+	printf("pacchetto\n");
+      }
       break;
     case AGGIORNATI:
       confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 1);
