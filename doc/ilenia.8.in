@@ -9,9 +9,9 @@ ilenia \- update/list ports collection and compile-install/update packages with 
 ports collection. If no collections are specified then all collections will be updated.
 \fBilenia\fP, now can also update, install and remove a packages with relatives 
 dependencies; \fBilenia\fP chooses which port (with same name) to 
-compile and install in the "ilenia --updated" way: she, if there is the same port in 
+compile and install in the "ilenia --updated" way: if there is the same port in 
 different repos, and if the port/package isn't controlled by favoriterepo or 
-favoriteversion, compile and install the one with newer version.
+favoriteversion, che compiles and installs the one with newer version.
 A \fIport\fP is a directory containing all necessary files for building a software package using pkgmk(8).
 .SH OPTIONS
 .TP
@@ -50,10 +50,10 @@ Used with \-d \-p and \-U options. Ignore the user's favorite version for ports 
 Used with \-U and \-R options, do not check dependencies
 .TP
 .B "\-\-all"
-Used with \-T and \-R options, show or removes all dipendents packages
+Used with \-T and \-R options, shows or removes all dependents packages
 .TP
 .B "\-\-cache"
-Forces ilenia to rebuild her cachefile, usefull when you modify ports in a local repository 
+Forces ilenia to rebuild her cachefile, useful when you modify ports in a local repository 
 .TP
 .B "\-v, \-\-version"
 Print version and exit.
@@ -62,7 +62,7 @@ Print version and exit.
 Print help and exit.
 .SH LOCAL REPOSITORY
 .TP
-You can use local repository on your machine. For make ilenia known them you have to create a file in "/etc/ports/" with ".local" extension (for example: my.local); in this file must be only a row, where is specified the fullpath of the local repository.
+You can use local repository on your machine. To let ilenia recognize them you have to create a file in "/etc/ports/" with ".local" extension (for example: my.local); this file must be a single row, where there is specified the fullpath of the local repository.
 For example:
 
 # my.local
@@ -79,16 +79,16 @@ Root of local ports collection.
 Directory for port collection configuration.
 .TP
 .B "/etc/ports/favoriterepo"
-File where are stored the information about favorite repository.
+File where the informations about the favorite repository are stored.
 .TP
 .B "/etc/ports/favoriteversion"
-File where are stored the information about favorite version.
+File where the informations about the favorite version are stored.
 .TP
 .B "/etc/ilenia.rc"
 File contening optional features like "POST_PKGADD"
 .SH POST_PKGADD
 .TP
-You can specify in your ilenia.rc a command, or some commands, to be executed after each installation of packages; the commands are executed in the, just compiled and installed, ports dir. 
+In your ilenia.rc you can specify a command, or some commands, to be executed after each installation of packages; the commands are executed in the, just compiled and installed, ports dir. 
 For example, I use:
 
 POST_PKGADD  = "pkgmk \-c; aplay /home/slash/sounds/grolsch_plop.wav"
