@@ -72,7 +72,8 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
   if ((pkgfile = fopen (percorso, "r")))
     {
       char riga[255] = "";
-      char nome[255] = "";
+      char *nome = "";
+      char *value = "";
       char versione[255] = "";
       int release = 0;
       struct deplist *d = NULL;
@@ -96,17 +97,23 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    }
 	  if (strncmp (riga, "name", 4) == 0)
 	    {
-	      strcpy (nome, get_value (riga, "name"));
+	      //strcpy (nome, get_value (riga, "name"));
+	      if (strlen (value = get_value (riga, "name")))
+		nome = strdup (value);
 	    }
 	  if (strncmp (riga, "version", 7) == 0)
 	    {
-	      strcpy (versione, get_value (riga, "version"));
+	      if (strlen (value = get_value (riga, "version")))
+		strcpy (versione, value);
 	    }
 	  if (strncmp (riga, "release", 7) == 0)
 	    {
-	      strcat (versione, "-");
-	      strcat (versione, get_value (riga, "release"));
-	      release = 1;
+	      if (strlen (value = get_value (riga, "release")))
+		{
+		  strcat (versione, "-");
+		  strcat (versione, value);
+		  release = 1;
+		}
 	    }
 	  if (strlen (nome) && strlen (versione) && release)
 	    {

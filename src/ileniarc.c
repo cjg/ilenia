@@ -31,24 +31,28 @@
 char *
 get_value (char *s, char *var)
 {
+  char *tmp = "";
   if (strncmp (s, var, strlen (var)) == 0)
     {
-      char *tmp;
       char splitted_s[2][MASSIMO];
       split (s, "=", splitted_s);
-      strcpy (splitted_s[1], trim (splitted_s[1]));
-      strcpy (splitted_s[1], mid (splitted_s[1], 1, FINE));
-      strcpy (splitted_s[1], trim (splitted_s[1]));
-      if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
+      strcpy (splitted_s[0], trim (splitted_s[0]));
+      //printf("%s\n", splitted_s[0]);
+      if (strcmp (splitted_s[0], var) == 0)
 	{
-	  strcpy (splitted_s[1],
-		  mid (splitted_s[1], 1, strlen (splitted_s[1]) - 2));
 	  strcpy (splitted_s[1], trim (splitted_s[1]));
+	  strcpy (splitted_s[1], mid (splitted_s[1], 1, FINE));
+	  strcpy (splitted_s[1], trim (splitted_s[1]));
+	  if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
+	    {
+	      strcpy (splitted_s[1],
+		      mid (splitted_s[1], 1, strlen (splitted_s[1]) - 2));
+	      strcpy (splitted_s[1], trim (splitted_s[1]));
+	    }
+	  tmp = strdup (splitted_s[1]);
 	}
-      tmp = strdup (splitted_s[1]);
-      return (tmp);
     }
-  return (NULL);
+  return (tmp);
 }
 
 int
