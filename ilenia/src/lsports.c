@@ -31,6 +31,7 @@
 #include "manipola.h"
 #include "db.h"
 #include "deplist.h"
+#include "ilenia.h"
 
 FILE *cachefile;
 
@@ -226,7 +227,7 @@ struct db * lsports_acrux_way () {
   struct db *ports=NULL;
   char nome_file[255];
   char estensione[255];
-  if (!(cachefile = fopen ("/var/cache/ilenia", "w"))) {
+  if (!(cachefile = fopen (CACHE, "w"))) {
     return ports;
   }
   etc_ports = opendir ("/etc/ports");
@@ -254,7 +255,7 @@ struct db * lsports_acrux_way () {
     }
   }
   fclose(cachefile);
-  chmod("/var/cache/ilenia", S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  chmod(CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   return(ports);
 }
 
@@ -264,7 +265,7 @@ struct db * lsports ()
   struct db *p = NULL;
   char riga[255];
     
-  if ((cachefile = fopen ("/var/cache/ilenia", "r"))) {
+  if ((cachefile = fopen (CACHE, "r"))) {
     if(fgets (riga, 255, cachefile)){
       while (fgets (riga, 255, cachefile)) {
 	int len;

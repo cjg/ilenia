@@ -24,3 +24,5 @@
 
 struct db * ports;
 struct db * pacchetti;
+
+#define CACHE "/var/cache/ilenia"

@@ -30,6 +30,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "manipola.h"
+#include "ilenia.h"
 
 int cvsup (char *nome_file) {
   int stato;
@@ -88,7 +89,7 @@ int aggiorna_collezione (char *collezione) {
   }
   FILE *file;
   char nome_file[255] = "";
-  strcpy (nome_file, "/var/cache/ilenia");
+  strcpy (nome_file, CACHE);
   if ((file = fopen (nome_file, "w"))) {
     fclose (file);
   }
@@ -122,7 +123,7 @@ int aggiorna_ports () {
   char nome_file[255];
   char estensione[255];
   FILE *file;
-  strcpy (nome_file, "/var/cache/ilenia");
+  strcpy (nome_file, CACHE);
   if ((file = fopen (nome_file, "w"))) {
     fclose (file);
   }
