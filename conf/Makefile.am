@@ -1,6 +1,10 @@
-ileniadir = /etc/ports
-ilenia_DATA = favoriterepo \
+portsdir = /etc/ports
+ports_DATA = favoriterepo \
 	      favoriteversion 
 
+ileniadir = /etc
+ilenia_DATA = ilenia.rc
+
 EXTRA_DIST = favoriterepo \
-	     favoriteversion 
+	     favoriteversion \
+	ilenia.rc	 
