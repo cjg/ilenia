@@ -155,8 +155,8 @@ main (int argc, char *argv[])
       aiuto ();
       return (0);
     }
-  if(parse_ileniarc()!=0)
-    return(1);
+  if (parse_ileniarc () != 0)
+    return (1);
 
   ports = lsports ();
   pacchetti = lspacchetti ();

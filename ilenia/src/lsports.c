@@ -96,16 +96,16 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    }
 	  if (strncmp (riga, "name", 4) == 0)
 	    {
-	      strcpy (nome, mid (riga, 5, strlen (riga) - 5));
+	      strcpy (nome, get_value (riga, "name"));
 	    }
 	  if (strncmp (riga, "version", 7) == 0)
 	    {
-	      strcpy (versione, mid (riga, 8, strlen (riga) - 8));
+	      strcpy (versione, get_value (riga, "version"));
 	    }
 	  if (strncmp (riga, "release", 7) == 0)
 	    {
 	      strcat (versione, "-");
-	      strcat (versione, mid (riga, 8, strlen (riga) - 8));
+	      strcat (versione, get_value (riga, "release"));
 	      release = 1;
 	    }
 	  if (strlen (nome) && strlen (versione) && release)

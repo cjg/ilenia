@@ -28,32 +28,54 @@
 #include "manipola.h"
 #include "ilenia.h"
 
+char *
+get_value (char *s, char *var)
+{
+  if (strncmp (s, var, strlen (var)) == 0)
+    {
+      char *tmp;
+      char splitted_s[2][MASSIMO];
+      split (s, "=", splitted_s);
+      strcpy (splitted_s[1], trim (splitted_s[1]));
+      strcpy (splitted_s[1], mid (splitted_s[1], 1, FINE));
+      strcpy (splitted_s[1], trim (splitted_s[1]));
+      if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
+	{
+	  strcpy (splitted_s[1],
+		  mid (splitted_s[1], 1, strlen (splitted_s[1]) - 2));
+	  strcpy (splitted_s[1], trim (splitted_s[1]));
+	}
+      tmp = strdup (splitted_s[1]);
+      return (tmp);
+    }
+  return (NULL);
+}
 
 int
-parse_ileniarc()
+parse_ileniarc ()
 {
-  FILE * rc;
-  if((rc=fopen("/etc/ilenia.rc", "r")))
+  FILE *rc;
+  if ((rc = fopen ("/etc/ilenia.rc", "r")))
     {
       char row[MASSIMO];
       while (fgets (row, MASSIMO, rc))
 	{
-	  strcpy(row, trim (row));
+	  strcpy (row, trim (row));
 	  if (row[0] != '#')
 	    {
-	      if(strncmp(row, "POST_PKGADD", 11)==0)
+	      if (strncmp (row, "POST_PKGADD", 11) == 0)
 		{
 		  char splitted_row[2][MASSIMO];
-		  split(row, "=", splitted_row);
-		  strcpy(row, mid(splitted_row[1],1,FINE));
-		  strcpy(row, trim(row));
-		  strcpy(row, mid(row, 1, strlen(row)-2));
-		  post_pkgadd=strdup(row);
+		  split (row, "=", splitted_row);
+		  strcpy (row, mid (splitted_row[1], 1, FINE));
+		  strcpy (row, trim (row));
+		  strcpy (row, mid (row, 1, strlen (row) - 2));
+		  post_pkgadd = strdup (row);
 		}
 	    }
 	}
     }
   else
-    return(1);
-  return(0);
+    return (1);
+  return (0);
 }
