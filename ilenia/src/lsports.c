@@ -184,10 +184,14 @@ struct db * parse_cvs (char *percorso){
     char pre_collezione[255];
     while (fgets (riga, 255, file)) {
       strcpy(riga, trim(riga));
-      if(strncmp(riga, "LOCAL_PATH=", 11)==0)
-	strcpy(prefix, mid(riga, 11, FINE));
-      if(strncmp(riga, "LOCAL_DIR=", 10)==0)
-	strcpy(collezione, mid(riga, 10, FINE));
+      if(strncmp(riga, "LOCAL_PATH=", 11)==0){
+	strcpy(prefix, mid(riga, 12, FINE));
+	strcpy(prefix, mid(prefix, 0, strlen(prefix)-1));
+      }
+      if(strncmp(riga, "LOCAL_DIR=", 10)==0){
+	strcpy(collezione, mid(riga, 11, FINE));
+	strcpy(collezione, mid(collezione, 0, strlen(collezione)-1));
+      }
     }
     p=inserisci_elemento_ordinato(prefix, collezione, "", NULL, p);
   }
