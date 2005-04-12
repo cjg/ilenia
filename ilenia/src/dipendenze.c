@@ -47,12 +47,12 @@ dipendenze_pacchetto (char *pacchetto, char *collezione)
 	  inserisci_elemento_inverso (thispkg->depends->pkg, "",
 				      il_piu_aggiornato (thispkg->
 							 depends->pkg,
-							 ports), NULL,
+							 ports), NULL, NULL,
 				      dependencies);
       else
 	dependencies =
 	  inserisci_elemento_inverso (thispkg->depends->pkg, "",
-				      "not found", NULL, dependencies);
+				      "not found", NULL, NULL, dependencies);
       thispkg->depends = thispkg->depends->next;
     }
   return (dependencies);
@@ -69,13 +69,14 @@ cerca_dipendenze (struct db *_pacchetti)
 	  struct db *d = NULL;
 	  d = dipendenze_pacchetto (_pacchetti->nome, _pacchetti->collezione);
 	  d = inserisci_elemento_inverso (_pacchetti->nome, "",
-					  _pacchetti->collezione, NULL, d);
+					  _pacchetti->collezione, NULL, NULL,
+					  d);
 	  while (d != NULL)
 	    {
 	      if (esiste (d->nome, dipendenze) != 0)
 		dipendenze =
 		  inserisci_elemento_inverso (d->nome, "",
-					      d->collezione, NULL,
+					      d->collezione, NULL, NULL,
 					      dipendenze);
 	      d = d->prossimo;
 	    }
@@ -94,7 +95,8 @@ dipendenze (char *pacchetto)
   if (esiste (pacchetto, ports) == 0)
     {
       strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
-      d = inserisci_elemento_inverso (pacchetto, "", collezione, NULL, d);
+      d =
+	inserisci_elemento_inverso (pacchetto, "", collezione, NULL, NULL, d);
 
       while (i != conta (d))
 	{
@@ -104,7 +106,7 @@ dipendenze (char *pacchetto)
     }
   else
     {
-      d = inserisci_elemento (pacchetto, "", "not found", NULL, d);
+      d = inserisci_elemento (pacchetto, "", "not found", NULL, NULL, d);
     }
   return (d);
 }
@@ -129,7 +131,7 @@ cerca_dipendenti (struct db *_pacchetti)
 		{
 		  if (cerca (p->nome, dependents) == NULL)
 		    dependents =
-		      inserisci_elemento (p->nome, "", repo, NULL,
+		      inserisci_elemento (p->nome, "", repo, NULL, NULL,
 					  dependents);
 		}
 	    }
@@ -147,7 +149,7 @@ dipendenti (char *pacchetto, int all)
   char collezione[255];
   int i = -10;
   strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
-  d = inserisci_elemento (pacchetto, "", collezione, NULL, d);
+  d = inserisci_elemento (pacchetto, "", collezione, NULL, NULL, d);
 
   while (i != conta (d))
     {
@@ -169,10 +171,18 @@ stampa_dipendenze (char *pacchetto)
       if (strcmp (d->collezione, "not found") != 0)
 	{
 	  printf ("%s [", d->nome);
-	  if (esiste (d->nome, pacchetti) != 0)
-	    printf (" ]\n");
+	  if (esiste (d->nome, pacchetti) == 0)
+	    {
+	      struct db *pa = NULL;
+	      pa = cerca (d->nome, pacchetti);
+	      printf ("installed]");
+	      if (strcmp (pa->versione, "alias") == 0)
+		printf (" (%s)\n", pa->collezione);
+	      else
+		printf ("\n");
+	    }
 	  else
-	    printf ("installed]\n");
+	    printf (" ]\n");
 	}
       else
 	{

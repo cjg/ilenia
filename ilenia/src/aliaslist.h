@@ -1,8 +1,8 @@
 /***************************************************************************
- *            ilenia.h
+ *            aliaslist.h
  *
- *  Tue Sep 28 11:06:51 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Tue Avr 12 16:01:32 2005
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  slash@crux-it.org
  ****************************************************************************/
 
@@ -22,14 +22,21 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct db *ports;
-struct db *pacchetti;
-struct repolist *repository;
-struct aliaseslist *aliases;
-char *post_pkgadd;
+struct aliaslist
+{
+  char pkg[255];
+  struct aliaslist *next;
+};
 
-#define CACHE "/var/cache/ilenia"
-#define ALIAS_FILE "/etc/ports/alias"
+struct aliaseslist
+{
+  struct aliaslist *alias;
+  struct aliaseslist *next;
+};
 
-int parse_ileniarc ();
-char *get_value (char *s, char *var);
+struct aliaslist *aliaslist_add (char *pkg, struct aliaslist *p);
+struct aliaslist *aliaslist_get (char *delim, struct aliaseslist *as);
+struct aliaseslist *aliaseslist_add (struct aliaslist *a,
+				     struct aliaseslist *p);
+struct aliaseslist *aliaseslist_build ();
+int aliaslist_exists (char *delim, struct aliaslist *p);

@@ -10,6 +10,7 @@
 #include "pkgutils.h"
 #include "dipendenze.h"
 #include "repolist.h"
+#include "aliaslist.h"
 #include "ilenia.h"
 
 #define AGGIORNA	1
@@ -178,6 +179,7 @@ main (int argc, char *argv[])
       if ((file = fopen (CACHE, "w")))
 	fclose (file);
     }
+  aliases = aliaseslist_build ();
   ports = lsports ();
   pacchetti = lspacchetti ();
 

@@ -32,6 +32,7 @@
 #include "db.h"
 #include "deplist.h"
 #include "repolist.h"
+#include "aliaslist.h"
 #include "ilenia.h"
 
 FILE *cachefile;
@@ -106,7 +107,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	  if (strlen (nome) && strlen (versione) && release)
 	    {
 	      p = inserisci_elemento_ordinato (nome, versione, collezione,
-					       d, p);
+					       d, NULL, p);
 	      char dependencies[MASSIMO] = "";
 	      if (d != NULL)
 		{
@@ -140,7 +141,7 @@ parsa_cvsup (char *percorso, struct repolist *p)
     {
       char riga[255];
       char prefix[255];
-      char mad_prefix[255]="";
+      char mad_prefix[255] = "";
       char collezione[255];
       while (fgets (riga, 255, file))
 	{
@@ -159,9 +160,9 @@ parsa_cvsup (char *percorso, struct repolist *p)
 			  && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  strcpy (mad_prefix,
-				  mid (prefix, strlen (PORTS_LOCATION)+1,
+				  mid (prefix, strlen (PORTS_LOCATION) + 1,
 				       FINE));
-			  strcpy(mad_prefix, trim(mad_prefix));
+			  strcpy (mad_prefix, trim (mad_prefix));
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			    strcat (mad_prefix, "/");
 			  strcpy (prefix, PORTS_LOCATION);
@@ -213,10 +214,10 @@ parsa_httpup (char *percorso, struct repolist *p)
 		    mid (prefix, 0, strlen (prefix) - strlen (collezione));
 		  if (strncmp
 		      (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)) == 0
-		      && strlen (prefix) > strlen (PORTS_LOCATION)+1)
+		      && strlen (prefix) > strlen (PORTS_LOCATION) + 1)
 		    {
 		      mad_prefix =
-			mid (prefix, strlen (PORTS_LOCATION)+1, FINE);
+			mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
 		      if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			mad_prefix = strcat (mad_prefix, "/");
 		      prefix = strdup (PORTS_LOCATION);
@@ -258,7 +259,7 @@ parse_cvs (char *percorso, struct repolist *p)
 			  && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  mad_prefix =
-			    mid (prefix, strlen (PORTS_LOCATION)+1, FINE);
+			    mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			    mad_prefix = strcat (mad_prefix, "/");
 			  mad_prefix = strdup (mad_prefix);
@@ -379,13 +380,12 @@ build_repolist ()
   return (p);
 }
 
-struct db *
-lsports_acrux_way (struct repolist *r)
+int build_cache (struct repolist *r)
 {
   struct db *ports = NULL;
   if (!(cachefile = fopen (CACHE, "w")))
     {
-      return ports;
+      return (-1);
     }
   while (r != NULL)
     {
@@ -394,7 +394,7 @@ lsports_acrux_way (struct repolist *r)
     }
   fclose (cachefile);
   chmod (CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-  return (ports);
+  return (0);
 }
 
 struct db *
@@ -403,7 +403,6 @@ lsports ()
   FILE *cachefile;
   struct db *p = NULL;
   char riga[255];
-
   if ((cachefile = fopen (CACHE, "r")))
     {
       if (fgets (riga, 255, cachefile))
@@ -422,13 +421,17 @@ lsports ()
 		}
 	      p = inserisci_elemento_ordinato (trim (splitted_row[0]),
 					       trim (splitted_row[1]),
-					       trim (splitted_row[2]), d, p);
+					       trim (splitted_row[2]), d,
+					       NULL, p);
 	    }
 	  fclose (cachefile);
 	  return (p);
 	}
     }
-  printf ("Building cache!\n");
-  p = lsports_acrux_way (repository);
+  else
+    {
+      if (build_cache (repository) == 0)
+	p = lsports ();
+    }
   return (p);
 }

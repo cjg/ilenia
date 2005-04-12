@@ -93,7 +93,8 @@ confronta (struct db *pacchetti_db, struct db *ports_db,
 		{
 		  c = inserisci_elemento_ordinato (pacchetti_db->nome,
 						   p->versione,
-						   p->collezione, NULL, c);
+						   p->collezione, NULL, NULL,
+						   c);
 		  if (stampa)
 		    print_formattato (pacchetti_db->nome,
 				      pacchetti_db->versione,
