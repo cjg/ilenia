@@ -61,8 +61,7 @@ prendi_favorite (int quale)
 			   strlen (riga) - strlen (favorite_opzioni)));
 	      strcpy (favorite_opzioni, trim (favorite_opzioni));
 	      p = inserisci_elemento_ordinato (nome, favorite_opzioni,
-					       favorite_opzioni, NULL, NULL,
-					       p);
+					       favorite_opzioni, NULL, p);
 	    }
 	}
     }
@@ -107,14 +106,14 @@ lspacchetti ()
 	    {
 	      strcpy (tmp, "installato");
 	    }
-	  p = inserisci_elemento_ordinato (nome, riga, tmp, NULL, NULL, p);
+	  p = inserisci_elemento_ordinato (nome, riga, tmp, NULL, p);
 	  struct aliaslist *a = NULL;
 	  a = aliaslist_get (nome, aliases);
 	  while (a != NULL)
 	    {
 	      if (strcmp (a->pkg, nome) != 0)
 		p =
-		  inserisci_elemento_ordinato (a->pkg, "alias", nome, NULL,
+		  inserisci_elemento_ordinato (a->pkg, "alias", nome,
 					       NULL, p);
 	      a = a->next;
 	    }

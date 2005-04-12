@@ -28,24 +28,20 @@ struct db
   char versione[255];
   char collezione[255];
   struct deplist *depends;
-  struct aliaslist *alias;
   struct db *prossimo;
 };
 
 struct db *inserisci_elemento (char *_nome, char *_versione,
 			       char *_collezione, struct deplist *d,
-			       struct aliaslist *a, struct db *p);
+			       struct db *p);
 struct db *inserisci_elemento_ordinato (char *_nome, char *_versione,
 					char *_collezione, struct deplist *d,
-					struct aliaslist *a, struct db *p);
+					struct db *p);
 struct db *inserisci_elemento_inverso (char *_nome, char *_versione,
 				       char *_collezione, struct deplist *d,
-				       struct aliaslist *a, struct db *p);
+				       struct db *p);
 struct db *cerca (char *parametro, struct db *p);
 int conta (struct db *p);
-struct db *rimuovi_elemento (char *nome, struct db *p);
-struct db *rimuovi_duplicati (struct db *p);
 int esiste (char *qualcosa, struct db *p);
 struct db *add_deplist (struct deplist *d, struct db *p);
-struct db *db_add_aliaslist (struct aliaslist *a, struct db *p);
 struct db *db_like (char *delim, struct db *p);

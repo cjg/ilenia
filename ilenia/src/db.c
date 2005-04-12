@@ -27,19 +27,11 @@
 #include <string.h>
 #include "db.h"
 #include "deplist.h"
-#include "aliaslist.h"
 
 struct db *
 add_deplist (struct deplist *d, struct db *p)
 {
   p->depends = d;
-  return (p);
-}
-
-struct db *
-db_add_aliaslist (struct aliaslist *a, struct db *p)
-{
-  p->alias = a;
   return (p);
 }
 
@@ -58,43 +50,8 @@ esiste (char *qualcosa, struct db *p)
 }
 
 struct db *
-rimuovi_elemento (char *nome, struct db *p)
-{
-  struct db *canc = NULL;
-  struct db *temp = NULL;
-  struct db *paz = NULL;
-  temp = p;
-  while (temp->prossimo && strcmp (temp->prossimo->nome, nome) != 0)
-    {
-      paz =
-	inserisci_elemento_inverso (temp->nome, temp->versione,
-				    temp->collezione, temp->depends,
-				    temp->alias, paz);
-      temp = temp->prossimo;
-    }
-  paz =
-    inserisci_elemento_inverso (temp->nome, temp->versione,
-				temp->collezione, temp->depends, temp->alias,
-				paz);
-  if (strcmp (temp->prossimo->nome, nome) == 0)
-    {
-      canc = temp->prossimo->prossimo;
-    }
-  while (canc != NULL)
-    {
-      paz =
-	inserisci_elemento_inverso (canc->nome, canc->versione,
-				    canc->collezione, canc->depends,
-				    temp->alias, paz);
-      canc = canc->prossimo;
-    }
-  return (paz);
-}
-
-struct db *
 inserisci_elemento (char *_nome, char *_versione,
-		    char *_collezione, struct deplist *d, struct aliaslist *a,
-		    struct db *p)
+		    char *_collezione, struct deplist *d, struct db *p)
 {
   struct db *paus = NULL;
   paus = (struct db *) malloc (sizeof (struct db));
@@ -102,7 +59,6 @@ inserisci_elemento (char *_nome, char *_versione,
   strcpy (paus->versione, _versione);
   strcpy (paus->collezione, _collezione);
   paus->depends = d;
-  paus->alias = a;
   if (p == NULL)
     {
       p = paus;
@@ -119,7 +75,7 @@ inserisci_elemento (char *_nome, char *_versione,
 struct db *
 inserisci_elemento_inverso (char *_nome, char *_versione,
 			    char *_collezione, struct deplist *d,
-			    struct aliaslist *a, struct db *p)
+			    struct db *p)
 {
   struct db *paus = NULL;
   paus = (struct db *) malloc (sizeof (struct db));
@@ -127,7 +83,6 @@ inserisci_elemento_inverso (char *_nome, char *_versione,
   strcpy (paus->versione, _versione);
   strcpy (paus->collezione, _collezione);
   paus->depends = d;
-  paus->alias = a;
   if (p == NULL)
     {
       p = paus;
@@ -148,8 +103,7 @@ inserisci_elemento_inverso (char *_nome, char *_versione,
 struct db *
 inserisci_elemento_ordinato (char *_nome, char *_versione,
 			     char *_collezione,
-			     struct deplist *d, struct aliaslist *a,
-			     struct db *p)
+			     struct deplist *d, struct db *p)
 {
   struct db *paus = NULL;
   struct db *paux = NULL;
@@ -159,7 +113,6 @@ inserisci_elemento_ordinato (char *_nome, char *_versione,
   strcpy (paus->versione, _versione);
   strcpy (paus->collezione, _collezione);
   paus->depends = d;
-  paus->alias = a;
   if (p == NULL)
     {
       p = paus;
@@ -203,8 +156,7 @@ cerca (char *parametro, struct db *p)
 	{
 	  paus =
 	    inserisci_elemento_ordinato (p->nome, p->versione,
-					 p->collezione, p->depends, p->alias,
-					 paus);
+					 p->collezione, p->depends, paus);
 	}
       p = p->prossimo;
     }
@@ -221,32 +173,6 @@ conta (struct db *p)
 }
 
 struct db *
-rimuovi_duplicati (struct db *p)
-{
-  struct db *paus = NULL;
-  struct db *paux = NULL;
-  while (p != NULL)
-    {
-      paus =
-	inserisci_elemento (p->nome, p->versione, p->collezione,
-			    p->depends, p->alias, paus);
-      p = p->prossimo;
-    }
-  while (paus != NULL)
-    {
-      if (!cerca (paus->nome, paux))
-	{
-	  paux =
-	    inserisci_elemento (paus->nome, paus->versione,
-				paus->collezione, paus->depends, paus->alias,
-				paux);
-	}
-      paus = paus->prossimo;
-    }
-  return (paux);
-}
-
-struct db *
 db_like (char *delim, struct db *p)
 {
   struct db *paus = NULL;
@@ -256,8 +182,7 @@ db_like (char *delim, struct db *p)
 	{
 	  paus =
 	    inserisci_elemento_ordinato (p->nome, p->versione,
-					 p->collezione, p->depends, p->alias,
-					 paus);
+					 p->collezione, p->depends, paus);
 	}
       p = p->prossimo;
     }

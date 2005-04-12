@@ -263,7 +263,7 @@ aggiorna_pacchetti (int opzioni_confronto)
 	  q =
 	    inserisci_elemento_ordinato (p->nome,
 					 questa_collezione (p->nome, repo, p),
-					 repo, NULL, NULL, q);
+					 repo, NULL, q);
 	}
       p = p->prossimo;
     }

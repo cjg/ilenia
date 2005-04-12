@@ -107,7 +107,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	  if (strlen (nome) && strlen (versione) && release)
 	    {
 	      p = inserisci_elemento_ordinato (nome, versione, collezione,
-					       d, NULL, p);
+					       d, p);
 	      char dependencies[MASSIMO] = "";
 	      if (d != NULL)
 		{
@@ -380,7 +380,8 @@ build_repolist ()
   return (p);
 }
 
-int build_cache (struct repolist *r)
+int
+build_cache (struct repolist *r)
 {
   struct db *ports = NULL;
   if (!(cachefile = fopen (CACHE, "w")))
@@ -421,8 +422,7 @@ lsports ()
 		}
 	      p = inserisci_elemento_ordinato (trim (splitted_row[0]),
 					       trim (splitted_row[1]),
-					       trim (splitted_row[2]), d,
-					       NULL, p);
+					       trim (splitted_row[2]), d, p);
 	    }
 	  fclose (cachefile);
 	  return (p);
