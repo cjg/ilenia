@@ -384,6 +384,7 @@ int
 build_cache (struct repolist *r)
 {
   struct db *ports = NULL;
+  printf("Building cache!\n");
   if (!(cachefile = fopen (CACHE, "w")))
     {
       return (-1);
@@ -406,32 +407,27 @@ lsports ()
   char riga[255];
   if ((cachefile = fopen (CACHE, "r")))
     {
-      if (fgets (riga, 255, cachefile))
+      if (!fgets (riga, 255, cachefile))
+	if(build_cache(repository)!=0)
+	  return(NULL);
+      while (fgets (riga, 255, cachefile))
 	{
-	  while (fgets (riga, 255, cachefile))
+	  int len;
+	  char splitted_row[MASSIMO][MASSIMO];
+	  len = split (riga, " ", splitted_row);
+	  int i;
+	  struct deplist *d = NULL;
+	  for (i = 3; i < len; i++)
 	    {
-	      int len;
-	      char splitted_row[MASSIMO][MASSIMO];
-	      len = split (riga, " ", splitted_row);
-	      int i;
-	      struct deplist *d = NULL;
-	      for (i = 3; i < len; i++)
-		{
-		  if (strlen (trim (splitted_row[i])) > 0)
-		    d = add (trim (splitted_row[i]), d);
-		}
-	      p = inserisci_elemento_ordinato (trim (splitted_row[0]),
-					       trim (splitted_row[1]),
-					       trim (splitted_row[2]), d, p);
+	      if (strlen (trim (splitted_row[i])) > 0)
+		d = add (trim (splitted_row[i]), d);
 	    }
-	  fclose (cachefile);
-	  return (p);
+	  p = inserisci_elemento_ordinato (trim (splitted_row[0]),
+					   trim (splitted_row[1]),
+					   trim (splitted_row[2]), d, p);
 	}
+      fclose (cachefile);
+      return (p);
     }
-  else
-    {
-      if (build_cache (repository) == 0)
-	p = lsports ();
-    }
-  return (p);
+  return(NULL);
 }
