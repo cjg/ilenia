@@ -183,7 +183,7 @@ main (int argc, char *argv[])
   ports = lsports ();
   pacchetti = lspacchetti ();
 
-  for (i = 0; i <= (azioni + rebuild_cache); i++)
+  for (i = 0; i <= (azioni - rebuild_cache); i++)
     {
       switch (azione[i])
 	{
