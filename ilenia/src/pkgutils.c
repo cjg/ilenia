@@ -35,6 +35,7 @@
 #include "lsports.h"
 #include "lspacchetti.h"
 #include "repolist.h"
+#include "output.h"
 
 int
 esegui_script (char *path, char *script)
@@ -267,11 +268,21 @@ aggiorna_pacchetti (int opzioni_confronto)
 	}
       p = p->prossimo;
     }
+  /*
+    someone wants that ilenia ask them if they're sure to update all packages,
+    I hate this feature, then I've to add another feature that bypass this feature
+  */
+  if(ask_for_update)
+    {
+      print_db(q);
+      if(!ask("Are you sure to update the above packages? [y/n] "))
+	return(1);
+    }
   while (q != NULL)
     {
-      printf ("%s\n", q->nome);
-      if (aggiorna_pacchetto_ (opzioni_confronto, q->nome) != 0)
-	return (-1);
+      //if (aggiorna_pacchetto_ (opzioni_confronto, q->nome) != 0)
+      //return (-1);
+      printf("update\n");
       q = q->prossimo;
     }
   return (0);

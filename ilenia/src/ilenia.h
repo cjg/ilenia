@@ -27,9 +27,11 @@ struct db *pacchetti;
 struct repolist *repository;
 struct aliaseslist *aliases;
 char *post_pkgadd;
+int ask_for_update;
 
 #define CACHE "/var/cache/ilenia"
 #define ALIAS_FILE "/etc/ports/alias"
 
 int parse_ileniarc ();
 char *get_value (char *s, char *var);
+int ask(char *question, ...);
