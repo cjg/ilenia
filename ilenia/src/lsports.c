@@ -384,7 +384,7 @@ int
 build_cache (struct repolist *r)
 {
   struct db *ports = NULL;
-  printf("Building cache!\n");
+  printf ("Building cache!\n");
   if (!(cachefile = fopen (CACHE, "w")))
     {
       return (-1);
@@ -408,8 +408,8 @@ lsports ()
   if ((cachefile = fopen (CACHE, "r")))
     {
       if (!fgets (riga, 255, cachefile))
-	if(build_cache(repository)!=0)
-	  return(NULL);
+	if (build_cache (repository) != 0)
+	  return (NULL);
       while (fgets (riga, 255, cachefile))
 	{
 	  int len;
@@ -429,5 +429,5 @@ lsports ()
       fclose (cachefile);
       return (p);
     }
-  return(NULL);
+  return (NULL);
 }

@@ -34,4 +34,4 @@ int ask_for_update;
 
 int parse_ileniarc ();
 char *get_value (char *s, char *var);
-int ask(char *question, ...);
+int ask (char *question, ...);

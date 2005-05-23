@@ -38,7 +38,6 @@ get_value (char *s, char *var)
       char splitted_s[2][MASSIMO];
       split (s, "=", splitted_s);
       strcpy (splitted_s[0], trim (splitted_s[0]));
-      //printf("%s\n", splitted_s[0]);
       if (strcmp (splitted_s[0], var) == 0)
 	{
 	  strcpy (splitted_s[1], trim (splitted_s[1]));
@@ -60,8 +59,8 @@ int
 parse_ileniarc ()
 {
   FILE *rc;
-  //ask_for_update=1;
-  post_pkgadd=strdup("");
+  ask_for_update = 1;
+  post_pkgadd = strdup ("");
   if ((rc = fopen ("/etc/ilenia.rc", "r")))
     {
       char row[MASSIMO];
@@ -81,34 +80,33 @@ parse_ileniarc ()
 		}
 	      if (strstr (row, "ASK_FOR_UPDATE"))
 		{
-		  printf("%s\n", get_value(row, "ASK_FOR_UPDATE"));
-		  if(strcasecmp(get_value(row, "ASK_FOR_UPDATE"), "No"))
-		    printf("no\n");
-		  //ask_for_update=0;
+		  if (strcasecmp (get_value (row, "ASK_FOR_UPDATE"), "No") ==
+		      0)
+		    ask_for_update = 0;
 		}
 	    }
 	}
     }
   else
-    printf("Warning you don't have a ilenia.rc file.\n");
-  printf("%i\n", ask_for_update);
+    printf ("Warning you don't have a ilenia.rc file.\n");
   return (0);
 }
 
-int ask(char *question, ...)
+int
+ask (char *question, ...)
 {
   char response[20];
   va_list args;
 
-  va_start(args, question);
-  vprintf(question, args);
-  va_end(args);
+  va_start (args, question);
+  vprintf (question, args);
+  va_end (args);
 
-  if(fgets(response, 20, stdin))
+  if (fgets (response, 20, stdin))
     {
-      strcpy(response, trim(response));
-      if(!strcasecmp(response, "Y") || !strlen(response))
-	return(1);
+      strcpy (response, trim (response));
+      if (!strcasecmp (response, "Y") || !strlen (response))
+	return (1);
     }
-  return(0);
+  return (0);
 }
