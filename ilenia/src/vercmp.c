@@ -2,8 +2,8 @@
  *            vercmp.c
  *
  *  Sat Jul 10 13:22:49 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
- *  slash@crux-it.org
+ *  Copyright  2005 - 2006  Coviello Giuseppe
+ *  immigrant@email.it
  ****************************************************************************/
 
 /*
@@ -22,6 +22,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <Python.h>
 #include <ctype.h>
 
 /*
@@ -93,20 +94,28 @@ strverscmp (s1, s2)
     }
 }
 
-int
-vercmp (char *installato, char *port)
+static PyObject *
+vercmp_vercmp (PyObject * self, PyObject * args)
+	       //char *installato, char *port)
 {
-  int i = strverscmp (installato, port);
-  if (i > 0)
-    {
-      // La versione installata è più aggiornata
-      return (0);
-    }
-  else if (i < 0)
-    {
-      // Il pacchetto deve essere aggiornato
-      return (1);
-    }
-  // Stessa versione
-  return 0;
+  char *ver1;
+  char *ver2;
+  PyArg_ParseTuple (args, "ss", &ver1, &ver2);
+  int i = strverscmp (ver1, ver2);
+  int ret = 0;
+  if (i < 0)
+    ret = 1;
+  return Py_BuildValue ("i", ret);
+}
+
+static PyMethodDef VercmpMethods[] = {
+  {"vercmp", vercmp_vercmp, METH_VARARGS,
+   "Confronts two strings"},
+  {NULL, NULL, 0, NULL}		/* Sentinel */
+};
+
+PyMODINIT_FUNC
+initvercmp (void)
+{
+  (void) Py_InitModule ("vercmp", VercmpMethods);
 }
