@@ -19,8 +19,8 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 
-from packages import Packages
-from confront import *
+from lib.packages import Packages
+from lib.confront import *
 from ConfigParser import ConfigParser
 import os, os.path
 
