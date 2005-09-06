@@ -61,12 +61,18 @@ class Ilenia:
                 action = option.keys()[0]
                 args = option.values()[0]
                 self.do_action(action, args)
+            else:
+                self.do_action(option)
 
     def do_action(self, action, args=None):
         if action == "-u":
             self.do_update(args)
         elif action == "-l":
             self.do_list(args)
+        elif action == "-p":
+            self.do_updated()
+        elif action == "-U":
+            self.do_update_pkg(args)
 
     def do_list(self, args):
         if not args:
