@@ -21,6 +21,7 @@
 
 from lib.packages import Packages
 from lib.confront import *
+from lib.option import IleniaOptions
 from ConfigParser import ConfigParser
 import os, os.path
 
@@ -38,35 +39,57 @@ class Config(ConfigParser):
             return self.getint(section, key)
 
 class Ilenia:
-    def __init__(self, options, args):
+    def __init__(self, options):
         self.config = Config("ilenia.conf")
-
+        self.options = options
+        
         self.repos = []
         for section in self.config.sections():
             if section[:4] == "repo":
                 self.repos.append((section[5:].strip(),
                                    self.config.get_value(section, "url")))
-        if options.update:
-            self.do_update()
-            
+           
         self.local_packages = Packages().list
         self.repos_packages = []
         for repo in self.repos:
             self.repos_packages = self.repos_packages + Packages(repo[0]).list
+        self.parse_options()
             
-        if options.list:
-            self.do_list()
-        if options.updated:
-            self.do_updated()
+    def parse_options(self):
+        for option in self.options:
+            if "dict" in str(type(option)):
+                action = option.keys()[0]
+                args = option.values()[0]
+                self.do_action(action, args)
 
-    def do_list(self):
+    def do_action(self, action, args=None):
+        if action == "-u":
+            self.do_update(args)
+        elif action == "-l":
+            self.do_list(args)
+
+    def do_list(self, args):
+        if not args:
+            args = []
+            for repo in self.repos:
+                args.append(repo[0])
+        print args
         for pkg in self.repos_packages:
-            print "%s %s %s %s" % (pkg["name"], pkg["version"], pkg["build"],
-                                   pkg["repo"])
+            if pkg["repo"] in args:
+                print "%s %s %s %s" % (pkg["name"], pkg["version"],
+                                       pkg["build"], pkg["repo"])
         
-    def do_update(self):
+    def do_update(self, args):
         import urllib
-        for repo in self.repos:
+        repos = []
+        if not args:
+            repos = self.repos
+        else:
+            for arg in args:
+                for repo in self.repos:
+                    if arg == repo[0]:
+                        repos.append(repo)
+        for repo in repos:
             if not os.path.isdir(repo[0]):
                 os.mkdir(repo[0])
             print "Updating info about %s ..." % repo[0]
@@ -88,23 +111,4 @@ class Ilenia:
 
 
 if __name__ == "__main__":
-    from optparse import OptionParser
-
-    parser = OptionParser(usage="%prog",
-                          version="ilenia 1.4-testing")
-    parser.add_option("-u", "--update",
-                      action="store_true", dest="update", default=False,
-                      help="Update packages lists.")
-    parser.add_option("-l", "--list",
-                      action="store_true", dest="list", default=False,
-                      help="Lists available  packages. When specified lists"+
-                      "packages of the specified repository")
-    parser.add_option("-p", "--updated",
-                      action="store_true", dest="updated", default=False,
-                      help = "Lists packages that could be updated")
-    parser.add_option("-v", "--Version",
-                      action="store_true", dest="version", default=False,
-                      help="Print version and exit.")
-
-    options, args = parser.parse_args()
-    Ilenia(options, args)
+    Ilenia(IleniaOptions().parse())
