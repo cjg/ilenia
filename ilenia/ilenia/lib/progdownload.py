@@ -37,9 +37,7 @@ def reporthook(numblocks, blocksize, filesize):
 
 def progdownload(url, filename):
     print "Downloading %s" % url
-    urllib.urlretrieve(url, filename,
-                       lambda numblocks, blocksize, filesize:
-                       reporthook(numblocks, blocksize, filesize))
+    urllib.urlretrieve(url, filename, reporthook)
     sys.stdout.write('\n')
 
 if __name__ == "__main__":
