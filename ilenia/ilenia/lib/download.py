@@ -22,23 +22,22 @@
 import urllib, os.path, string, md5
 from progdownload import progdownload
 
-def download(pkg, config):
-    path, filename = get_url(pkg, config)
-    md5sum = get_md5sum(pkg, config)
+def download(pkg, repos):
+    path, filename = get_url(pkg, repos)
+    md5sum = get_md5sum(pkg)
     if filename and md5sum:
         progdownload("%s/%s" % (path, filename), os.path.join("/tmp", filename))
         if md5sum == do_md5sum(os.path.join("/tmp", filename)):
             return os.path.join("/tmp", filename)
     return None
 
-def get_url(pkg, config):
+def get_url(pkg, repos):
     f_io = file(os.path.join(pkg["repo"], "FILELIST.TXT"))
     lines = f_io.readlines()
     for line in lines:
         if pkg["name"]+"-"+pkg["version"] in line:
             url = line[line.index("./")+1:]
-            url = "%s/%s" % (config.get_value("repo %s" % pkg["repo"],
-                                              "url"), url)
+            url = "%s/%s" % (repos.get_url(pkg["repo"]), url)
             url = url.replace("//", "/")
             url = url.replace(":/", "://")
             url = url.replace("\n", "")
@@ -46,7 +45,7 @@ def get_url(pkg, config):
             return path, filename
     return None
 
-def get_md5sum(pkg, config):
+def get_md5sum(pkg):
     f_io = file(os.path.join(pkg["repo"], "CHECKSUMS.md5"))
     lines = f_io.readlines()
     for line in lines:

@@ -20,9 +20,10 @@
 """
 
 import sys, string
+from copy import copy
 
 class Options:
-    def __init__(self, ):
+    def __init__(self):
         self.options = []
 
     def add_option(self, option):
@@ -30,19 +31,17 @@ class Options:
 
     def parse(self, args = sys.argv[1:]):
         options = []
-        rargs = args
+        rargs = copy(args)
         for a in args:
             if a[0] == "-":
                 rargs.remove(a)
                 a_type = self.check_type(a)
                 if a_type == "toggle":
                     options.append(a)
-                if a_type == "list":
+                elif a_type == "list":
                     a_args = self.get_args(rargs)
                     options.append({a:a_args})
-                    rargs = rargs[len(a_args):]
-                    args = rargs
-            
+                    args = args[len(a_args):]
         return options
 
     def get_args(self, rargs):
@@ -73,6 +72,7 @@ class IleniaOptions(Options):
         self.add_option(Option("-l", "list"))
         self.add_option(Option("-p"))
         self.add_option(Option("-U", "list"))
+        self.add_option(Option("--no-favoriterepo"))
 
 if __name__ == "__main__":
     print IleniaOptions().parse()

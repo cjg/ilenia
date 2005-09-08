@@ -28,6 +28,9 @@ def confront(parent):
         newer_pkg = get_newer(parent.repos_packages.get_info(pkg_name))
         if not newer_pkg:
             continue
+        if not parent.no_favoriterepo and pkg_name in parent.favoriterepo:
+            if not newer_pkg["repo"] == parent.favoriterepo.get_repo(pkg_name):
+                continue
         if vercmp(pkg["version"], newer_pkg["version"]):
             updated_packages.append({"name":pkg["name"],
                                      "l_version":pkg["version"],
