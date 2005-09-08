@@ -21,44 +21,64 @@
 
 import os, os.path, string
 
-class Packages:
+class Packages(list):
     def __init__(self, repo = None):
         if not repo:
-            self.build_local_list()
+            self.build_local_infolist()
         else:
-            self.build_repo_list(repo)
+            self.build_repo_infolist(repo)
+        self.sort()
             
-    def build_local_list(self):
+    def build_local_infolist(self):
+        self.infolist = []
         self.list = []
         for f in os.listdir("/var/log/packages/"):
             f_splitted = f.rsplit("-", 3)
-            self.list.append({"name":f_splitted[0],
-                              "version":f_splitted[1],
-                              "build":f_splitted[3]})
-
-    def build_repo_list(self, repo):
+            self.infolist.append({"name":f_splitted[0],
+                                  "version":f_splitted[1],
+                                  "build":f_splitted[3]})
+            self.list.append(f_splitted[0])
+            if not f_splitted[0] in self:
+                self.append(f_splitted[0])
+            
+    def build_repo_infolist(self, repos):
+        self.infolist = []
         self.list = []
-        try:
-            f_io = file(os.path.join(repo, "PACKAGES.TXT"))
-        except:
-            print os.path.join(repo, "PACKAGES.TXT")
-            return
-        for line in f_io.readlines():
-            if line[:12] == "PACKAGE NAME":
-                line = line[13:].strip()[:-4]
-                line_splitted = line.rsplit("-", 3)
-                try:
-                    self.list.append({"name":line_splitted[0],
-                                      "version":line_splitted[1],
-                                      "build":line_splitted[3],
-                                      "repo":repo})
-                except:
-                    pass
-                    #print line
-                                  
+        for repo in repos:
+            try:
+                f_io = file(os.path.join(repo, "PACKAGES.TXT"))
+            except:
+                print os.path.join(repo, "PACKAGES.TXT")
+                return
+            for line in f_io.readlines():
+                if line[:12] == "PACKAGE NAME":
+                    line = line[13:].strip()[:-4]
+                    line_splitted = line.rsplit("-", 3)
+                    try:
+                        self.infolist.append({"name":line_splitted[0],
+                                              "version":line_splitted[1],
+                                              "build":line_splitted[3],
+                                              "repo":repo})
+                        self.list.append(line_splitted[0])
+                        if not line_splitted[0] in self:
+                            self.append(line_splitted[0])
+                    except:
+                        pass
 
+    def get_info(self, pkg_name):
+        if not pkg_name in self:
+            return None
+        infos = []
+        index = self.list.index(pkg_name)
+        infos.append(self.infolist[index])
+        while True:
+            index += 1
+            try:
+                index = self.list.index(pkg_name, index)
+                infos.append(self.infolist[index])
+            except:
+                return infos
 
 if __name__ == "__main__":
-    for pkg in Packages("/var/swaret/repos/Slacky.it/PACKAGES.TXT").list:
-        print "Name %s Version %s Build %s" % (pkg["name"], pkg["version"],
-                                               pkg["build"])
+    p = Packages(["slackware", "freerock"])
+    print p.get_info("xchat")

@@ -23,14 +23,26 @@ from vercmp import vercmp
 
 def confront(parent):
     updated_packages = []
-    repos_packages = []
-    for l_pkg in parent.local_packages:
-        for r_pkg in parent.repos_packages:
-            if l_pkg["name"] == r_pkg["name"]:
-                if vercmp(l_pkg["version"], r_pkg["version"]):
-                    updated_packages.append({"name":l_pkg["name"],
-                                             "l_version":l_pkg["version"],
-                                             "r_version":r_pkg["version"],
-                                             "repo":r_pkg["repo"]})
-
+    for pkg_name in parent.local_packages:
+        pkg = parent.local_packages.get_info(pkg_name)[0]
+        newer_pkg = get_newer(parent.repos_packages.get_info(pkg_name))
+        if not newer_pkg:
+            continue
+        if vercmp(pkg["version"], newer_pkg["version"]):
+            updated_packages.append({"name":pkg["name"],
+                                     "l_version":pkg["version"],
+                                     "r_version":newer_pkg["version"],
+                                     "repo":newer_pkg["repo"]})
     return updated_packages
+
+def get_newer(pkglist):
+    if not pkglist:
+        return None
+    for pkg in pkglist:
+        try:
+            if vercmp(newer_pkg["version"], pkg["version"]):
+                newer_pkg = pkg
+        except:
+            newer_pkg = pkg
+    return newer_pkg
+        

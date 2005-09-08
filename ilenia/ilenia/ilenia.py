@@ -20,7 +20,9 @@
 """
 
 from lib.packages import Packages
+from lib.repos import Repos
 from lib.confront import *
+from lib.progdownload import *
 from lib.option import IleniaOptions
 from ConfigParser import ConfigParser
 import os, os.path
@@ -43,16 +45,10 @@ class Ilenia:
         self.config = Config("ilenia.conf")
         self.options = options
         
-        self.repos = []
-        for section in self.config.sections():
-            if section[:4] == "repo":
-                self.repos.append((section[5:].strip(),
-                                   self.config.get_value(section, "url")))
+        self.repos = Repos(self.config)
            
-        self.local_packages = Packages().list
-        self.repos_packages = []
-        for repo in self.repos:
-            self.repos_packages = self.repos_packages + Packages(repo[0]).list
+        self.local_packages = Packages()
+        self.repos_packages = Packages(self.repos)
         self.parse_options()
             
     def parse_options(self):
@@ -67,6 +63,8 @@ class Ilenia:
     def do_action(self, action, args=None):
         if action == "-u":
             self.do_update(args)
+        elif action == "-i":
+            self.do_list_installed()
         elif action == "-l":
             self.do_list(args)
         elif action == "-p":
@@ -74,35 +72,34 @@ class Ilenia:
         elif action == "-U":
             self.do_update_pkg(args)
 
+    def do_list_installed(self):
+        for pkg in self.local_packages:
+            pkg_info = self.local_packages.get_info(pkg)[0]
+            print "Name: %s \t Version: %s" % (pkg_info["name"],
+                                               pkg_info["version"])
+
     def do_list(self, args):
         if not args:
-            args = []
-            for repo in self.repos:
-                args.append(repo[0])
-        print args
+            args = self.repos
         for pkg in self.repos_packages:
-            if pkg["repo"] in args:
-                print "%s %s %s %s" % (pkg["name"], pkg["version"],
-                                       pkg["build"], pkg["repo"])
+            for pkg_info in self.repos_packages.get_info(pkg):
+                if pkg_info["repo"] in args:
+                    print "%s %s %s %s" % (pkg_info["name"],
+                                           pkg_info["version"],
+                                           pkg_info["build"], pkg_info["repo"])
         
     def do_update(self, args):
-        import urllib
-        repos = []
         if not args:
-            repos = self.repos
-        else:
-            for arg in args:
-                for repo in self.repos:
-                    if arg == repo[0]:
-                        repos.append(repo)
-        for repo in repos:
-            if not os.path.isdir(repo[0]):
-                os.mkdir(repo[0])
-            print "Updating info about %s ..." % repo[0]
+            args = self.repos
+
+        for repo_name in args:
+            if not os.path.isdir(repo_name):
+                os.mkdir(repo_name)
+            print "Updating info about %s ..." % repo_name
             for f in ["CHECKSUMS.md5", "PACKAGES.TXT", "FILELIST.TXT"]:
-                url = "%s/%s" % (repo[1], f)
-                filename = "%s/%s" % (repo[0], f)
-                urllib.urlretrieve(url, filename)
+                url = "%s/%s" % (self.repos.get_url(repo_name), f)
+                filename = "%s/%s" % (repo_name, f)
+                progdownload(url, filename)
 
     def do_updated(self):
         u_list = confront(self)
@@ -115,6 +112,24 @@ class Ilenia:
         else:
             print "The system is up to date"
 
+    def do_update_pkg(self, args):
+        from lib.download import download
+        if not args:
+            pass
+        for pkg_name in args:
+            pkg = get_newer(self.repos_packages.get_info(pkg_name))
+            if not pkg:
+                print "Package %s not found!" % pkg_name
+                continue
+            pkg_file = download(pkg, self.config)
+            if not pkg_file:
+                print "Error downloading %s from %s!" % (pkg["name"],
+                                                         pkg["repo"])
+                return
+            if pkg_name in self.local_packages:
+                print "upgradepkg %s" % pkg_file
+            else:
+                print "installpkg %s" % pkg_file
 
 if __name__ == "__main__":
     Ilenia(IleniaOptions().parse())

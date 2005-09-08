@@ -69,6 +69,7 @@ class IleniaOptions(Options):
     def __init__(self):
         Options.__init__(self)
         self.add_option(Option("-u", "list"))
+        self.add_option(Option("-i"))
         self.add_option(Option("-l", "list"))
         self.add_option(Option("-p"))
         self.add_option(Option("-U", "list"))
