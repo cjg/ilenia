@@ -1,9 +1,13 @@
+	* 10/09:
+	- Enhaced download progressbar (ProgressiveDownload)
+	- Working install and update packages
 	* 07/09:
 	- Created Repos class
 	- Created download with progressbar
 	- Improved Packages class
 	- Cleaned code
 	- Supporting -U command
+	- Created Favoriterepo
 	* 06/09:
 	- homemade OptionParser
 	* 05/09:

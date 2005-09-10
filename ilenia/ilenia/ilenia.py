@@ -21,6 +21,7 @@
 
 from lib.packages import Packages
 from lib.repos import Repos
+from lib.favorite import Favoriterepo
 from lib.confront import *
 from lib.progdownload import *
 from lib.option import IleniaOptions
@@ -49,9 +50,16 @@ class Ilenia:
            
         self.local_packages = Packages()
         self.repos_packages = Packages(self.repos)
+
+        self.favoriterepo = Favoriterepo(self.config)
+        self.no_favoriterepo = False
+
         self.parse_options()
             
     def parse_options(self):
+        if "--no-favoriterepo" in self.options:
+            self.no_favoriterepo = True
+            self.options.remove("--no-favoriterepo")
         for option in self.options:
             if "dict" in str(type(option)):
                 action = option.keys()[0]
@@ -114,22 +122,39 @@ class Ilenia:
 
     def do_update_pkg(self, args):
         from lib.download import download
+        sys_update = False
         if not args:
-            pass
+            for pkg in confront(self):
+                pkg_file = download(pkg, self.repos)
+                if not pkg_file:
+                    print "Error downloading %s from %s!" % (pkg["name"],
+                                                             pkg["repo"])
+                    return
+                if not os.system("upgradepkg %s" % pkg_file) == 0:
+                    print "Error upgrading %s" % pkg_file
+                    return
+            return
+        
         for pkg_name in args:
             pkg = get_newer(self.repos_packages.get_info(pkg_name))
             if not pkg:
-                print "Package %s not found!" % pkg_name
+                if not sys_update:
+                    print "Package %s not found!" % pkg_name
                 continue
-            pkg_file = download(pkg, self.config)
+            pkg_file = download(pkg, self.repos)
             if not pkg_file:
                 print "Error downloading %s from %s!" % (pkg["name"],
                                                          pkg["repo"])
                 return
             if pkg_name in self.local_packages:
-                print "upgradepkg %s" % pkg_file
+                if not os.system("upgradepkg %s" % pkg_file) == 0:
+                    print "Error upgrading %s" % pkg_file
+                    return
             else:
-                print "installpkg %s" % pkg_file
+                if not os.system("installpkg %s" % pkg_file) == 0:
+                    print "Error installing %s" % pkg_file
+                    return
+            os.system("rm %s" % pkg_file)
 
 if __name__ == "__main__":
     Ilenia(IleniaOptions().parse())

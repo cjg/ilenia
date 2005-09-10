@@ -35,7 +35,11 @@ def get_url(pkg, repos):
     f_io = file(os.path.join(pkg["repo"], "FILELIST.TXT"))
     lines = f_io.readlines()
     for line in lines:
-        if pkg["name"]+"-"+pkg["version"] in line:
+        try:
+            version = pkg["version"]
+        except:
+            version = pkg["r_version"]
+        if pkg["name"]+"-"+version in line:
             url = line[line.index("./")+1:]
             url = "%s/%s" % (repos.get_url(pkg["repo"]), url)
             url = url.replace("//", "/")
@@ -49,7 +53,11 @@ def get_md5sum(pkg):
     f_io = file(os.path.join(pkg["repo"], "CHECKSUMS.md5"))
     lines = f_io.readlines()
     for line in lines:
-        if pkg["name"]+"-"+pkg["version"] in line:
+        try:
+            version = pkg["version"]
+        except:
+            version = pkg["r_version"]
+        if pkg["name"]+"-"+version in line:
             md5sum = line[:line.index(" ")].strip()
             return md5sum
     return None
