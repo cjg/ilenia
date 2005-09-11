@@ -1,5 +1,6 @@
 	* 11/09:
 	- ProgressiveDownload is now a class
+	- Fixed favoriterepo issues
 	* 10/09:
 	- Enhaced download progressbar (ProgressiveDownload)
 	- Working install and update packages

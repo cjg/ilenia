@@ -136,7 +136,8 @@ class Ilenia:
             return
         
         for pkg_name in args:
-            pkg = get_newer(self.repos_packages.get_info(pkg_name))
+            pkg = get_newer(self.repos_packages.get_info(pkg_name),
+                            self.favoriterepo)
             if not pkg:
                 if not sys_update:
                     print "Package %s not found!" % pkg_name

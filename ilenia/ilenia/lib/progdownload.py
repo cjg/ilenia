@@ -116,5 +116,5 @@ class ProgressiveDownload:
         sys.stdout.flush()
             
 if __name__ == "__main__":
-    ProgressiveDownload("http://commvulitlei.altervista.org/discografia/just_a_pulp_song.zip"),
+    ProgressiveDownload("http://commvulitlei.altervista.org/discografia/just_a_pulp_song.zip",
                         "just_a_pulp_song.zip")

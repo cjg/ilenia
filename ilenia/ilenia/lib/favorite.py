@@ -29,6 +29,7 @@ class Favoriterepo(list):
             if "," in pkgs:
                 pkgs = pkgs.split(",")
                 for pkg in pkgs:
+                    pkg=pkg.strip()
                     self.list.append((pkg, repo))
                     if not pkg in self:
                         self.append(pkg)
@@ -38,5 +39,8 @@ class Favoriterepo(list):
                     self.append(pkgs)
 
     def get_repo(self, pkg_name):
-        return self.list[self.index(pkg_name)][1]
+        try:
+            return self.list[self.index(pkg_name)][1]
+        except:
+            return None
                 

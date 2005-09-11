@@ -38,14 +38,22 @@ def confront(parent):
                                      "repo":newer_pkg["repo"]})
     return updated_packages
 
-def get_newer(pkglist):
+def get_newer(pkglist, favoriterepo=None):
     if not pkglist:
         return None
-    for pkg in pkglist:
+    newer_pkg = None
+    for pkg in pkglist[1:]:
         try:
+            if favoriterepo:
+                if not pkg["repo"] == favoriterepo.get_repo(pkg["name"]):
+                    continue
             if vercmp(newer_pkg["version"], pkg["version"]):
                 newer_pkg = pkg
         except:
+            if favoriterepo:
+                if not pkg["repo"] == favoriterepo.get_repo(pkg["name"]):
+                    continue
             newer_pkg = pkg
+                
     return newer_pkg
         
