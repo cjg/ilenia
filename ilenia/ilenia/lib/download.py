@@ -20,13 +20,14 @@
 """
 
 import urllib, os.path, string, md5
-from progdownload import progdownload
+from progdownload import ProgressiveDownload
 
 def download(pkg, repos):
     path, filename = get_url(pkg, repos)
     md5sum = get_md5sum(pkg)
     if filename and md5sum:
-        progdownload("%s/%s" % (path, filename), os.path.join("/tmp", filename))
+        ProgressiveDownload("%s/%s" % (path, filename),
+                            os.path.join("/tmp", filename))
         if md5sum == do_md5sum(os.path.join("/tmp", filename)):
             return os.path.join("/tmp", filename)
     return None

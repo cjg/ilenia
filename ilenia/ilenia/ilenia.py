@@ -107,7 +107,7 @@ class Ilenia:
             for f in ["CHECKSUMS.md5", "PACKAGES.TXT", "FILELIST.TXT"]:
                 url = "%s/%s" % (self.repos.get_url(repo_name), f)
                 filename = "%s/%s" % (repo_name, f)
-                progdownload(url, filename)
+                ProgressiveDownload(url, filename)
 
     def do_updated(self):
         u_list = confront(self)
