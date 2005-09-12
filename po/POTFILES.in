@@ -10,5 +10,7 @@ src/eggtrayicon.c
 src/eggtrayicon.h
 src/drawtrayicon.c
 src/drawtrayicon.h
+src/checkupdates.c
+src/checkupdates.h
 
 

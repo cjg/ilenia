@@ -8,6 +8,7 @@ INCLUDES = \
 	$(PACKAGE_CFLAGS)
 
 AM_CFLAGS =\
+	 -D_GNU_SOURCE\
 	 -Wall\
 	 -g
 
@@ -18,7 +19,9 @@ ilenia_notifier_SOURCES = \
 	eggtrayicon.c\
 	eggtrayicon.h\
 	drawtrayicon.c\
-	drawtrayicon.h
+	drawtrayicon.h\
+	checkupdates.c\
+	checkupdates.h
 
 ilenia_notifier_LDFLAGS = 
 

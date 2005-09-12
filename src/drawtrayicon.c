@@ -31,6 +31,21 @@ button_pressed_cb (GtkWidget * w_event, GtkWidget * w_icon)
 	gtk_main_quit ();
 }
 
+void
+set_updated_icon (GtkWidget * w_icon)
+{
+	gtk_image_set_from_stock (GTK_IMAGE (w_icon), GTK_STOCK_YES,
+				  GTK_ICON_SIZE_MENU);
+}
+
+void
+set_toupdate_icon (GtkWidget * w_icon)
+{
+	gtk_image_set_from_stock (GTK_IMAGE (w_icon), GTK_STOCK_NO,
+				  GTK_ICON_SIZE_MENU);
+
+}
+
 GtkWidget *
 draw_tray_icon ()
 {
