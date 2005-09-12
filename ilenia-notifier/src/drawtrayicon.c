@@ -26,23 +26,32 @@
 #include "eggtrayicon.h"
 
 static void
-first_button_pressed (GtkWidget * button, EggTrayIcon * icon)
+button_pressed_cb (GtkWidget * w_event, GtkWidget * w_icon)
 {
-	gtk_main_quit();
+	gtk_main_quit ();
 }
 
-void
+GtkWidget *
 draw_tray_icon ()
 {
-  GtkWidget *button;
-  EggTrayIcon *tray_icon;
-
-  tray_icon = egg_tray_icon_new ("ilenia-notifier");
-  button = gtk_button_new_with_label ("Quit");
-  g_signal_connect (button, "clicked",
-		    G_CALLBACK (first_button_pressed), tray_icon);
-  gtk_container_add (GTK_CONTAINER (tray_icon), button);
-  gtk_widget_show_all (GTK_WIDGET (tray_icon));
-
-  gtk_main ();
+	EggTrayIcon *tray_icon;
+	GtkWidget *w_icon =
+		gtk_image_new_from_stock (GTK_STOCK_FILE, GTK_ICON_SIZE_MENU);
+	GtkWidget *w_event = gtk_event_box_new ();
+	gtk_widget_set_events (GTK_WIDGET (w_event), GDK_BUTTON_PRESS);
+	g_signal_connect (w_event, "button-press-event",
+			  G_CALLBACK (button_pressed_cb), w_icon);
+	gtk_container_add (GTK_CONTAINER (w_event), w_icon);
+	//gtk_image_set_from_stock (GTK_IMAGE (w_icon), GTK_STOCK_YES,
+	//                        GTK_ICON_SIZE_MENU);
+	tray_icon = egg_tray_icon_new ("ilenia-notifier");
+	//button = gtk_button_new_with_label ("Quit");
+	//g_signal_connect (button, "clicked",
+	//        G_CALLBACK (first_button_pressed), tray_icon);
+	gtk_container_add (GTK_CONTAINER (tray_icon), w_event);
+	gtk_widget_show_all (GTK_WIDGET (tray_icon));
+	return (w_icon);
+	//gtk_main ();
 }
+
+//void

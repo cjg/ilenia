@@ -21,10 +21,10 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _DRAWTRAYICON_H
 #define _DRAWTRAYICON_H
 
-void draw_tray_icon();
+GtkWidget *draw_tray_icon ();
 
 #endif /* _DRAWTRAYICON_H */
