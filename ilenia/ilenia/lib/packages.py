@@ -46,7 +46,8 @@ class Packages(list):
         self.list = []
         for repo in repos:
             try:
-                f_io = file(os.path.join(repo, "PACKAGES.TXT"))
+                f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia",
+                                         repo, "PACKAGES.TXT"))
             except:
                 print os.path.join(repo, "PACKAGES.TXT")
                 return

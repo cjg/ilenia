@@ -1,3 +1,5 @@
+	* 13/09:
+	- setup works
 	* 11/09:
 	- ProgressiveDownload is now a class
 	- Fixed favoriterepo issues

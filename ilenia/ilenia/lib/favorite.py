@@ -24,7 +24,12 @@ import string
 class Favoriterepo(list):
     def __init__(self, config):
         self.list = []
-        for item in config.items("favoriterepo"):
+        try:
+            items = config.items("favoriterepo")
+        except:
+            return
+
+        for item in items:
             repo, pkgs = item
             if "," in pkgs:
                 pkgs = pkgs.split(",")

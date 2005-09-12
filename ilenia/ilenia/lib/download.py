@@ -33,7 +33,8 @@ def download(pkg, repos):
     return None
 
 def get_url(pkg, repos):
-    f_io = file(os.path.join(pkg["repo"], "FILELIST.TXT"))
+    f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia", pkg["repo"],
+                             "FILELIST.TXT"))
     lines = f_io.readlines()
     for line in lines:
         try:

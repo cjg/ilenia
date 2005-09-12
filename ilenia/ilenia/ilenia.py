@@ -43,7 +43,7 @@ class Config(ConfigParser):
 
 class Ilenia:
     def __init__(self, options):
-        self.config = Config("ilenia.conf")
+        self.config = Config()
         self.options = options
         
         self.repos = Repos(self.config)
@@ -101,16 +101,18 @@ class Ilenia:
             args = self.repos
 
         for repo_name in args:
-            if not os.path.isdir(repo_name):
-                os.mkdir(repo_name)
+            repo_path = os.path.join(os.path.sep, "var", "lib", "ilenia",
+                                     repo_name)
+            if not os.path.isdir(repo_path):
+                os.mkdir(repo_path)
             print "Updating info about %s ..." % repo_name
             for f in ["CHECKSUMS.md5", "PACKAGES.TXT", "FILELIST.TXT"]:
                 url = "%s/%s" % (self.repos.get_url(repo_name), f)
-                filename = "%s/%s" % (repo_name, f)
+                filename = "%s/%s" % (repo_path, f)
                 ProgressiveDownload(url, filename)
 
     def do_updated(self):
-        u_list = confront(self)
+        u_list = confront(self) 
         if len(u_list):
             for pkg in u_list:
                 print "%s \t %s \t %s \t %s" % (pkg["name"],

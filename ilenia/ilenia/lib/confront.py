@@ -41,8 +41,10 @@ def confront(parent):
 def get_newer(pkglist, favoriterepo=None):
     if not pkglist:
         return None
+    if favoriterepo and not pkglist[0]["name"] in favoriterepo:
+        favoriterepo = None
     newer_pkg = None
-    for pkg in pkglist[1:]:
+    for pkg in pkglist:
         try:
             if favoriterepo:
                 if not pkg["repo"] == favoriterepo.get_repo(pkg["name"]):
@@ -54,6 +56,5 @@ def get_newer(pkglist, favoriterepo=None):
                 if not pkg["repo"] == favoriterepo.get_repo(pkg["name"]):
                     continue
             newer_pkg = pkg
-                
     return newer_pkg
         

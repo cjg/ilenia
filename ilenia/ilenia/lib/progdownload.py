@@ -116,5 +116,9 @@ class ProgressiveDownload:
         sys.stdout.flush()
             
 if __name__ == "__main__":
-    ProgressiveDownload("http://commvulitlei.altervista.org/discografia/just_a_pulp_song.zip",
-                        "just_a_pulp_song.zip")
+    if len(sys.argv)==1:
+        print "Usage: progdownload.py url [filename]"
+    elif len(sys.argv)==2:
+        ProgressiveDownload(sys.argv[1])
+    else:
+        ProgressiveDownload(sys.argv[1], sys.argv[2])
