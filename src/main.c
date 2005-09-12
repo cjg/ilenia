@@ -21,7 +21,9 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
+#include <unistd.h>
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include "drawtrayicon.h"
@@ -29,10 +31,15 @@
 gint
 main (gint argc, gchar ** argv)
 {
-  gtk_init (&argc, &argv);
-	draw_tray_icon();
-
-  gtk_main ();
-
-  return 0;
+	FILE *pipein;
+	gtk_init (&argc, &argv);
+	GtkWidget *w_icon = draw_tray_icon ();
+	chdir ("/home/slash/Desktop/ilenia/ilenia");
+	pipein = popen ("python ilenia.py -p", "r");
+	size_t *n = 0;
+	char *ptr = NULL;
+	getline (&ptr, &n, pipein);
+	printf ("%s\n", ptr);
+	gtk_main ();
+	return 0;
 }
