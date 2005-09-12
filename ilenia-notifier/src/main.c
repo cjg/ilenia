@@ -23,23 +23,17 @@
  */
 
 #include <unistd.h>
-#define _GNU_SOURCE
-#include <stdio.h>
 #include <gtk/gtk.h>
 #include "drawtrayicon.h"
+#include "checkupdates.h"
 
 gint
 main (gint argc, gchar ** argv)
 {
-	FILE *pipein;
 	gtk_init (&argc, &argv);
 	GtkWidget *w_icon = draw_tray_icon ();
 	chdir ("/home/slash/Desktop/ilenia/ilenia");
-	pipein = popen ("python ilenia.py -p", "r");
-	size_t *n = 0;
-	char *ptr = NULL;
-	getline (&ptr, &n, pipein);
-	printf ("%s\n", ptr);
+	set_icon (w_icon);
 	gtk_main ();
 	return 0;
 }

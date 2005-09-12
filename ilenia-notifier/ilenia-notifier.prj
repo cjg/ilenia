@@ -75,7 +75,9 @@ module.source.files=\
 	eggtrayicon.c\
 	eggtrayicon.h\
 	drawtrayicon.c\
-	drawtrayicon.h
+	drawtrayicon.h\
+	checkupdates.c\
+	checkupdates.h
 
 module.pixmap.name=pixmaps
 module.pixmap.type=
@@ -100,7 +102,8 @@ compiler.options.include.paths=
 compiler.options.library.paths=
 compiler.options.libraries=
 compiler.options.libraries.selected=
-compiler.options.defines=
+compiler.options.defines=\
+	_GNU_SOURCE
 compiler.options.defines.selected=
 compiler.options.warning.buttons=0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 
 compiler.options.optimize.buttons=1 0 0 0 

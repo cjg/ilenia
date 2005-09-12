@@ -1,7 +1,7 @@
 /***************************************************************************
- *            drawtrayicon.h
+ *            checkupdates.h
  *
- *  Mon Sep 12 11:47:41 2005
+ *  Mon Sep 12 14:01:16 2005
  *  Copyright  2005  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
@@ -22,11 +22,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DRAWTRAYICON_H
-#define _DRAWTRAYICON_H
+#ifndef _CHECKUPDATES_H
+#define _CHECKUPDATES_H
 
-GtkWidget *draw_tray_icon ();
-void set_updated_icon (GtkWidget * w_icon);
-void set_toupdate_icon (GtkWidget * w_icon);
+void set_icon (GtkWidget * w_icon);
 
-#endif /* _DRAWTRAYICON_H */
+#endif /* _CHECKUPDATES_H */

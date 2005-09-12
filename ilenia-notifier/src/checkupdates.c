@@ -1,7 +1,7 @@
 /***************************************************************************
- *            drawtrayicon.h
+ *            checkupdates.c
  *
- *  Mon Sep 12 11:47:41 2005
+ *  Mon Sep 12 13:59:02 2005
  *  Copyright  2005  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
@@ -22,11 +22,25 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DRAWTRAYICON_H
-#define _DRAWTRAYICON_H
+#include <stdlib.h>
+#include <string.h>
+#include <gtk/gtk.h>
+#include "drawtrayicon.h"
 
-GtkWidget *draw_tray_icon ();
-void set_updated_icon (GtkWidget * w_icon);
-void set_toupdate_icon (GtkWidget * w_icon);
-
-#endif /* _DRAWTRAYICON_H */
+void
+set_icon (GtkWidget * w_icon)
+{
+	FILE *pipein;
+	pipein = popen ("python ilenia.py -p", "r");
+	size_t n = 0;
+	char *ptr = NULL;
+	getline (&ptr, &n, pipein);
+	printf ("%s\n", ptr);
+	if (strcmp ("The system is up to date", ptr))
+		set_toupdate_icon (w_icon);
+	else
+		set_updated_icon (w_icon);
+	free (ptr);
+	// but i don't like timeout
+	g_timeout_add(30*1000, set_icon, w_icon);
+}
