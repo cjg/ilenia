@@ -19,7 +19,7 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 
-import gtk, gettext, os, sys, thread
+import gtk, gettext, os, sys, thread, socket
 
 gettext.NullTranslations()
 gettext.install("ilenia-notifier")
@@ -67,6 +67,7 @@ class Notifier(trayicon.TrayIcon):
         self.show_all()
         gtk.threads_init()
         thread.start_new_thread(self.init_ilenia, ())
+        thread.start_new_thread(self.ipc_start, ())
         gtk.main()
 
     def init_ilenia(self):
@@ -107,6 +108,17 @@ class Notifier(trayicon.TrayIcon):
     def on_quit(self, w, event):
         if event.button == 1:
             gtk.main_quit()
+
+    def ipc_start(self):
+        import socket
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.bind('/tmp/ilenia-notifier')
+        sock.listen(1)
+        while 1:
+            client = sock.accept()[0]
+            if client.recv(1024) == "notify":
+                thread.start_new_thread(self.init_ilenia, ())
+            client.close() 
 
 if __name__ == "__main__":
     Notifier()
