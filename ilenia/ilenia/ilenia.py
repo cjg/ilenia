@@ -42,7 +42,7 @@ class Config(ConfigParser):
             return self.getint(section, key)
 
 class Ilenia:
-    def __init__(self, options):
+    def __init__(self, options=None):
         self.config = Config()
         self.options = options
         
@@ -54,8 +54,9 @@ class Ilenia:
         self.favoriterepo = Favoriterepo(self.config)
         self.no_favoriterepo = False
 
-        self.parse_options()
-            
+        if self.options:
+            self.parse_options()
+    
     def parse_options(self):
         if "--no-favoriterepo" in self.options:
             self.no_favoriterepo = True
@@ -79,6 +80,9 @@ class Ilenia:
             self.do_updated()
         elif action == "-U":
             self.do_update_pkg(args)
+
+        if "-u" or "-U" in action:
+            self.notify()
 
     def do_list_installed(self):
         for pkg in self.local_packages:
@@ -111,8 +115,12 @@ class Ilenia:
                 filename = "%s/%s" % (repo_path, f)
                 ProgressiveDownload(url, filename)
 
-    def do_updated(self):
-        u_list = confront(self) 
+    def do_updated(self, print_output=True):
+        u_list = confront(self)
+
+        if not print_output:
+            return u_list
+        
         if len(u_list):
             for pkg in u_list:
                 print "%s \t %s \t %s \t %s" % (pkg["name"],
@@ -158,6 +166,17 @@ class Ilenia:
                     print "Error installing %s" % pkg_file
                     return
             os.system("rm %s" % pkg_file)
+
+    def notify(self):
+        import socket
+        try:
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock.connect('/tmp/ilenia-notifier')
+            sock.send('notify')
+            sock.close()
+        except:
+            pass
+
 
 if __name__ == "__main__":
     Ilenia(IleniaOptions().parse())
