@@ -80,6 +80,8 @@ class Ilenia:
             self.do_updated()
         elif action == "-U":
             self.do_update_pkg(args)
+        elif action == "-h":
+            self.do_help()
 
         if "-u" or "-U" in action:
             self.notify()
@@ -166,6 +168,9 @@ class Ilenia:
                     print "Error installing %s" % pkg_file
                     return
             os.system("rm %s" % pkg_file)
+
+    def do_help(self):
+        IleniaOptions().print_help()
 
     def notify(self):
         import socket

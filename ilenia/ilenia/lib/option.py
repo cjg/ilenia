@@ -22,12 +22,12 @@
 import sys, string
 from copy import copy
 
-class Options:
+class Options(list):
     def __init__(self):
         self.options = []
 
     def add_option(self, option):
-        self.options.append(option)
+        self.append(option)
 
     def parse(self, args = sys.argv[1:]):
         options = []
@@ -42,6 +42,9 @@ class Options:
                     a_args = self.get_args(rargs)
                     options.append({a:a_args})
                     args = args[len(a_args):]
+                else:
+                    print "Error: option %s not known!" % a
+
         return options
 
     def get_args(self, rargs):
@@ -53,26 +56,38 @@ class Options:
         return args
 
     def check_type(self, option):
-        for o in self.options:
+        for o in self:
             if option == o.option:
                 return o.type
         return None
+
+    def print_help(self):
+        for option in self:
+            print "%s\t%s" % (option.option, option.help_text)
             
     
 class Option:
-    def __init__(self, option, o_type="toggle"):
+    def __init__(self, option, o_type="toggle", help_text=None):
         self.option = option
         self.type = o_type
+        self.help_text = help_text
 
 class IleniaOptions(Options):
     def __init__(self):
         Options.__init__(self)
-        self.add_option(Option("-u", "list"))
-        self.add_option(Option("-i"))
-        self.add_option(Option("-l", "list"))
-        self.add_option(Option("-p"))
-        self.add_option(Option("-U", "list"))
-        self.add_option(Option("--no-favoriterepo"))
+        self.add_option(Option("-u", "list",
+                               "Updates info about repos packages"))
+        self.add_option(Option("-i", "toggle", "Lists installed packages"))
+        self.add_option(Option("-l", "list",
+                               "Lists packages of all repos or that of the specifies ones"))
+        self.add_option(Option("-p", "toggle",
+                               "Shows packages that must be updated"))
+        self.add_option(Option("-U", "list",
+                               "Upgrade/install specified packages or upgrade the system"))
+        self.add_option(Option("--no-favoriterepo", "toggle",
+                               "Nevermind about favoriterepo settings"))
+        self.add_option(Option("-h", "toggle", "This quick reference"))
+
 
 if __name__ == "__main__":
     print IleniaOptions().parse()
