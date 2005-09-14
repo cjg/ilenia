@@ -26,6 +26,8 @@ gettext.install("ilenia-notifier")
 
 from egg import trayicon
 
+from lib import reposupdate
+
 from ilenia.ilenia import Ilenia
 
 class Notifier(trayicon.TrayIcon):
@@ -68,6 +70,7 @@ class Notifier(trayicon.TrayIcon):
         gtk.threads_init()
         thread.start_new_thread(self.init_ilenia, ())
         thread.start_new_thread(self.ipc_start, ())
+        self.update_repos()
         gtk.main()
 
     def init_ilenia(self):
@@ -96,6 +99,9 @@ class Notifier(trayicon.TrayIcon):
         gtk.threads_enter()
         self.w_icon.set_from_stock(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
         gtk.threads_leave()
+
+    def update_repos(self):
+        thread.start_new_thread(reposupdate.update, ())
     
     def on_event(self, w, event):
         if event.button == 3:
