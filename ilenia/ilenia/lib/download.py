@@ -52,7 +52,8 @@ def get_url(pkg, repos):
     return None
 
 def get_md5sum(pkg):
-    f_io = file(os.path.join(pkg["repo"], "CHECKSUMS.md5"))
+    f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia", pkg["repo"],
+                             "CHECKSUMS.md5"))
     lines = f_io.readlines()
     for line in lines:
         try:

@@ -85,6 +85,8 @@ class ProgressiveDownload:
 
     def _progressbar(self, downloaded_percentage, downloaded_kbyte,
                     filesize_kbyte, rate, elapsed_time):
+        if not sys.stdout.isatty():
+            return
         sys.stdout.write("\b"*79)
         bar = "[%s%s] %s%s%% %s%s kb/s   %s/%skb" % (
             "#"*int(downloaded_percentage*(30.0/100)),     
