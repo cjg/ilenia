@@ -26,8 +26,6 @@ gettext.install("ilenia-notifier")
 
 from egg import trayicon
 
-from lib import reposupdate
-
 from ilenia.ilenia import Ilenia
 
 class Notifier(trayicon.TrayIcon):
@@ -53,6 +51,11 @@ class Notifier(trayicon.TrayIcon):
         self.w_update.connect("button_press_event", self.on_update)
         self.w_menu.add(self.w_update)
 
+        w_update_repos = gtk.ImageMenuItem(gtk.STOCK_CONNECT,
+                                           _("Update Repos"))
+        w_update_repos.connect("button_press_event", self.on_update_repos)
+        self.w_menu.add(w_update_repos)
+        
         self.w_menu.add(gtk.SeparatorMenuItem())
         
         self.w_quit = gtk.ImageMenuItem(gtk.STOCK_QUIT, _("Quit"))
@@ -67,6 +70,9 @@ class Notifier(trayicon.TrayIcon):
         self.w_tooltips.enable()
         self.add(w_event)
         self.show_all()
+        self.updating_repos = False
+        self.updating_ilenia = False
+        
         gtk.threads_init()
         thread.start_new_thread(self.init_ilenia, ())
         thread.start_new_thread(self.ipc_start, ())
@@ -74,11 +80,15 @@ class Notifier(trayicon.TrayIcon):
         gtk.main()
 
     def init_ilenia(self):
+        while self.updating_repos:
+            pass
+        self.updating_ilenia = True
         gtk.threads_enter()
         self.w_icon.set_from_stock(gtk.STOCK_REFRESH, gtk.ICON_SIZE_MENU)
         gtk.threads_leave()
         self.ilenia = Ilenia()
         self.get_updated()
+        self.updating_ilenia = False
 
     def get_updated(self):
         u_list = self.ilenia.do_updated(False)
@@ -100,8 +110,17 @@ class Notifier(trayicon.TrayIcon):
         self.w_icon.set_from_stock(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
         gtk.threads_leave()
 
+    def _update_repos(self):
+        while self.updating_ilenia:
+            pass
+        gtk.threads_enter()
+        self.w_icon.set_from_stock(gtk.STOCK_CONNECT, gtk.ICON_SIZE_MENU)
+        gtk.threads_leave()
+        stdout = os.popen("update-repos")
+        stdout.close()
+    
     def update_repos(self):
-        thread.start_new_thread(reposupdate.update, ())
+        thread.start_new_thread(self._update_repos, ())
     
     def on_event(self, w, event):
         if event.button == 3:
@@ -110,6 +129,10 @@ class Notifier(trayicon.TrayIcon):
     def on_update(self, w, event):
         if event.button == 1:
             thread.start_new_thread(self.init_ilenia, ())
+
+    def on_update_repos(self, w, event):
+        if event.button == 1:
+            thread.start_new_thread(self._update_repos, ())
             
     def on_quit(self, w, event):
         if event.button == 1:
