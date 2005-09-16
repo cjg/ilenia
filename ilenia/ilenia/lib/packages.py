@@ -34,12 +34,17 @@ class Packages(list):
         self.list = []
         for f in os.listdir("/var/log/packages/"):
             f_splitted = f.rsplit("-", 3)
-            self.infolist.append({"name":f_splitted[0],
-                                  "version":f_splitted[1],
-                                  "build":f_splitted[3]})
-            self.list.append(f_splitted[0])
-            if not f_splitted[0] in self:
-                self.append(f_splitted[0])
+            try:
+                self.infolist.append({"name":f_splitted[0],
+                                      "version":f_splitted[1],
+                                      "build":f_splitted[3]})
+            
+                self.list.append(f_splitted[0])
+                if not f_splitted[0] in self:
+                    self.append(f_splitted[0])
+            except:
+                pass
+                #print f
             
     def build_repo_infolist(self, repos):
         self.infolist = []
