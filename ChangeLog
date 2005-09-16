@@ -1,3 +1,5 @@
+	* 16/09:
+	- improved IPC
 	* 14/09:
 	- created update-repos a wrapper for ilenia.py -u that allows
 	users to update repos info
