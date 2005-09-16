@@ -76,15 +76,22 @@ class Notifier(trayicon.TrayIcon):
         gtk.threads_init()
         thread.start_new_thread(self.init_ilenia, ())
         thread.start_new_thread(self.ipc_start, ())
-        self.update_repos()
+        #self.update_repos()
         gtk.main()
 
+    def set_icon(self, icon):
+        self._icon = icon
+        #gtk.threads_enter()
+        self.w_icon.set_from_stock(self._icon, gtk.ICON_SIZE_MENU)
+        #gtk.threads_leave()
+        
     def init_ilenia(self):
         while self.updating_repos:
             pass
         self.updating_ilenia = True
         gtk.threads_enter()
-        self.w_icon.set_from_stock(gtk.STOCK_REFRESH, gtk.ICON_SIZE_MENU)
+        self.set_icon(gtk.STOCK_REFRESH)
+        self.w_tooltips.set_tip(self, _("Ilenia-notifier: updating .."))
         gtk.threads_leave()
         self.ilenia = Ilenia()
         self.get_updated()
@@ -99,7 +106,7 @@ class Notifier(trayicon.TrayIcon):
 
     def set_toupdate(self, num):
         gtk.threads_enter()
-        self.w_icon.set_from_stock(gtk.STOCK_NO, gtk.ICON_SIZE_MENU)
+        self.set_icon(gtk.STOCK_NO)
         self.w_tooltips.set_tip(self,
                                 _("Ilenia-notifier: %i updates available") %
                                 num)
@@ -107,14 +114,18 @@ class Notifier(trayicon.TrayIcon):
     
     def set_noupdate(self):
         gtk.threads_enter()
-        self.w_icon.set_from_stock(gtk.STOCK_YES, gtk.ICON_SIZE_MENU)
+        self.set_icon(gtk.STOCK_YES)
+        self.w_tooltips.set_tip(self,
+                                _("Ilenia-notifier: the system is up to date"))
         gtk.threads_leave()
 
     def _update_repos(self):
         while self.updating_ilenia:
             pass
         gtk.threads_enter()
-        self.w_icon.set_from_stock(gtk.STOCK_CONNECT, gtk.ICON_SIZE_MENU)
+        self.set_icon(gtk.STOCK_CONNECT)
+        self.w_tooltips.set_tip(self,
+                                _("Ilenia-notifier: updating info about repos ..."))
         gtk.threads_leave()
         stdout = os.popen("update-repos")
         stdout.close()
@@ -136,6 +147,7 @@ class Notifier(trayicon.TrayIcon):
             
     def on_quit(self, w, event):
         if event.button == 1:
+            os.unlink("/tmp/ilenia-notifier")
             gtk.main_quit()
 
     def ipc_start(self):
@@ -145,8 +157,18 @@ class Notifier(trayicon.TrayIcon):
         sock.listen(1)
         while 1:
             client = sock.accept()[0]
-            if client.recv(1024) == "notify":
+            client_command = client.recv(1024)
+            if client_command == "start":
+                gtk.threads_enter()
+                self._picon = self._icon
+                self.set_icon(gtk.STOCK_EXECUTE)
+                gtk.threads_leave()
+            elif client_command == "update":
                 thread.start_new_thread(self.init_ilenia, ())
+            elif client_command == "end":
+                gtk.threads_enter()
+                self.set_icon(self._picon)
+                gtk.threads_leave()
             client.close() 
 
 if __name__ == "__main__":

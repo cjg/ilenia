@@ -25,6 +25,7 @@ from lib.favorite import Favoriterepo
 from lib.confront import *
 from lib.progdownload import *
 from lib.option import IleniaOptions
+from lib.notify import *
 from ConfigParser import ConfigParser
 import os, os.path
 
@@ -43,6 +44,8 @@ class Config(ConfigParser):
 
 class Ilenia:
     def __init__(self, options=None):
+        notify_start()
+        
         self.config = Config()
         self.options = options
         
@@ -53,7 +56,7 @@ class Ilenia:
 
         self.favoriterepo = Favoriterepo(self.config)
         self.no_favoriterepo = False
-
+        
         if self.options:
             self.parse_options()
     
@@ -83,8 +86,10 @@ class Ilenia:
         elif action == "-h":
             self.do_help()
 
-        if "-u" or "-U" in action:
-            self.notify()
+        if "-u" in action or "-U" in action:
+            notify_update()
+        else:
+            notify_end()
 
     def do_list_installed(self):
         for pkg in self.local_packages:
@@ -171,17 +176,6 @@ class Ilenia:
 
     def do_help(self):
         IleniaOptions().print_help()
-
-    def notify(self):
-        import socket
-        try:
-            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            sock.connect('/tmp/ilenia-notifier')
-            sock.send('notify')
-            sock.close()
-        except:
-            pass
-
 
 if __name__ == "__main__":
     Ilenia(IleniaOptions().parse())
