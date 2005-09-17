@@ -150,6 +150,7 @@ class Ilenia:
                 if not os.system("upgradepkg %s" % pkg_file) == 0:
                     print "Error upgrading %s" % pkg_file
                     return
+                os.unlink(pkg_file)
             return
         
         for pkg_name in args:
@@ -172,7 +173,8 @@ class Ilenia:
                 if not os.system("installpkg %s" % pkg_file) == 0:
                     print "Error installing %s" % pkg_file
                     return
-            os.system("rm %s" % pkg_file)
+
+            os.unlink(pkg_file)
 
     def do_help(self):
         IleniaOptions().print_help()
