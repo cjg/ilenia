@@ -74,8 +74,8 @@ class install_etc(cmd.Command):
 
     def run(self):
         mkpath(os.path.join(self.install_dir))
-        copy_file(os.path.join("conf", "ilenia.conf"),
-                  os.path.join(self.install_dir, "ilenia.conf"))
+        copy_file(os.path.join("conf", "ilenia.conf.new"),
+                  os.path.join(self.install_dir, "ilenia.conf.new"))
         
 
 setup(name='ilenia',
