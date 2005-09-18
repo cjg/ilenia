@@ -25,4 +25,4 @@ sys.path.pop(0)
 from ilenia.ilenia import Ilenia
 from ilenia.lib.option import IleniaOptions
 
-Ilenia(IleniaOptions().parse())
+Ilenia(IleniaOptions().parse(), True)

@@ -43,8 +43,11 @@ class Config(ConfigParser):
             return self.getint(section, key)
 
 class Ilenia:
-    def __init__(self, options=None):
-        notify_start()
+    def __init__(self, options=None, use_ipc=False):
+        self.use_ipc = use_ipc
+        print use_ipc
+        if self.use_ipc:
+            notify_start()
         
         self.config = Config()
         self.options = options
@@ -56,7 +59,7 @@ class Ilenia:
 
         self.favoriterepo = Favoriterepo(self.config)
         self.no_favoriterepo = False
-        
+
         if self.options:
             self.parse_options()
     
@@ -86,10 +89,11 @@ class Ilenia:
         elif action == "-h":
             self.do_help()
 
-        if "-u" in action or "-U" in action:
-            notify_update()
-        else:
-            notify_end()
+        if self.use_ipc:
+            if "-u" in action or "-U" in action:
+                notify_update()
+            else:
+                notify_end()
 
     def do_list_installed(self):
         for pkg in self.local_packages:
@@ -180,4 +184,4 @@ class Ilenia:
         IleniaOptions().print_help()
 
 if __name__ == "__main__":
-    Ilenia(IleniaOptions().parse())
+    Ilenia(IleniaOptions().parse(), True)

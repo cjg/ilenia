@@ -19,7 +19,7 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 
-import sys, urllib, string, time
+import sys, urllib, string, time, os
 
 class ProgressiveDownload:
     """
@@ -64,7 +64,7 @@ class ProgressiveDownload:
 
         self.start_time = time.time()
 
-        urllib.urlretrieve(self.url, self.filename, self._reporthook)
+        urllib.urlretrieve(self.url, filename, self._reporthook)
 
         os.rename(filename, self.filename)
         
