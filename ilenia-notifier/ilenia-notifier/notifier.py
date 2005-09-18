@@ -27,6 +27,7 @@ gettext.install("ilenia-notifier")
 from egg import trayicon
 
 from ilenia.ilenia import Ilenia
+from lib.details import Details
 
 class Notifier(trayicon.TrayIcon):
     def __init__(self):
@@ -57,6 +58,13 @@ class Notifier(trayicon.TrayIcon):
         self.w_menu.add(w_update_repos)
         
         self.w_menu.add(gtk.SeparatorMenuItem())
+
+        w_show_details = gtk.ImageMenuItem(gtk.STOCK_INFO,
+                                           _("Show Details Window"))
+        w_show_details.connect("button_press_event", self.on_show_details)
+        self.w_menu.add(w_show_details)
+        
+        self.w_menu.add(gtk.SeparatorMenuItem())
         
         self.w_quit = gtk.ImageMenuItem(gtk.STOCK_QUIT, _("Quit"))
         self.w_quit.connect("button_press_event", self.on_quit)
@@ -72,18 +80,18 @@ class Notifier(trayicon.TrayIcon):
         self.show_all()
         self.updating_repos = False
         self.updating_ilenia = False
-        
+        self.working = False
+
+        self.w_details = Details()
+
         gtk.threads_init()
         thread.start_new_thread(self.init_ilenia, ())
         thread.start_new_thread(self.ipc_start, ())
-        #self.update_repos()
         gtk.main()
 
     def set_icon(self, icon):
         self._icon = icon
-        #gtk.threads_enter()
         self.w_icon.set_from_stock(self._icon, gtk.ICON_SIZE_MENU)
-        #gtk.threads_leave()
         
     def init_ilenia(self):
         while self.updating_repos:
@@ -98,9 +106,10 @@ class Notifier(trayicon.TrayIcon):
         self.updating_ilenia = False
 
     def get_updated(self):
-        u_list = self.ilenia.do_updated(False)
-        if len(u_list)>0:
-            self.set_toupdate(len(u_list))
+        self.u_list = self.ilenia.do_updated(False)
+        self.w_details.set_list(self.u_list)
+        if len(self.u_list)>0:
+            self.set_toupdate(len(self.u_list))
         else:
             self.set_noupdate()
 
@@ -129,14 +138,24 @@ class Notifier(trayicon.TrayIcon):
         gtk.threads_leave()
         stdout = os.popen("update-repos")
         stdout.close()
+        self.updating_repos = False
     
     def update_repos(self):
+        self.updating_repos = True
         thread.start_new_thread(self._update_repos, ())
     
     def on_event(self, w, event):
+        if self.updating_repos or self.updating_ilenia or self.working:
+            return
+        if event.button == 1:
+            self.w_details.show()
         if event.button == 3:
             self.w_menu.popup(None, None, None, 0, event.time)
 
+    def on_show_details(self, w, event):
+        if event.button == 1:
+            self.w_details.show()
+            
     def on_update(self, w, event):
         if event.button == 1:
             thread.start_new_thread(self.init_ilenia, ())
@@ -162,10 +181,13 @@ class Notifier(trayicon.TrayIcon):
                 gtk.threads_enter()
                 self._picon = self._icon
                 self.set_icon(gtk.STOCK_EXECUTE)
+                self.working = True
                 gtk.threads_leave()
             elif client_command == "update":
+                self.working = False
                 thread.start_new_thread(self.init_ilenia, ())
             elif client_command == "end":
+                self.working = False
                 gtk.threads_enter()
                 self.set_icon(self._picon)
                 gtk.threads_leave()

@@ -45,7 +45,7 @@ class Config(ConfigParser):
 class Ilenia:
     def __init__(self, options=None, use_ipc=False):
         self.use_ipc = use_ipc
-        print use_ipc
+
         if self.use_ipc:
             notify_start()
         
