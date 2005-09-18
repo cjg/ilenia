@@ -60,10 +60,14 @@ class ProgressiveDownload:
         if self.report == self._progressbar:
             print "Downloading %s" % self.url
 
+        filename = "%s.part" % self.filename
+
         self.start_time = time.time()
 
         urllib.urlretrieve(self.url, self.filename, self._reporthook)
 
+        os.rename(filename, self.filename)
+        
         if self.report == self._progressbar:
             sys.stdout.write("\n")
 
