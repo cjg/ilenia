@@ -1,3 +1,31 @@
+	* 20/09:
+	- created prettyprint function for printing data organized in columns
+	* 18/09:
+	- no partial downloads anymore
+	* 16/09:
+	- improved IPC
+	* 14/09:
+	- quick help
+	* 13/09:
+	- setup works
+	- IPC with ilenia-notifier
+	* 11/09:
+	- ProgressiveDownload is now a class
+	- Fixed favoriterepo issues
+	* 10/09:
+	- Enhaced download progressbar (ProgressiveDownload)
+	- Working install and update packages
+	* 07/09:
+	- Created Repos class
+	- Created download with progressbar
+	- Improved Packages class
+	- Cleaned code
+	- Supporting -U command
+	- Created Favoriterepo
+	* 06/09:
+	- homemade OptionParser
+	* 05/09:
+	- pythonized and slackwarized
 1.4:
 	- feature: introduced alias
 	- feature: added a little search function
