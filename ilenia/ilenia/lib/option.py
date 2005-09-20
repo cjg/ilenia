@@ -21,6 +21,7 @@
 
 import sys, string
 from copy import copy
+from prettyprint import *
 
 class Options(list):
     def __init__(self):
@@ -63,7 +64,7 @@ class Options(list):
 
     def print_help(self):
         for option in self:
-            print "%s\t%s" % (option.option, option.help_text)
+            prettyprint ([option.option, option.help_text], [18, 60])
             
     
 class Option:

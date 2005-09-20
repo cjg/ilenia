@@ -26,6 +26,7 @@ from lib.confront import *
 from lib.progdownload import *
 from lib.option import IleniaOptions
 from lib.notify import *
+from lib.prettyprint import *
 from ConfigParser import ConfigParser
 import os, os.path
 
@@ -98,18 +99,20 @@ class Ilenia:
     def do_list_installed(self):
         for pkg in self.local_packages:
             pkg_info = self.local_packages.get_info(pkg)[0]
-            print "Name: %s \t Version: %s" % (pkg_info["name"],
-                                               pkg_info["version"])
+            prettyprint(["Name:", pkg_info["name"], "Version:",
+                         pkg_info["version"]], [5,25,8,10])
 
     def do_list(self, args):
         if not args:
             args = self.repos
         for pkg in self.repos_packages:
+            prettyprint (["Package", "Version", "Build", "Repo"],
+                         [25, 10, 6, 30])
             for pkg_info in self.repos_packages.get_info(pkg):
                 if pkg_info["repo"] in args:
-                    print "%s %s %s %s" % (pkg_info["name"],
-                                           pkg_info["version"],
-                                           pkg_info["build"], pkg_info["repo"])
+                    prettyprint ([pkg_info["name"],pkg_info["version"],
+                                  pkg_info["build"], pkg_info["repo"]],
+                                 [25, 10, 6, 30])
         
     def do_update(self, args):
         if not args:
@@ -133,11 +136,12 @@ class Ilenia:
             return u_list
         
         if len(u_list):
+            prettyprint (["Package", "Local Ver", "Repo Ver", "Repo"],
+                         [25, 10, 10, 30])
+
             for pkg in u_list:
-                print "%s \t %s \t %s \t %s" % (pkg["name"],
-                                                pkg["l_version"],
-                                                pkg["r_version"],
-                                                pkg["repo"])
+                prettyprint ([pkg["name"], pkg["l_version"], pkg["r_version"],
+                        pkg["repo"]], [25, 10, 10, 30])
         else:
             print "The system is up to date"
 

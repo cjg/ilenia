@@ -1,3 +1,5 @@
+	* 20/09:
+	- created prettyprint function for printing data organized in columns
 	* 18/09:
 	- no partial downloads anymore
 	* 16/09:
