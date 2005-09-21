@@ -105,9 +105,9 @@ class Ilenia:
     def do_list(self, args):
         if not args:
             args = self.repos
+        prettyprint (["Package", "Version", "Build", "Repo"],
+                     [25, 10, 6, 30])
         for pkg in self.repos_packages:
-            prettyprint (["Package", "Version", "Build", "Repo"],
-                         [25, 10, 6, 30])
             for pkg_info in self.repos_packages.get_info(pkg):
                 if pkg_info["repo"] in args:
                     prettyprint ([pkg_info["name"],pkg_info["version"],

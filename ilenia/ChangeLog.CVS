@@ -1,5 +1,6 @@
 	* 21/09:
 	- Enhaced Option parser
+	- Fixed print list
 	* 20/09:
 	- created prettyprint function for printing data organized in columns
 	* 18/09:
