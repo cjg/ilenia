@@ -24,8 +24,9 @@ from copy import copy
 from prettyprint import *
 
 class Options(list):
-    def __init__(self):
+    def __init__(self, desc):
         self.options = []
+        self.desc = desc
 
     def add_option(self, option):
         self.append(option)
@@ -45,7 +46,10 @@ class Options(list):
                     args = args[len(a_args):]
                 else:
                     print "Error: option %s not known!" % a
-
+                    self.print_help()
+                    return
+        if len(options) == 0:
+            self.print_help()
         return options
 
     def get_args(self, rargs):
@@ -63,6 +67,7 @@ class Options(list):
         return None
 
     def print_help(self):
+        print self.desc
         for option in self:
             prettyprint ([option.option, option.help_text], [18, 60])
             
@@ -75,7 +80,7 @@ class Option:
 
 class IleniaOptions(Options):
     def __init__(self):
-        Options.__init__(self)
+        Options.__init__(self, "Usage: ilenia option [arg(s)]")
         self.add_option(Option("-u", "list",
                                "Updates info about repos packages"))
         self.add_option(Option("-i", "toggle", "Lists installed packages"))
