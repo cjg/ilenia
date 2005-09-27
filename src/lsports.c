@@ -32,11 +32,12 @@
 #include "db.h"
 #include "deplist.h"
 #include "repolist.h"
+#include "aliaslist.h"
 #include "ilenia.h"
 
 FILE *cachefile;
 
-#define PORTS_LOCATION "/usr/ports/"
+#define PORTS_LOCATION "/usr/ports"
 
 struct deplist *
 deplist_from_deprow (char *deprow)
@@ -44,26 +45,12 @@ deplist_from_deprow (char *deprow)
   struct deplist *d = NULL;
   if (strlen (deprow) > 0)
     {
-      char tmp[MASSIMO];
-      strcpy (deprow, sed (deprow, " ", ","));
-      while (strlen (deprow) > 0)
-	{
-	  if (strstr (deprow, ","))
-	    {
-	      strcpy (tmp, strstr (deprow, ","));
-	      strcpy (tmp, mid (deprow, 0, strlen (deprow) - strlen (tmp)));
-	      strcpy (deprow, mid (strstr (deprow, ","), 1, FINE));
-	    }
-	  else
-	    {
-	      strcpy (tmp, deprow);
-	      strcpy (deprow, "");
-	    }
-	  strcpy (tmp, trim (tmp));
-	  if (strlen (trim (tmp)) > 0)
-	    d = add (trim (tmp), d);
-	  strcpy (deprow, trim (deprow));
-	}
+      char deps[255][MASSIMO];
+      int how_many_deps, i;
+      deprow = sed (deprow, ",", " ");
+      how_many_deps = split (deprow, " ", deps);
+      for (i = 0; i < how_many_deps; i++)
+	d = add (trim (deps[i]), d);
     }
   return (d);
 }
@@ -98,17 +85,17 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 		    }
 		}
 	    }
-	  if (strncmp (riga, "name", 4) == 0)
+	  else if (strncmp (riga, "name", 4) == 0)
 	    {
 	      if (strlen (value = get_value (riga, "name")))
 		nome = strdup (value);
 	    }
-	  if (strncmp (riga, "version", 7) == 0)
+	  else if (strncmp (riga, "version", 7) == 0)
 	    {
 	      if (strlen (value = get_value (riga, "version")))
 		strcpy (versione, value);
 	    }
-	  if (strncmp (riga, "release", 7) == 0)
+	  else if (strncmp (riga, "release", 7) == 0)
 	    {
 	      if (strlen (value = get_value (riga, "release")))
 		{
@@ -121,8 +108,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    {
 	      p = inserisci_elemento_ordinato (nome, versione, collezione,
 					       d, p);
-	      char dependencies[MASSIMO];
-	      strcpy (dependencies, "");
+	      char dependencies[MASSIMO] = "";
 	      if (d != NULL)
 		{
 		  while (d != NULL)
@@ -132,11 +118,14 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 		      d = d->next;
 		    }
 		}
+
 	      fprintf (cachefile, "%s %s %s %s\n", nome, versione,
 		       collezione, dependencies);
 	      strcpy (nome, "");
 	      strcpy (versione, "");
 	      release = 0;
+	      fclose (pkgfile);
+	      return (p);
 	    }
 	}
       fclose (pkgfile);
@@ -152,7 +141,7 @@ parsa_cvsup (char *percorso, struct repolist *p)
     {
       char riga[255];
       char prefix[255];
-      char mad_prefix[255];
+      char mad_prefix[255] = "";
       char collezione[255];
       while (fgets (riga, 255, file))
 	{
@@ -171,8 +160,9 @@ parsa_cvsup (char *percorso, struct repolist *p)
 			  && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  strcpy (mad_prefix,
-				  mid (prefix, strlen (PORTS_LOCATION),
+				  mid (prefix, strlen (PORTS_LOCATION) + 1,
 				       FINE));
+			  strcpy (mad_prefix, trim (mad_prefix));
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			    strcat (mad_prefix, "/");
 			  strcpy (prefix, PORTS_LOCATION);
@@ -224,10 +214,10 @@ parsa_httpup (char *percorso, struct repolist *p)
 		    mid (prefix, 0, strlen (prefix) - strlen (collezione));
 		  if (strncmp
 		      (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)) == 0
-		      && strlen (prefix) > strlen (PORTS_LOCATION))
+		      && strlen (prefix) > strlen (PORTS_LOCATION) + 1)
 		    {
 		      mad_prefix =
-			mid (prefix, strlen (PORTS_LOCATION), FINE);
+			mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
 		      if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			mad_prefix = strcat (mad_prefix, "/");
 		      prefix = strdup (PORTS_LOCATION);
@@ -269,7 +259,7 @@ parse_cvs (char *percorso, struct repolist *p)
 			  && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  mad_prefix =
-			    mid (prefix, strlen (PORTS_LOCATION), FINE);
+			    mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			    mad_prefix = strcat (mad_prefix, "/");
 			  mad_prefix = strdup (mad_prefix);
@@ -390,13 +380,14 @@ build_repolist ()
   return (p);
 }
 
-struct db *
-lsports_acrux_way (struct repolist *r)
+int
+build_cache (struct repolist *r)
 {
   struct db *ports = NULL;
+  printf ("Building cache!\n");
   if (!(cachefile = fopen (CACHE, "w")))
     {
-      return ports;
+      return (-1);
     }
   while (r != NULL)
     {
@@ -405,7 +396,7 @@ lsports_acrux_way (struct repolist *r)
     }
   fclose (cachefile);
   chmod (CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-  return (ports);
+  return (0);
 }
 
 struct db *
@@ -414,32 +405,29 @@ lsports ()
   FILE *cachefile;
   struct db *p = NULL;
   char riga[255];
-
   if ((cachefile = fopen (CACHE, "r")))
     {
-      if (fgets (riga, 255, cachefile))
+      if (!fgets (riga, 255, cachefile))
+	if (build_cache (repository) != 0)
+	  return (NULL);
+      while (fgets (riga, 255, cachefile))
 	{
-	  while (fgets (riga, 255, cachefile))
+	  int len;
+	  char splitted_row[MASSIMO][MASSIMO];
+	  len = split (riga, " ", splitted_row);
+	  int i;
+	  struct deplist *d = NULL;
+	  for (i = 3; i < len; i++)
 	    {
-	      int len;
-	      char splitted_row[MASSIMO][MASSIMO];
-	      len = split (riga, " ", splitted_row);
-	      int i;
-	      struct deplist *d = NULL;
-	      for (i = 3; i < len; i++)
-		{
-		  if (strlen (trim (splitted_row[i])) > 0)
-		    d = add (trim (splitted_row[i]), d);
-		}
-	      p = inserisci_elemento_ordinato (trim (splitted_row[0]),
-					       trim (splitted_row[1]),
-					       trim (splitted_row[2]), d, p);
+	      if (strlen (trim (splitted_row[i])) > 0)
+		d = add (trim (splitted_row[i]), d);
 	    }
-	  fclose (cachefile);
-	  return (p);
+	  p = inserisci_elemento_ordinato (trim (splitted_row[0]),
+					   trim (splitted_row[1]),
+					   trim (splitted_row[2]), d, p);
 	}
+      fclose (cachefile);
+      return (p);
     }
-  printf ("Building cache!\n");
-  p = lsports_acrux_way (repository);
-  return (p);
+  return (NULL);
 }

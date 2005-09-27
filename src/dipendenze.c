@@ -169,10 +169,18 @@ stampa_dipendenze (char *pacchetto)
       if (strcmp (d->collezione, "not found") != 0)
 	{
 	  printf ("%s [", d->nome);
-	  if (esiste (d->nome, pacchetti) != 0)
-	    printf (" ]\n");
+	  if (esiste (d->nome, pacchetti) == 0)
+	    {
+	      struct db *pa = NULL;
+	      pa = cerca (d->nome, pacchetti);
+	      printf ("installed]");
+	      if (strcmp (pa->versione, "alias") == 0)
+		printf (" (%s)\n", pa->collezione);
+	      else
+		printf ("\n");
+	    }
 	  else
-	    printf ("installed]\n");
+	    printf (" ]\n");
 	}
       else
 	{

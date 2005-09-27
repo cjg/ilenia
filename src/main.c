@@ -10,6 +10,7 @@
 #include "pkgutils.h"
 #include "dipendenze.h"
 #include "repolist.h"
+#include "aliaslist.h"
 #include "ilenia.h"
 
 #define AGGIORNA	1
@@ -19,6 +20,7 @@
 #define DIPENDENZE      8
 #define RIMUOVI         9
 #define DEPENDENT      10
+#define REPOLIST       11
 
 int
 main (int argc, char *argv[])
@@ -80,6 +82,11 @@ main (int argc, char *argv[])
 	{
 	  azioni++;
 	  azione[azioni] = AIUTO;
+	}
+      else if (strcmp (argv[i], "--repository-list") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = REPOLIST;
 	}
       else if (strcmp (argv[i], "--no-favorite-repo") == 0)
 	{
@@ -172,13 +179,21 @@ main (int argc, char *argv[])
       if ((file = fopen (CACHE, "w")))
 	fclose (file);
     }
+  aliases = aliaseslist_build ();
   ports = lsports ();
   pacchetti = lspacchetti ();
 
-  for (i = 0; i <= (azioni + rebuild_cache); i++)
+  for (i = 0; i <= (azioni - rebuild_cache); i++)
     {
       switch (azione[i])
 	{
+	case REPOLIST:
+	  while (repository != NULL)
+	    {
+	      printf ("%s\n", repository->repository);
+	      repository = repository->next;
+	    }
+	  break;
 	case DIPENDENZE:
 	  if (opzioni_d != -1)
 	    {
@@ -234,7 +249,7 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_l; j++)
 		{
-		  p = cerca (opzione_l[j], ports);
+		  p = db_like (opzione_l[j], ports);
 		  print_db (p);
 		}
 	    }
