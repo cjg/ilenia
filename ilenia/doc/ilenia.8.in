@@ -92,6 +92,9 @@ In your ilenia.rc you can specify a command, or some commands, to be executed af
 For example, I use:
 
 POST_PKGADD  = "pkgmk \-c; aplay /home/slash/sounds/grolsch_plop.wav"
+.SH ASK_FOR_UPDATE
+.TP
+Now ilenia, when you are trying to update all packages, asks you if you're sure to do that. If you like, the old way: without any question; you can set the ASK_FOR_UPDATE variable to "No" (I use this).
 .SH SEE ALSO
 pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1), httpup(8)
 .SH AUTHOR

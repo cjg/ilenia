@@ -27,6 +27,8 @@
 #include "lspacchetti.h"
 #include "manipola.h"
 #include "db.h"
+#include "aliaslist.h"
+#include "ilenia.h"
 
 struct db *
 prendi_favorite (int quale)
@@ -105,6 +107,16 @@ lspacchetti ()
 	      strcpy (tmp, "installato");
 	    }
 	  p = inserisci_elemento_ordinato (nome, riga, tmp, NULL, p);
+	  struct aliaslist *a = NULL;
+	  a = aliaslist_get (nome, aliases);
+	  while (a != NULL)
+	    {
+	      if (strcmp (a->pkg, nome) != 0)
+		p =
+		  inserisci_elemento_ordinato (a->pkg, "alias", nome,
+					       NULL, p);
+	      a = a->next;
+	    }
 	  strcpy (nome, "");
 	  nuovo_record = 0;
 	}

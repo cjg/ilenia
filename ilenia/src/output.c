@@ -54,7 +54,7 @@ aiuto ()
   printf ("usage: ilenia [options] [collections] [packages]\n");
   printf ("options:\n");
   printf ("\t-u, --update           update ports\n");
-  printf ("\t-l, --list             list ports\n");
+  printf ("\t-l, --list             list ports, or search for ports\n");
   printf ("\t-d, --diff             list version differences\n");
   printf
     ("\t-p, --updated          list ports with version newer than the installed ones\n");
@@ -73,6 +73,7 @@ aiuto ()
   printf
     ("\t--all                  shows or remove all dependents packages (sometime requires some minutes)\n");
   printf ("\t--cache                rebuild the cache\n");
+  printf ("\t--repository-list    list repository that ilenia are using\n");
 }
 
 void
