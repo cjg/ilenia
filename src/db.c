@@ -188,3 +188,17 @@ db_like (char *delim, struct db *p)
     }
   return (paus);
 }
+
+struct db * 
+db_from_repo (char *repo, struct db *p)
+{
+  struct db *paus = NULL;
+  while (p != NULL)
+    {
+      if (strcmp(p->collezione, repo)==0)
+	paus = inserisci_elemento_ordinato (p->nome, p->versione, p->collezione,
+					    p->depends, paus);
+      p = p->prossimo;
+    }
+  return(paus);
+}

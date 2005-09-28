@@ -21,6 +21,9 @@ Update ports.
 .B "\-l, \-\-list"
 List ports. When specified lists ports of the specified collection(s).
 .TP
+.B "\-s, \-\-search"
+Search for ports.
+.TP
 .B "\-d, \-\-diff"
 List version differences between local ports and installed packages.
 .TP
@@ -99,6 +102,6 @@ Now ilenia, when you are trying to update all packages, asks you if you're sure 
 pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1), httpup(8)
 .SH AUTHOR
 .nf
-Coviello Giuseppe <slash@crux-it.org>
-http://www.crux-it.org http://coviello.altervista.org
+Coviello Giuseppe <giuseppe@users.berlios.de>
+http://ilenia.berlios.de http://coviello.altervista.org
 .fi

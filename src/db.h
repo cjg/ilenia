@@ -45,3 +45,4 @@ int conta (struct db *p);
 int esiste (char *qualcosa, struct db *p);
 struct db *add_deplist (struct deplist *d, struct db *p);
 struct db *db_like (char *delim, struct db *p);
+struct db *db_from_repo (char *repo, struct db *p);
