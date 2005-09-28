@@ -106,6 +106,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    }
 	  if (strlen (nome) && strlen (versione) && release)
 	    {
+	      strcpy(versione, sed(versione, " ", "_"));
 	      p = inserisci_elemento_ordinato (nome, versione, collezione,
 					       d, p);
 	      char dependencies[MASSIMO] = "";
