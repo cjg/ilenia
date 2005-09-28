@@ -21,6 +21,7 @@
 #define RIMUOVI         9
 #define DEPENDENT      10
 #define REPOLIST       11
+#define SEARCH         12
 
 int
 main (int argc, char *argv[])
@@ -38,6 +39,7 @@ main (int argc, char *argv[])
   char opzione_l[argc][255];
   char opzione_r[argc][255];
   char opzione_t[argc][255];
+  char opzione_s[argc][255];
   int azioni = -1;
   int opzioni = -1;
   int opzioni_p = -1;
@@ -45,6 +47,7 @@ main (int argc, char *argv[])
   int opzioni_l = -1;
   int opzioni_r = -1;
   int opzioni_t = -1;
+  int opzioni_s = -1;
   int opzioni_confronto = 0;
   int controlla_dipendenze = 0;
   int all = 0;
@@ -60,6 +63,11 @@ main (int argc, char *argv[])
 	{
 	  azioni++;
 	  azione[azioni] = LSPORTS;
+	}
+      else if (strcmp (argv[i], "-s") == 0 || strcmp (argv[i], "--search") == 0)
+	{
+	  azioni++;
+	  azione[azioni] = SEARCH;
 	}
       else if (strcmp (argv[i], "-d") == 0 || strcmp (argv[i], "--diff") == 0)
 	{
@@ -150,6 +158,11 @@ main (int argc, char *argv[])
 	    {
 	      opzioni_l++;
 	      strcpy (opzione_l[opzioni_l], argv[i]);
+	    }
+	  else if (azione[azioni] == SEARCH)
+	    {
+	      opzioni_s++;
+	      strcpy (opzione_s[opzioni_s], argv[i]);
 	    }
 	  else if (azione[azioni] == RIMUOVI)
 	    {
@@ -245,11 +258,24 @@ main (int argc, char *argv[])
 	    print_db (ports);
 	  else
 	    {
-	      struct db *p = NULL;
 	      int j;
 	      for (j = 0; j <= opzioni_l; j++)
 		{
-		  p = db_like (opzione_l[j], ports);
+		  if(repolist_exists(opzione_l[j], repository))
+		    print_db(db_from_repo(opzione_l[j], ports));
+		}
+	    }
+	  break;
+	case SEARCH:
+	  if (opzioni_s == -1)
+	    printf ("What can I search?\n");
+	  else
+	    {
+	      struct db *p = NULL;
+	      int j;
+	      for (j = 0; j <= opzioni_s; j++)
+		{
+		  p = db_like (opzione_s[j], ports);
 		  print_db (p);
 		}
 	    }

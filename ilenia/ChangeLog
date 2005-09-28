@@ -1,6 +1,7 @@
 1.4:
 	- feature: introduced alias
 	- feature: added a little search function
+	- feature: search function
 1.3:	
 	- feature: support for local repository
 	- feature: --cache forces ilenia to rebuild the cache
