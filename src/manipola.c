@@ -3,7 +3,7 @@
  *
  *  Sat Jul 10 12:51:53 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
- *  slash@crux-it.org
+ *  immigrant@email.it
  ****************************************************************************/
 
 /*
