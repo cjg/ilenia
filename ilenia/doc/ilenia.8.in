@@ -87,6 +87,10 @@ File where the informations about the favorite repository are stored.
 .B "/etc/ports/favoriteversion"
 File where the informations about the favorite version are stored.
 .TP
+.B "/etc/ports/alias"
+File where the informations about the alias are stored.
+In each row could be a list of equivalent packages (such as: sendmail exim postfix). Ilenia don't install a package as dependencies if you have an equivalent ones installed.
+.TP
 .B "/etc/ilenia.rc"
 File contening optional features like "POST_PKGADD"
 .SH POST_PKGADD
@@ -102,6 +106,6 @@ Now ilenia, when you are trying to update all packages, asks you if you're sure 
 pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1), httpup(8)
 .SH AUTHOR
 .nf
-Coviello Giuseppe <giuseppe@users.berlios.de>
+Coviello Giuseppe <immigrant@email.it>
 http://ilenia.berlios.de http://coviello.altervista.org
 .fi
