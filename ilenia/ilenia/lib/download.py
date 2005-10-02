@@ -33,17 +33,13 @@ def download(pkg, repos):
     return None
 
 def get_url(pkg, repos):
-    f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia", pkg["repo"],
+    f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia", pkg.repo,
                              "FILELIST.TXT"))
     lines = f_io.readlines()
     for line in lines:
-        try:
-            version = pkg["version"]
-        except:
-            version = pkg["r_version"]
-        if pkg["name"]+"-"+version in line:
+        if "/"+pkg.name+"-"+pkg.version in line:
             url = line[line.index("./")+1:]
-            url = "%s/%s" % (repos.get_url(pkg["repo"]), url)
+            url = "%s/%s" % (repos.get_url(pkg.repo), url)
             url = url.replace("//", "/")
             url = url.replace(":/", "://")
             url = url.replace("\n", "")
@@ -52,15 +48,11 @@ def get_url(pkg, repos):
     return None
 
 def get_md5sum(pkg):
-    f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia", pkg["repo"],
+    f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia", pkg.repo,
                              "CHECKSUMS.md5"))
     lines = f_io.readlines()
     for line in lines:
-        try:
-            version = pkg["version"]
-        except:
-            version = pkg["r_version"]
-        if pkg["name"]+"-"+version in line:
+        if "/"+pkg.name+"-"+pkg.version in line:
             md5sum = line[:line.index(" ")].strip()
             return md5sum
     return None

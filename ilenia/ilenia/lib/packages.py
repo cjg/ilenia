@@ -19,7 +19,7 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 
-import os, os.path, string, re
+import os, os.path, string, re, copy
 
 class Packages(list):
     def __init__(self, repo = None):
@@ -27,13 +27,17 @@ class Packages(list):
             self.build_local_infolist()
         else:
             self.build_repo_infolist(repo)
+        self._unsorted = copy.copy(self)
         self.sort()
             
     def build_local_infolist(self):
         self._list = []
         for f in os.listdir("/var/log/packages/"):
-            self._list.append(Package(f, "local"))
-            self.append(self._list[len(self._list)].name)
+            try:
+                self._list.append(Package(f, "local"))
+                self.append(self._list[len(self._list)-1].name)
+            except:
+                pass
             
     def build_repo_infolist(self, repos):
         self._list = []
@@ -47,20 +51,23 @@ class Packages(list):
             for line in f_io.readlines():
                 if line[:12] == "PACKAGE NAME":
                     line = line[13:].strip()[:-4]
-                    self._list.append(Package(line, repo))
-                    self.append(self._list[len(self._list)].name)
+                    try:
+                        self._list.append(Package(line, repo))
+                        self.append(self._list[len(self._list)-1].name)
+                    except:
+                        pass
 
     def get_packages(self, name):
         if not name in self:
             return None
         
         packages = []
-        index = self.index(name)
+        index = self._unsorted.index(name)
         packages.append(self._list[index])
         while True:
             index += 1
             try:
-                index = self.index(name, index)
+                index = self._unsorted.index(name, index)
                 packages.append(self._list[index])
             except:
                 return packages
@@ -83,5 +90,4 @@ class Package:
 
 if __name__ == "__main__":
     p = Packages(["slackware", "freerock"])
-    print p
-    print p.get_packages("xchat")
+    print p.get_packages("xchat")[0].name

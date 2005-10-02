@@ -23,37 +23,39 @@ from vercmp import vercmp
 
 def confront(parent):
     updated_packages = []
-    for pkg_name in parent.local_packages:
-        pkg = parent.local_packages.get_info(pkg_name)[0]
-        newer_pkg = get_newer(parent.repos_packages.get_info(pkg_name))
+    for p in parent.local_packages:
+        pkg = parent.local_packages.get_packages(p)[0]
+        newer_pkg = get_newer(parent.repos_packages.get_packages(p))
         if not newer_pkg:
             continue
-        if not parent.no_favoriterepo and pkg_name in parent.favoriterepo:
-            if not newer_pkg["repo"] == parent.favoriterepo.get_repo(pkg_name):
+        if not parent.no_favoriterepo and p in parent.favoriterepo:
+            if not newer_pkg.repo == parent.favoriterepo.get_repo(p):
                 continue
-        if vercmp(pkg["version"], newer_pkg["version"]):
-            updated_packages.append({"name":pkg["name"],
-                                     "l_version":pkg["version"],
-                                     "r_version":newer_pkg["version"],
-                                     "repo":newer_pkg["repo"]})
+        if vercmp(pkg.version, newer_pkg.version):
+            updated_packages.append((pkg, newer_pkg))
+        elif (pkg.version == newer_pkg.version
+              and pkg.packager == newer_pkg.packager):
+            if vercmp(pkg.release, newer_pkg.release):
+                updated_packages.append((pkg, newer_pkg))
+
     return updated_packages
 
 def get_newer(pkglist, favoriterepo=None):
     if not pkglist:
         return None
-    if favoriterepo and not pkglist[0]["name"] in favoriterepo:
+    if favoriterepo and not pkglist[0].name in favoriterepo:
         favoriterepo = None
     newer_pkg = None
     for pkg in pkglist:
         try:
             if favoriterepo:
-                if not pkg["repo"] == favoriterepo.get_repo(pkg["name"]):
+                if not pkg.repo == favoriterepo.get_repo(pkg.name):
                     continue
-            if vercmp(newer_pkg["version"], pkg["version"]):
+            if vercmp(newer_pkg.version, pkg.version):
                 newer_pkg = pkg
         except:
             if favoriterepo:
-                if not pkg["repo"] == favoriterepo.get_repo(pkg["name"]):
+                if not pkg.repo == favoriterepo.get_repo(pkg.name):
                     continue
             newer_pkg = pkg
     return newer_pkg

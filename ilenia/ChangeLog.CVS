@@ -1,3 +1,6 @@
+	* 02/10:
+	- Working with class Package
+	- Considering package's release after package's version while updating
 	* 21/09:
 	- Enhaced Option parser
 	- Fixed print list

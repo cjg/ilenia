@@ -97,21 +97,21 @@ class Ilenia:
                 notify_end()
 
     def do_list_installed(self):
-        for pkg in self.local_packages:
-            pkg_info = self.local_packages.get_info(pkg)[0]
-            prettyprint(["Name:", pkg_info["name"], "Version:",
-                         pkg_info["version"]], [5,25,8,10])
+        for p in self.local_packages:
+            pkg = self.local_packages.get_packages(p)[0]
+            prettyprint(["Name:", pkg.name, "Version:",
+                         pkg.version], [5,25,8,10])
 
     def do_list(self, args):
         if not args:
             args = self.repos
         prettyprint (["Package", "Version", "Build", "Repo"],
                      [25, 10, 6, 30])
-        for pkg in self.repos_packages:
-            for pkg_info in self.repos_packages.get_info(pkg):
-                if pkg_info["repo"] in args:
-                    prettyprint ([pkg_info["name"],pkg_info["version"],
-                                  pkg_info["build"], pkg_info["repo"]],
+        for p in self.repos_packages:
+            for pkg in self.repos_packages.get_packages(p):
+                if pkg.repo in args:
+                    prettyprint ([pkg.name, pkg.version,
+                                  pkg.release+pkg.packager, pkg.repo],
                                  [25, 10, 6, 30])
         
     def do_update(self, args):
@@ -137,11 +137,13 @@ class Ilenia:
         
         if len(u_list):
             prettyprint (["Package", "Local Ver", "Repo Ver", "Repo"],
-                         [25, 10, 10, 30])
+                         [25, 15, 15, 20])
 
-            for pkg in u_list:
-                prettyprint ([pkg["name"], pkg["l_version"], pkg["r_version"],
-                        pkg["repo"]], [25, 10, 10, 30])
+            for u in u_list:
+                prettyprint ([u[0].name,
+                              u[0].version+"-"+u[0].release+u[0].packager,
+                              u[1].version+"-"+u[1].release+u[1].packager,
+                              u[1].repo], [25, 15, 15, 20])
         else:
             print "The system is up to date"
 
@@ -149,11 +151,11 @@ class Ilenia:
         from lib.download import download
         sys_update = False
         if not args:
-            for pkg in confront(self):
-                pkg_file = download(pkg, self.repos)
+            for u in confront(self):
+                pkg_file = download(u[1], self.repos)
                 if not pkg_file:
-                    print "Error downloading %s from %s!" % (pkg["name"],
-                                                             pkg["repo"])
+                    print "Error downloading %s from %s!" % (u[1].name,
+                                                             u[1].repo)
                     return
                 if not os.system("upgradepkg %s" % pkg_file) == 0:
                     print "Error upgrading %s" % pkg_file
@@ -161,19 +163,19 @@ class Ilenia:
                 os.unlink(pkg_file)
             return
         
-        for pkg_name in args:
-            pkg = get_newer(self.repos_packages.get_info(pkg_name),
+        for p in args:
+            pkg = get_newer(self.repos_packages.get_packages(p),
                             self.favoriterepo)
             if not pkg:
                 if not sys_update:
-                    print "Package %s not found!" % pkg_name
+                    print "Package %s not found!" % p
                 continue
             pkg_file = download(pkg, self.repos)
             if not pkg_file:
-                print "Error downloading %s from %s!" % (pkg["name"],
-                                                         pkg["repo"])
+                print "Error downloading %s from %s!" % (pkg.name,
+                                                         pkg.repo)
                 return
-            if pkg_name in self.local_packages:
+            if p in self.local_packages:
                 if not os.system("upgradepkg %s" % pkg_file) == 0:
                     print "Error upgrading %s" % pkg_file
                     return
