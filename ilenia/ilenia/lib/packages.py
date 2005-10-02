@@ -19,7 +19,7 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 
-import os, os.path, string
+import os, os.path, string, re
 
 class Packages(list):
     def __init__(self, repo = None):
@@ -30,25 +30,13 @@ class Packages(list):
         self.sort()
             
     def build_local_infolist(self):
-        self.infolist = []
-        self.list = []
+        self._list = []
         for f in os.listdir("/var/log/packages/"):
-            f_splitted = f.rsplit("-", 3)
-            try:
-                self.infolist.append({"name":f_splitted[0],
-                                      "version":f_splitted[1],
-                                      "build":f_splitted[3]})
-            
-                self.list.append(f_splitted[0])
-                if not f_splitted[0] in self:
-                    self.append(f_splitted[0])
-            except:
-                pass
-                #print f
+            self._list.append(Package(f, "local"))
+            self.append(self._list[len(self._list)].name)
             
     def build_repo_infolist(self, repos):
-        self.infolist = []
-        self.list = []
+        self._list = []
         for repo in repos:
             try:
                 f_io = file(os.path.join(os.path.sep, "var", "lib", "ilenia",
@@ -59,32 +47,41 @@ class Packages(list):
             for line in f_io.readlines():
                 if line[:12] == "PACKAGE NAME":
                     line = line[13:].strip()[:-4]
-                    line_splitted = line.rsplit("-", 3)
-                    try:
-                        self.infolist.append({"name":line_splitted[0],
-                                              "version":line_splitted[1],
-                                              "build":line_splitted[3],
-                                              "repo":repo})
-                        self.list.append(line_splitted[0])
-                        if not line_splitted[0] in self:
-                            self.append(line_splitted[0])
-                    except:
-                        pass
+                    self._list.append(Package(line, repo))
+                    self.append(self._list[len(self._list)].name)
 
-    def get_info(self, pkg_name):
-        if not pkg_name in self:
+    def get_packages(self, name):
+        if not name in self:
             return None
-        infos = []
-        index = self.list.index(pkg_name)
-        infos.append(self.infolist[index])
+        
+        packages = []
+        index = self.index(name)
+        packages.append(self._list[index])
         while True:
             index += 1
             try:
-                index = self.list.index(pkg_name, index)
-                infos.append(self.infolist[index])
+                index = self.index(name, index)
+                packages.append(self._list[index])
             except:
-                return infos
+                return packages
+
+class Package:
+    def __init__(self, pkgname, repo):
+        self.name = ""
+        self.version = ""
+        self.arch = ""
+        self.release = ""
+        self.packager = ""
+        self.repo = repo
+        [self.name, self.version, self.arch, build] = pkgname.rsplit("-", 3)
+        packager = re.search("[a-zA-Z]\w*", build)
+        if packager:
+            self.packager = packager.group(0)
+            self.release = build[:-len(self.packager)]
+        else:
+            self.release = build
 
 if __name__ == "__main__":
     p = Packages(["slackware", "freerock"])
-    print p.get_info("xchat")
+    print p
+    print p.get_packages("xchat")
