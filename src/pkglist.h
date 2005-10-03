@@ -40,6 +40,6 @@ struct pkglist *pkglist_add_reversed (char *name, char *version, char *repo,
 struct pkglist *pkglist_add_deplist (struct deplist *d, struct pkglist *p);
 struct pkglist *pkglist_find (char *param, struct pkglist *p);
 struct pkglist *pkglist_find_like (char *param, struct pkglist *p);
-struct pkglist *pkglist_find_from_repo (char *repo, struct pkglist *p);
+struct pkglist *pkglist_select_from_repo (char *repo, struct pkglist *p);
 int pkglist_len (struct pkglist *p);
 int pkglist_exists (char *param, struct pkglist *p);

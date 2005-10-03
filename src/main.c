@@ -263,7 +263,7 @@ main (int argc, char *argv[])
 	      for (j = 0; j <= opzioni_l; j++)
 		{
 		  if (repolist_exists (opzione_l[j], repository))
-		    print_db (pkglist_find_from_repo (opzione_l[j], ports));
+		    print_db (pkglist_select_from_repo (opzione_l[j], ports));
 		}
 	    }
 	  break;
