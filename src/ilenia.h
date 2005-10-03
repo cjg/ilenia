@@ -22,8 +22,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct db *ports;
-struct db *pacchetti;
+struct pkglist *ports;
+struct pkglist *pacchetti;
 struct repolist *repository;
 struct aliaseslist *aliases;
 char *post_pkgadd;
