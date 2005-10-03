@@ -1,5 +1,5 @@
 /***************************************************************************
- *            aggiorna.h
+ *            update.h
  *
  *  Thu Jul 15 18:17:19 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
@@ -22,5 +22,5 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-int aggiorna_ports ();
-int aggiorna_collezione (char *collezione);
+int update_repo (char *name);
+int update_all_repos ();

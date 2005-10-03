@@ -92,7 +92,7 @@ tab2spazi (char *s)
 }
 
 char *
-mid (char *s, int inizio, int lunghezza)
+oldmid (char *s, int inizio, int lunghezza)
 {
   static char local_s[MASSIMO] = "";
   strcpy (local_s, s);
@@ -112,6 +112,29 @@ mid (char *s, int inizio, int lunghezza)
     }
   local_s[lunghezza] = '\0';
   return ((char *) local_s);
+}
+
+char *
+mid (char *s, int start, int length)
+{
+  char *local_s;
+  local_s = strdup(s);
+  int x, z = 0;
+  if (length == -1)
+    length = strlen (local_s) - start;
+  if ((start + length) <= strlen (local_s))
+    {
+      for (x = 0; x <= strlen (local_s); x++)
+	{
+	  if ((x >= start))
+	    {
+	      local_s[z] = local_s[x];
+	      z++;
+	    }
+	}
+    }
+  local_s[length] = '\0';
+  return (local_s);
 }
 
 char *

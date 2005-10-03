@@ -1,21 +1,18 @@
 ## Process this file with automake to produce Makefile.in
 
-## Created by Anjuta - will be overwritten
-## If you don't want it to overwrite it,
-## 	Please disable it in the Anjuta project configuration
-
 INCLUDES =
 
 AM_CFLAGS =\
-	 -Wall\
-	 -g
+	-Wall\
+	-g\
+	-D_GNU_SOURCE
 
 bin_PROGRAMS = ilenia
 
 ilenia_SOURCES = \
 	main.c\
-	aggiorna.c\
-	aggiorna.h\
+	update.c\
+	update.h\
 	confronto.c\
 	confronto.h\
 	pkglist.c\

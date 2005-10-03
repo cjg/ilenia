@@ -5,7 +5,7 @@
 #include "lspacchetti.h"
 #include "lsports.h"
 #include "confronto.h"
-#include "aggiorna.h"
+#include "update.h"
 #include "output.h"
 #include "pkgutils.h"
 #include "dipendenze.h"
@@ -243,14 +243,14 @@ main (int argc, char *argv[])
 	case AGGIORNA:
 	  if (opzioni < 0)
 	    {
-	      aggiorna_ports ();
+	      update_all_repos ();
 	    }
 	  else
 	    {
 	      int j;
 	      for (j = 0; j <= opzioni; j++)
 		{
-		  aggiorna_collezione (opzione[j]);
+		  update_repo (opzione[j]);
 		}
 	    }
 	  break;

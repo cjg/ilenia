@@ -1,5 +1,5 @@
 /***************************************************************************
- *            aggiorna.c
+ *            update.c
  *
  *  Thu Jul 15 16:27:56 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
@@ -23,6 +23,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
 #include <sys/types.h>
@@ -30,189 +31,178 @@
 #include <time.h>
 #include <unistd.h>
 #include "manipola.h"
+#include "repolist.h"
 #include "ilenia.h"
 
 int
-cvsup (char *nome_file)
+cvsup (char *filename)
 {
-  int stato;
+  int status;
   pid_t pid = fork ();
   if (pid == 0)
-    {
-      execl ("/usr/bin/cvsup", "", "-g", "-L", "1", "-r", "0", "-c",
-	     ".cvsup", nome_file, 0);
-    }
+    execl ("/usr/bin/cvsup", "", "-g", "-L", "1", "-r", "0", "-c",
+	   ".cvsup", filename, 0);
   else if (pid < 0)
-    {
-      stato = -1;
-    }
+    status = -1;
   else
     {
-      while ((waitpid (pid, &stato, 0) == 0))
+      while ((waitpid (pid, &status, 0) == 0))
 	{
 	}
     }
-  return (stato);
+  return (status);
 }
 
 int
-httpup (char *nome_file)
+httpup (char *filename)
 {
   FILE *file;
-  if ((file = fopen (nome_file, "r")))
-    {
-      char riga[255];
-      static char root_dir[255];
-      static char url[255];
-      while (fgets (riga, 255, file))
-	{
-	  strcpy (riga, trim (riga));
-	  if (strcmp (mid (riga, 0, 8), "ROOT_DIR") == 0)
-	    {
-	      strcpy (root_dir, mid (riga, 9, FINE));
-	    }
-	  if (strcmp (mid (riga, 0, 3), "URL") == 0)
-	    {
-	      strcpy (url, mid (riga, 4, FINE));
-	    }
-	  if (strlen (root_dir) && strlen (url))
-	    {
-	      int stato;
-	      pid_t pid = fork ();
-	      if (pid == 0)
-		{
-		  execl ("/usr/bin/httpup", "", "sync", url, root_dir, 0);
-		}
-	      else if (pid < 0)
-		{
-		  stato = -1;
-		}
-	      else
-		{
-		  while ((waitpid (pid, &stato, 0) == 0))
-		    {
-		    }
-		}
-	      root_dir[0] = '\0';
-	      url[0] = '\0';
-	      return (stato);
-	    }
-	}
-    }
-  return (-1);
-}
 
-int
-cvs (char *filepath)
-{
-  int state;
+  if (!(file = fopen (filename, "r")))
+    return (-1);
+
+  size_t n = 0;
+  char *line = NULL;
+  int nread = getline (&line, &n, file);
+  char *root_dir = NULL;
+  char *url = NULL;
+  while (nread > 0)
+    {
+      line = trim (line);
+
+      if (strncmp (line, "ROOT_DIR", 8) == 0)
+	root_dir = mid (line, 9, FINE);
+
+      if (strncmp (line, "URL", 3) == 0)
+	url = mid (line, 4, FINE);
+
+      nread = getline (&line, &n, file);
+    }
+
+  line = NULL;
+  free (line);
+
+  if (!(strlen (root_dir) && strlen (url)))
+    return (-1);
+
+  int status;
   pid_t pid = fork ();
   if (pid == 0)
-    {
-      execl ("/etc/ports/drivers/cvs", "", filepath, 0);
-    }
+    execl ("/usr/bin/httpup", "", "sync", url, root_dir, 0);
   else if (pid < 0)
-    {
-      state = -1;
-    }
+    status = -1;
   else
     {
-      while ((waitpid (pid, &state, 0) == 0))
+      while ((waitpid (pid, &status, 0) == 0))
 	{
 	}
     }
-  return (state);
+
+  root_dir = NULL;
+  url = NULL;
+  free (root_dir);
+  free (url);
+
+  return (status);
+}
+
+int
+cvs (char *path)
+{
+  int status;
+  pid_t pid = fork ();
+  if (pid == 0)
+    execl ("/etc/ports/drivers/cvs", "", path, 0);
+  else if (pid < 0)
+    status = -1;
+  else
+    {
+      while ((waitpid (pid, &status, 0) == 0))
+	{
+	}
+    }
+  return (status);
 }
 
 
 int
-aggiorna_collezione (char *collezione)
+update_repo (char *name)
 {
   if (getuid () != 0)
     {
       printf ("ilenia: only root can update the ports tree\n\n");
       return (-1);
     }
+
   FILE *file;
-  char nome_file[255] = "";
-  strcpy (nome_file, CACHE);
-  if ((file = fopen (nome_file, "w")))
+  char filename[20 + strlen (name)];
+
+  if ((file = fopen (CACHE, "w")))
     {
       fclose (file);
     }
-  strcpy (nome_file, "/etc/ports/");
-  strcat (nome_file, collezione);
-  strcat (nome_file, ".cvsup");
-  if ((file = fopen (nome_file, "r")))
+
+  sprintf (filename, "/etc/ports/%s.cvsup", name);
+  if ((file = fopen (filename, "r")))
     {
+      cvsup (filename);
       fclose (file);
-      cvsup (nome_file);
       return (0);
     }
-  strcpy (nome_file, "/etc/ports/");
-  strcat (nome_file, collezione);
-  strcat (nome_file, ".httpup");
-  if ((file = fopen (nome_file, "r")))
+
+  sprintf (filename, "/etc/ports/%s.httpup", name);
+  if ((file = fopen (filename, "r")))
     {
+      httpup (filename);
       fclose (file);
-      httpup (nome_file);
       return (0);
     }
-  // supporting crux ppc
-  strcpy (nome_file, "/etc/ports/");
-  strcat (nome_file, collezione);
-  strcat (nome_file, ".cvs");
-  if ((file = fopen (nome_file, "r")))
+
+  sprintf (filename, "/etc/ports/%s.cvs", name);
+  if ((file = fopen (filename, "r")))
     {
+      cvs (filename);
       fclose (file);
-      httpup (nome_file);
       return (0);
     }
-  printf ("ilenia: %s not found\n\n", collezione);
+
+  printf ("ilenia: %s not found\n\n", name);
   return (-1);
 }
 
 int
-aggiorna_ports ()
+update_all_repos ()
 {
   if (getuid () != 0)
     {
       printf ("ilenia: only root can update the ports tree\n\n");
       return (-1);
     }
-  DIR *etc_ports;
+
+  int status = 0;
+  DIR *dir;
   struct dirent *info_file;
-  char nome_file[255];
-  char estensione[255];
   FILE *file;
-  strcpy (nome_file, CACHE);
-  if ((file = fopen (nome_file, "w")))
+
+  if ((file = fopen (CACHE, "w")))
     {
       fclose (file);
     }
-  etc_ports = opendir ("/etc/ports");
-  while ((info_file = readdir (etc_ports)))
+
+  dir = opendir ("/etc/ports");
+  while ((info_file = readdir (dir)))
     {
       if (strstr (info_file->d_name, "."))
 	{
-	  strcpy (estensione, strstr (info_file->d_name, "."));
-	  strcpy (estensione, mid (estensione, 1, FINE));
-	  strcpy (nome_file, "/etc/ports/");
-	  strcat (nome_file, info_file->d_name);
-	  if (strcmp (estensione, "cvsup") == 0)
-	    {
-	      cvsup (nome_file);
-	    }
-	  else if (strcmp (estensione, "httpup") == 0)
-	    {
-	      httpup (nome_file);
-	    }
-	  // supporting crux ppc
-	  else if (strcmp (estensione, "cvs") == 0)
-	    {
-	      cvs (nome_file);
-	    }
+	  char *name = NULL;
+	  name = mid (info_file->d_name, 0, strlen (info_file->d_name) -
+		      strlen (strstr (info_file->d_name, ".")));
+	  if (strlen (name))
+	    update_repo (name);
+	  name = NULL;
+	  free (name);
 	}
     }
-  return (0);
+
+  return (status);
 }
