@@ -36,7 +36,8 @@ struct aliaseslist
 
 struct aliaslist *aliaslist_add (char *name, struct aliaslist *a);
 struct aliaslist *aliaslist_get (char *param, struct aliaseslist *s);
+int aliaslist_exists (char *param, struct aliaslist *a);
+
 struct aliaseslist *aliaseslist_add (struct aliaslist *a,
 				     struct aliaseslist *s);
 struct aliaseslist *aliaseslist_build ();
-int aliaslist_exists (char *param, struct aliaslist *a);

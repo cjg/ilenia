@@ -50,7 +50,7 @@ deplist_from_deprow (char *deprow)
       deprow = sed (deprow, ",", " ");
       how_many_deps = split (deprow, " ", deps);
       for (i = 0; i < how_many_deps; i++)
-	d = add (trim (deps[i]), d);
+	d = deplist_add (trim (deps[i]), d);
     }
   return (d);
 }
@@ -113,7 +113,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct pkglist *p)
 		{
 		  while (d != NULL)
 		    {
-		      strcat (dependencies, d->pkg);
+		      strcat (dependencies, d->name);
 		      strcat (dependencies, " ");
 		      d = d->next;
 		    }
@@ -420,7 +420,7 @@ lsports ()
 	  for (i = 3; i < len; i++)
 	    {
 	      if (strlen (trim (splitted_row[i])) > 0)
-		d = add (trim (splitted_row[i]), d);
+		d = deplist_add (trim (splitted_row[i]), d);
 	    }
 	  p = pkglist_add_ordered (trim (splitted_row[0]),
 				   trim (splitted_row[1]),
