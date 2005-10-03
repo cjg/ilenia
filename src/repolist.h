@@ -24,12 +24,11 @@
 
 struct repolist
 {
-  char repository[255];
+  char name[255];
   char path[255];
   struct repolist *next;
 };
 
-struct repolist *repolist_add (char *repository, char *path,
-			       struct repolist *p);
-int repolist_exists (char *delim, struct repolist *p);
-struct repolist *repolist_find (char *delim, struct repolist *p);
+struct repolist *repolist_add (char *name, char *path, struct repolist *r);
+struct repolist *repolist_find (char *param, struct repolist *r);
+int repolist_exists (char *param, struct repolist *r);

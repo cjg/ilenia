@@ -34,16 +34,17 @@ print_db (struct pkglist *p)
 {
   char s[MASSIMO];
   //       33                                20                   20
-  printf ("Package                           Version              Repository\n");
+  printf
+    ("Package                           Version              Repository\n");
   while (p != NULL)
     {
-      strcpy (s, mid(p->name, 0, 33));
-      strcat (s, spazi (33 - strlen (mid(p->name, 0, 33))));
+      strcpy (s, mid (p->name, 0, 33));
+      strcat (s, spazi (33 - strlen (mid (p->name, 0, 33))));
       strcat (s, " ");
-      strcat (s, spazi (20 - strlen (mid(p->version, 0, 20))));
-      strcat (s, mid(p->version, 0, 20));
+      strcat (s, spazi (20 - strlen (mid (p->version, 0, 20))));
+      strcat (s, mid (p->version, 0, 20));
       strcat (s, " ");
-      strcat (s, mid(p->repo, 0, 20));
+      strcat (s, mid (p->repo, 0, 20));
       printf ("%s\n", s);
       p = p->next;
     }
@@ -56,7 +57,8 @@ aiuto ()
   printf ("usage: ilenia [options] [collections] [packages]\n");
   printf ("options:\n");
   printf ("\t-u, --update           update ports\n");
-  printf ("\t-l, --list             list all ports, or only from specified repos\n");
+  printf
+    ("\t-l, --list             list all ports, or only from specified repos\n");
   printf ("\t-s, --search           search for ports\n");
   printf ("\t-d, --diff             list version differences\n");
   printf
