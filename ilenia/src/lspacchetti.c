@@ -111,8 +111,8 @@ lspacchetti ()
 	  a = aliaslist_get (nome, aliases);
 	  while (a != NULL)
 	    {
-	      if (strcmp (a->pkg, nome) != 0)
-		p = pkglist_add_ordered (a->pkg, "alias", nome, NULL, p);
+	      if (strcmp (a->name, nome) != 0)
+		p = pkglist_add_ordered (a->name, "alias", nome, NULL, p);
 	      a = a->next;
 	    }
 	  strcpy (nome, "");

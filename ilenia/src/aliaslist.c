@@ -30,71 +30,71 @@
 #include "manipola.h"
 
 struct aliaslist *
-aliaslist_add (char *pkg, struct aliaslist *p)
+aliaslist_add (char *name, struct aliaslist *a)
 {
-  struct aliaslist *paus = NULL;
-  paus = (struct aliaslist *) malloc (sizeof (struct aliaslist));
-  strcpy (paus->pkg, pkg);
-  if (p == NULL)
+  struct aliaslist *aaus = NULL;
+  aaus = (struct aliaslist *) malloc (sizeof (struct aliaslist));
+  strcpy (aaus->name, name);
+  if (a == NULL)
     {
-      p = paus;
-      p->next = NULL;
+      a = aaus;
+      a->next = NULL;
     }
   else
     {
-      paus->next = p;
-      p = paus;
+      aaus->next = a;
+      a = aaus;
     }
-  return (p);
-}
-
-struct aliaseslist *
-aliaseslist_add (struct aliaslist *a, struct aliaseslist *p)
-{
-  struct aliaseslist *paus = NULL;
-  paus = (struct aliaseslist *) malloc (sizeof (struct aliaseslist));
-  paus->alias = a;
-  if (p == NULL)
-    {
-      p = paus;
-      p->next = NULL;
-    }
-  else
-    {
-      paus->next = p;
-      p = paus;
-    }
-  return (p);
+  return (a);
 }
 
 struct aliaslist *
-aliaslist_get (char *delim, struct aliaseslist *as)
+aliaslist_get (char *param, struct aliaseslist *s)
 {
-  while (as != NULL)
+  while (s != NULL)
     {
-      if (aliaslist_exists (delim, as->alias))
-	return (as->alias);
-      as = as->next;
+      if (aliaslist_exists (param, s->alias))
+	return (s->alias);
+      s = s->next;
     }
   return (NULL);
 }
 
 int
-aliaslist_exists (char *delim, struct aliaslist *p)
+aliaslist_exists (char *param, struct aliaslist *a)
 {
-  while (p != NULL)
+  while (a != NULL)
     {
-      if (strcmp (p->pkg, delim) == 0)
+      if (strcmp (a->name, param) == 0)
 	return (1);
-      p = p->next;
+      a = a->next;
     }
   return (0);
 }
 
 struct aliaseslist *
+aliaseslist_add (struct aliaslist *a, struct aliaseslist *s)
+{
+  struct aliaseslist *saus = NULL;
+  saus = (struct aliaseslist *) malloc (sizeof (struct aliaseslist));
+  saus->alias = a;
+  if (s == NULL)
+    {
+      s = saus;
+      s->next = NULL;
+    }
+  else
+    {
+      saus->next = s;
+      s = saus;
+    }
+  return (s);
+}
+
+struct aliaseslist *
 aliaseslist_build ()
 {
-  struct aliaseslist *as = NULL;
+  struct aliaseslist *s = NULL;
   FILE *aliasfile;
   char row[255];
 
@@ -111,10 +111,10 @@ aliaseslist_build ()
 	      how_many_alias = split (row, " ", alias);
 	      for (i = 0; i < how_many_alias; i++)
 		a = aliaslist_add (trim (alias[i]), a);
-	      as = aliaseslist_add (a, as);
+	      s = aliaseslist_add (a, s);
 	    }
 	}
 
     }
-  return (as);
+  return (s);
 }
