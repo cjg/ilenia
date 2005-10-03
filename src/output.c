@@ -25,27 +25,27 @@
 #include <stdio.h>
 #include <string.h>
 #include "manipola.h"
-#include "db.h"
+#include "pkglist.h"
 #include "../config.h"
 #include "deplist.h"
 
 void
-print_db (struct db *p)
+print_db (struct pkglist *p)
 {
   char s[MASSIMO];
   //       33                                20                   20
   printf ("Package                           Version              Repository\n");
   while (p != NULL)
     {
-      strcpy (s, mid(p->nome, 0, 33));
-      strcat (s, spazi (33 - strlen (mid(p->nome, 0, 33))));
+      strcpy (s, mid(p->name, 0, 33));
+      strcat (s, spazi (33 - strlen (mid(p->name, 0, 33))));
       strcat (s, " ");
-      strcat (s, spazi (20 - strlen (mid(p->versione, 0, 20))));
-      strcat (s, mid(p->versione, 0, 20));
+      strcat (s, spazi (20 - strlen (mid(p->version, 0, 20))));
+      strcat (s, mid(p->version, 0, 20));
       strcat (s, " ");
-      strcat (s, mid(p->collezione, 0, 20));
+      strcat (s, mid(p->repo, 0, 20));
       printf ("%s\n", s);
-      p = p->prossimo;
+      p = p->next;
     }
   printf ("\n");
 }

@@ -23,6 +23,6 @@
  */
 
 
-void print_db (struct db *p);
+void print_db (struct pkglist *p);
 void aiuto ();
 void versione ();

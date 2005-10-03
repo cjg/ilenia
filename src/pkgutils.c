@@ -27,7 +27,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
-#include "db.h"
+#include "pkglist.h"
 #include "manipola.h"
 #include "confronto.h"
 #include "dipendenze.h"
@@ -146,28 +146,28 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   int aggiornare = 0;
   char collezione[255];
   char port[255];
-  struct db *p;
-  if (esiste (pacchetto, pacchetti) == 0)
+  struct pkglist *p;
+  if (pkglist_exists (pacchetto, pacchetti) == 0)
     aggiornare = 1;
 
-  strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
+  strcpy (collezione, pkglist_get_newer (pacchetto, ports));
 
   if (opzioni_confronto != NO_REPO && opzioni_confronto != NO_FAVORITE)
     {
       p = prendi_favorite (REPO);
-      if ((p = cerca (pacchetto, p)))
+      if ((p = pkglist_find (pacchetto, p)))
 	{
-	  strcpy (collezione, p->collezione);
+	  strcpy (collezione, p->repo);
 	}
     }
 
   if (opzioni_confronto != NO_VERSION && opzioni_confronto != NO_FAVORITE)
     {
       p = prendi_favorite (VERSIONE);
-      if ((p = cerca (pacchetto, p)))
+      if ((p = pkglist_find (pacchetto, p)))
 	{
 	  strcpy (collezione,
-		  questa_versione (pacchetto, p->versione, ports));
+		  pkglist_get_from_version (pacchetto, p->version, ports));
 	}
     }
 
@@ -190,19 +190,19 @@ aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
       printf ("ilenia: only root can update or install packages\n\n");
       return (-1);
     }
-  struct db *d = NULL;
+  struct pkglist *d = NULL;
   if (opzioni_confronto >= 0)
     {
       d = dipendenze (pacchetto);
-      while (d->prossimo != NULL)
+      while (d->next != NULL)
 	{
-	  printf ("%s [", d->nome);
-	  if (strcmp (d->collezione, "not found") != 0)
+	  printf ("%s [", d->name);
+	  if (strcmp (d->repo, "not found") != 0)
 	    {
-	      if (esiste (d->nome, pacchetti) != 0)
+	      if (pkglist_exists (d->name, pacchetti) != 0)
 		{
 		  printf ("install now]\n");
-		  if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
+		  if (aggiorna_pacchetto_ (opzioni_confronto, d->name) != 0)
 		    return (-1);
 		}
 	      else
@@ -214,23 +214,23 @@ aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 	    {
 	      printf ("not found]\n");
 	    }
-	  d = d->prossimo;
+	  d = d->next;
 	}
-      if (strcmp (d->collezione, "not found") != 0)
+      if (strcmp (d->repo, "not found") != 0)
 	{
-	  if (aggiorna_pacchetto_ (opzioni_confronto, d->nome) != 0)
+	  if (aggiorna_pacchetto_ (opzioni_confronto, d->name) != 0)
 	    return (-1);
 	}
       else
 	{
-	  printf ("%s [not found]\n", d->nome);
+	  printf ("%s [not found]\n", d->name);
 	  return (-1);
 	}
     }
   else
     {
       opzioni_confronto *= -1;
-      if (esiste (pacchetto, ports) == 0)
+      if (pkglist_exists (pacchetto, ports) == 0)
 	{
 	  if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
 	    return (-1);
@@ -253,22 +253,22 @@ aggiorna_pacchetti (int opzioni_confronto)
       printf ("ilenia: only root can update or install packages\n\n");
       return (-1);
     }
-  struct db *p = NULL;
-  struct db *q = NULL;
-  p = confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 0);
+  struct pkglist *p = NULL;
+  struct pkglist *q = NULL;
+  p = pkglist_confront (pacchetti, ports, AGGIORNATI, opzioni_confronto, 0);
   while (p != NULL)
     {
-      if (esiste (p->nome, q) != 0)
+      if (pkglist_exists (p->name, q) != 0)
 	{
-	  char *repo = il_piu_aggiornato (p->nome, p);
+	  char *repo = pkglist_get_newer (p->name, p);
 	  q =
-	    inserisci_elemento_ordinato (p->nome,
-					 questa_collezione (p->nome, repo, p),
-					 repo, NULL, q);
+	    pkglist_add_ordered (p->name,
+				 pkglist_get_from_repo (p->name, repo, p),
+				 repo, NULL, q);
 	}
-      p = p->prossimo;
+      p = p->next;
     }
-  if (conta (q) < 1)
+  if (pkglist_len (q) < 1)
     {
       printf ("All packages are up-to-date\n");
       return (0);
@@ -285,9 +285,9 @@ aggiorna_pacchetti (int opzioni_confronto)
     }
   while (q != NULL)
     {
-      if (aggiorna_pacchetto_ (opzioni_confronto, q->nome) != 0)
+      if (aggiorna_pacchetto_ (opzioni_confronto, q->name) != 0)
 	return (-1);
-      q = q->prossimo;
+      q = q->next;
     }
   return (0);
 }
@@ -325,19 +325,19 @@ pkgrm (char *pkg, int nocheckdeps, int removeall)
       printf ("ilenia: only root can remove packages\n\n");
       return (-1);
     }
-  struct db *p = NULL;
+  struct pkglist *p = NULL;
   if (removeall)
     {
       p = dipendenti (pkg, 1);
       while (p != NULL)
 	{
-	  do_pkgrm (p->nome);
-	  p = p->prossimo;
+	  do_pkgrm (p->name);
+	  p = p->next;
 	}
       return (0);
     }
   p = dipendenti (pkg, 0);
-  if (conta (p) > 1)
+  if (pkglist_len (p) > 1)
     {
       if (nocheckdeps)
 	{
