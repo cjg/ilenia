@@ -26,5 +26,5 @@
 #define VERSIONE        5
 #define REPO            2
 
-struct db *lspacchetti ();
-struct db *prendi_favorite (int quale);
+struct pkglist *lspacchetti ();
+struct pkglist *prendi_favorite (int quale);
