@@ -24,7 +24,7 @@
 
 struct aliaslist
 {
-  char pkg[255];
+  char name[255];
   struct aliaslist *next;
 };
 
@@ -34,9 +34,9 @@ struct aliaseslist
   struct aliaseslist *next;
 };
 
-struct aliaslist *aliaslist_add (char *pkg, struct aliaslist *p);
-struct aliaslist *aliaslist_get (char *delim, struct aliaseslist *as);
+struct aliaslist *aliaslist_add (char *name, struct aliaslist *a);
+struct aliaslist *aliaslist_get (char *param, struct aliaseslist *s);
 struct aliaseslist *aliaseslist_add (struct aliaslist *a,
-				     struct aliaseslist *p);
+				     struct aliaseslist *s);
 struct aliaseslist *aliaseslist_build ();
-int aliaslist_exists (char *delim, struct aliaslist *p);
+int aliaslist_exists (char *param, struct aliaslist *a);
