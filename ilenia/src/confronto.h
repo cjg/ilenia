@@ -31,8 +31,8 @@
 #define NO_FAVORITE	3
 
 
-struct db *confronta (struct db *pacchetti_db, struct db *ports_db,
-		      int tipo, int opzioni, int stampa);
-char *il_piu_aggiornato (char *pacchetto, struct db *p);
-char *questa_versione (char *nome, char *versione, struct db *p);
-char *questa_collezione (char *nome, char *collezione, struct db *p);
+struct pkglist *pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
+				  int type, int options, int print);
+char *pkglist_get_newer (char *name, struct pkglist *p);
+char *pkglist_get_from_version (char *nome, char *version, struct pkglist *p);
+char *pkglist_get_from_repo (char *name, char *repo, struct pkglist *p);
