@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include "manipola.h"
-#include "db.h"
+#include "pkglist.h"
 #include "deplist.h"
 #include "repolist.h"
 #include "aliaslist.h"
@@ -55,8 +55,8 @@ deplist_from_deprow (char *deprow)
   return (d);
 }
 
-struct db *
-parsa_pkgfile (char *percorso, char *collezione, struct db *p)
+struct pkglist *
+parsa_pkgfile (char *percorso, char *collezione, struct pkglist *p)
 {
   FILE *pkgfile;
   if ((pkgfile = fopen (percorso, "r")))
@@ -106,9 +106,8 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    }
 	  if (strlen (nome) && strlen (versione) && release)
 	    {
-	      strcpy(versione, sed(versione, " ", "_"));
-	      p = inserisci_elemento_ordinato (nome, versione, collezione,
-					       d, p);
+	      strcpy (versione, sed (versione, " ", "_"));
+	      p = pkglist_add_ordered (nome, versione, collezione, d, p);
 	      char dependencies[MASSIMO] = "";
 	      if (d != NULL)
 		{
@@ -319,8 +318,8 @@ parse_local (char *path, struct repolist *p)
 }
 
 
-struct db *
-leggi_dir (char *collezione, char *prefix, struct db *p)
+struct pkglist *
+leggi_dir (char *collezione, char *prefix, struct pkglist *p)
 {
   DIR *dir;
   struct dirent *info_file;
@@ -384,7 +383,7 @@ build_repolist ()
 int
 build_cache (struct repolist *r)
 {
-  struct db *ports = NULL;
+  struct pkglist *ports = NULL;
   printf ("Building cache!\n");
   if (!(cachefile = fopen (CACHE, "w")))
     {
@@ -400,11 +399,11 @@ build_cache (struct repolist *r)
   return (0);
 }
 
-struct db *
+struct pkglist *
 lsports ()
 {
   FILE *cachefile;
-  struct db *p = NULL;
+  struct pkglist *p = NULL;
   char riga[255];
   if ((cachefile = fopen (CACHE, "r")))
     {
@@ -423,9 +422,9 @@ lsports ()
 	      if (strlen (trim (splitted_row[i])) > 0)
 		d = add (trim (splitted_row[i]), d);
 	    }
-	  p = inserisci_elemento_ordinato (trim (splitted_row[0]),
-					   trim (splitted_row[1]),
-					   trim (splitted_row[2]), d, p);
+	  p = pkglist_add_ordered (trim (splitted_row[0]),
+				   trim (splitted_row[1]),
+				   trim (splitted_row[2]), d, p);
 	}
       fclose (cachefile);
       return (p);
