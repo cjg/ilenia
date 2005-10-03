@@ -18,8 +18,8 @@ ilenia_SOURCES = \
 	aggiorna.h\
 	confronto.c\
 	confronto.h\
-	db.c\
-	db.h\
+	pkglist.c\
+	pkglist.h\
 	lspacchetti.c\
 	lspacchetti.h\
 	lsports.c\
