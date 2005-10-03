@@ -42,16 +42,16 @@ dipendenze_pacchetto (char *pacchetto, char *collezione)
   thispkg = pkglist_find (collezione, thispkg);
   while (thispkg->depends != NULL)
     {
-      if (pkglist_exists (thispkg->depends->pkg, ports) == 0)
+      if (pkglist_exists (thispkg->depends->name, ports) == 0)
 	dependencies =
-	  pkglist_add_reversed (thispkg->depends->pkg, "",
+	  pkglist_add_reversed (thispkg->depends->name, "",
 				pkglist_get_newer (thispkg->
-						   depends->pkg,
+						   depends->name,
 						   ports), NULL,
 				dependencies);
       else
 	dependencies =
-	  pkglist_add_reversed (thispkg->depends->pkg, "",
+	  pkglist_add_reversed (thispkg->depends->name, "",
 				"not found", NULL, dependencies);
       thispkg->depends = thispkg->depends->next;
     }
@@ -124,7 +124,7 @@ cerca_dipendenti (struct pkglist *_pacchetti)
 	  struct pkglist *tmp = NULL;
 	  if ((tmp = pkglist_find (repo, pkglist_find (p->name, ports))))
 	    {
-	      if (exists (_pacchetti->name, tmp->depends))
+	      if (deplist_exists (_pacchetti->name, tmp->depends))
 		{
 		  if (pkglist_find (p->name, dependents) == NULL)
 		    dependents =

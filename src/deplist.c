@@ -27,32 +27,32 @@
 #include "deplist.h"
 
 struct deplist *
-add (char *pkg, struct deplist *p)
+deplist_add (char *name, struct deplist *d)
 {
-  struct deplist *paus = NULL;
-  paus = (struct deplist *) malloc (sizeof (struct deplist));
-  strcpy (paus->pkg, pkg);
-  if (p == NULL)
+  struct deplist *daus = NULL;
+  daus = (struct deplist *) malloc (sizeof (struct deplist));
+  strcpy (daus->name, name);
+  if (d == NULL)
     {
-      p = paus;
-      p->next = NULL;
+      d = daus;
+      d->next = NULL;
     }
   else
     {
-      paus->next = p;
-      p = paus;
+      daus->next = d;
+      d = daus;
     }
-  return (p);
+  return (d);
 }
 
 int
-exists (char *delim, struct deplist *p)
+deplist_exists (char *param, struct deplist *d)
 {
-  while (p != NULL)
+  while (d != NULL)
     {
-      if (strcmp (p->pkg, delim) == 0)
+      if (strcmp (d->name, param) == 0)
 	return (1);
-      p = p->next;
+      d = d->next;
     }
   return (0);
 }

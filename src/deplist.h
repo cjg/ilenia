@@ -24,9 +24,9 @@
 
 struct deplist
 {
-  char pkg[255];
+  char name[255];
   struct deplist *next;
 };
 
-struct deplist *add (char *pkg, struct deplist *p);
-int exists (char *delim, struct deplist *p);
+struct deplist *deplist_add (char *name, struct deplist *d);
+int deplist_exists (char *param, struct deplist *d);
