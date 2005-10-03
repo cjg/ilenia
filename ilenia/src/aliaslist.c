@@ -102,8 +102,8 @@ aliaseslist_build ()
     {
       while (fgets (row, 255, aliasfile))
 	{
-	  strcpy(row, trim(row));
-	  if (strlen (row) > 0 && row[0]!='#')
+	  strcpy (row, trim (row));
+	  if (strlen (row) > 0 && row[0] != '#')
 	    {
 	      char alias[255][MASSIMO];
 	      int how_many_alias, i;

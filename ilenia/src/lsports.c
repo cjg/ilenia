@@ -391,7 +391,7 @@ build_cache (struct repolist *r)
     }
   while (r != NULL)
     {
-      ports = leggi_dir (r->repository, r->path, ports);
+      ports = leggi_dir (r->name, r->path, ports);
       r = r->next;
     }
   fclose (cachefile);

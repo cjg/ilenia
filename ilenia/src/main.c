@@ -204,7 +204,7 @@ main (int argc, char *argv[])
 	case REPOLIST:
 	  while (repository != NULL)
 	    {
-	      printf ("%s\n", repository->repository);
+	      printf ("%s\n", repository->name);
 	      repository = repository->next;
 	    }
 	  break;

@@ -27,48 +27,48 @@
 #include "repolist.h"
 
 struct repolist *
-repolist_add (char *repository, char *path, struct repolist *p)
+repolist_add (char *name, char *path, struct repolist *r)
 {
-  struct repolist *paus = NULL;
-  paus = (struct repolist *) malloc (sizeof (struct repolist));
-  strcpy (paus->repository, repository);
-  strcpy (paus->path, path);
-  if (p == NULL)
+  struct repolist *raus = NULL;
+  raus = (struct repolist *) malloc (sizeof (struct repolist));
+  strcpy (raus->name, name);
+  strcpy (raus->path, path);
+  if (r == NULL)
     {
-      p = paus;
-      p->next = NULL;
+      r = raus;
+      r->next = NULL;
     }
   else
     {
-      paus->next = p;
-      p = paus;
+      raus->next = r;
+      r = raus;
     }
-  return (p);
-}
-
-int
-repolist_exists (char *delim, struct repolist *p)
-{
-  while (p != NULL)
-    {
-      if (strcmp (p->repository, delim) == 0)
-	return (1);
-      p = p->next;
-    }
-  return (0);
+  return (r);
 }
 
 struct repolist *
-repolist_find (char *delim, struct repolist *p)
+repolist_find (char *param, struct repolist *r)
 {
-  struct repolist *paus = NULL;
-  while (p != NULL)
+  struct repolist *raus = NULL;
+  while (r != NULL)
     {
-      if (strcmp (p->repository, delim) == 0)
+      if (strcmp (r->name, param) == 0)
 	{
-	  paus = repolist_add (p->repository, p->path, paus);
+	  raus = repolist_add (r->name, r->path, raus);
 	}
-      p = p->next;
+      r = r->next;
     }
-  return (paus);
+  return (raus);
+}
+
+int
+repolist_exists (char *param, struct repolist *r)
+{
+  while (r != NULL)
+    {
+      if (strcmp (r->name, param) == 0)
+	return (1);
+      r = r->next;
+    }
+  return (0);
 }

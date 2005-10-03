@@ -76,17 +76,13 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 	      if ((pkgs->repo[0] == 'R')
 		  && (options != NO_REPO && options != NO_FAVORITE))
 		{
-		  if (strcmp
-		      (mid (pkgs->repo, 2, FINE),
-		       paus->repo) != 0)
+		  if (strcmp (mid (pkgs->repo, 2, FINE), paus->repo) != 0)
 		    skip = 1;
 		}
 	      if ((pkgs->repo[0] == 'V')
 		  && (options != NO_VERSION && options != NO_FAVORITE))
 		{
-		  if (strcmp
-		      (mid (pkgs->repo, 2, FINE),
-		       pkgs->version) == 0)
+		  if (strcmp (mid (pkgs->repo, 2, FINE), pkgs->version) == 0)
 		    skip = 1;
 		}
 	      if (test != 0 && skip != 1)
@@ -96,8 +92,7 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 						  paus->repo, NULL, confront);
 		  if (print)
 		    prettyprint (pkgs->name,
-				 pkgs->version,
-				 paus->repo, paus->version);
+				 pkgs->version, paus->repo, paus->version);
 		}
 	    }
 	  paus = paus->next;
@@ -172,4 +167,3 @@ pkglist_get_from_repo (char *name, char *repo, struct pkglist *p)
     }
   return ((char *) version);
 }
-
