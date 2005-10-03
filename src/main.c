@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "db.h"
+#include "pkglist.h"
 #include "deplist.h"
 #include "lspacchetti.h"
 #include "lsports.h"
@@ -64,7 +64,8 @@ main (int argc, char *argv[])
 	  azioni++;
 	  azione[azioni] = LSPORTS;
 	}
-      else if (strcmp (argv[i], "-s") == 0 || strcmp (argv[i], "--search") == 0)
+      else if (strcmp (argv[i], "-s") == 0
+	       || strcmp (argv[i], "--search") == 0)
 	{
 	  azioni++;
 	  azione[azioni] = SEARCH;
@@ -261,8 +262,8 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_l; j++)
 		{
-		  if(repolist_exists(opzione_l[j], repository))
-		    print_db(db_from_repo(opzione_l[j], ports));
+		  if (repolist_exists (opzione_l[j], repository))
+		    print_db (pkglist_find_from_repo (opzione_l[j], ports));
 		}
 	    }
 	  break;
@@ -271,17 +272,18 @@ main (int argc, char *argv[])
 	    printf ("What can I search?\n");
 	  else
 	    {
-	      struct db *p = NULL;
+	      struct pkglist *p = NULL;
 	      int j;
 	      for (j = 0; j <= opzioni_s; j++)
 		{
-		  p = db_like (opzione_s[j], ports);
+		  p = pkglist_find_like (opzione_s[j], ports);
 		  print_db (p);
 		}
 	    }
 	  break;
 	case DIFFERENZE:
-	  confronta (pacchetti, ports, DIFFERENZE, opzioni_confronto, 1);
+	  pkglist_confront (pacchetti, ports, DIFFERENZE, opzioni_confronto,
+			    1);
 	  break;
 	case RIMUOVI:
 	  if (opzioni_r != -1)
@@ -312,7 +314,8 @@ main (int argc, char *argv[])
 	    }
 	  break;
 	case AGGIORNATI:
-	  confronta (pacchetti, ports, AGGIORNATI, opzioni_confronto, 1);
+	  pkglist_confront (pacchetti, ports, AGGIORNATI, opzioni_confronto,
+			    1);
 	  break;
 	case VERSIONE:
 	  versione ();
