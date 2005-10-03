@@ -26,11 +26,11 @@
 #include <string.h>
 #include "lspacchetti.h"
 #include "manipola.h"
-#include "db.h"
+#include "pkglist.h"
 #include "aliaslist.h"
 #include "ilenia.h"
 
-struct db *
+struct pkglist *
 prendi_favorite (int quale)
 {
   FILE *favorite;
@@ -38,7 +38,7 @@ prendi_favorite (int quale)
   char nomefile[255] = "";
   char nome[255] = "";
   char favorite_opzioni[255] = "";
-  struct db *p = NULL;
+  struct pkglist *p = NULL;
   if (quale == REPO)
     {
       strcpy (nomefile, "/etc/ports/favoriterepo");
@@ -60,25 +60,25 @@ prendi_favorite (int quale)
 		      mid (riga, 0,
 			   strlen (riga) - strlen (favorite_opzioni)));
 	      strcpy (favorite_opzioni, trim (favorite_opzioni));
-	      p = inserisci_elemento_ordinato (nome, favorite_opzioni,
-					       favorite_opzioni, NULL, p);
+	      p = pkglist_add_ordered (nome, favorite_opzioni,
+				       favorite_opzioni, NULL, p);
 	    }
 	}
     }
   return (p);
 }
 
-struct db *
+struct pkglist *
 lspacchetti ()
 {
   FILE *file_io = fopen (DB_FILE, "r");
   char riga[255];
   char nome[255] = "";
   int nuovo_record = 1;
-  struct db *p = NULL;
-  struct db *paus = NULL;
-  struct db *favoriterepo = NULL;
-  struct db *favoriteversion = NULL;
+  struct pkglist *p = NULL;
+  struct pkglist *paus = NULL;
+  struct pkglist *favoriterepo = NULL;
+  struct pkglist *favoriteversion = NULL;
   favoriterepo = prendi_favorite (REPO);
   favoriteversion = prendi_favorite (VERSIONE);
   while (fgets (riga, 255, file_io))
@@ -92,29 +92,27 @@ lspacchetti ()
       else if (nuovo_record)
 	{
 	  char tmp[255] = "";
-	  if ((paus = cerca (nome, favoriterepo)) != NULL)
+	  if ((paus = pkglist_find (nome, favoriterepo)) != NULL)
 	    {
 	      strcpy (tmp, "R ");
-	      strcat (tmp, paus->collezione);
+	      strcat (tmp, paus->repo);
 	    }
-	  else if ((paus = cerca (nome, favoriteversion)) != NULL)
+	  else if ((paus = pkglist_find (nome, favoriteversion)) != NULL)
 	    {
 	      strcpy (tmp, "V ");
-	      strcat (tmp, paus->versione);
+	      strcat (tmp, paus->version);
 	    }
 	  else
 	    {
 	      strcpy (tmp, "installato");
 	    }
-	  p = inserisci_elemento_ordinato (nome, riga, tmp, NULL, p);
+	  p = pkglist_add_ordered (nome, riga, tmp, NULL, p);
 	  struct aliaslist *a = NULL;
 	  a = aliaslist_get (nome, aliases);
 	  while (a != NULL)
 	    {
 	      if (strcmp (a->pkg, nome) != 0)
-		p =
-		  inserisci_elemento_ordinato (a->pkg, "alias", nome,
-					       NULL, p);
+		p = pkglist_add_ordered (a->pkg, "alias", nome, NULL, p);
 	      a = a->next;
 	    }
 	  strcpy (nome, "");
