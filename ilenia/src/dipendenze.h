@@ -22,7 +22,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct db *dipendenze (char *pacchetto);
-struct db *dipendenti (char *pacchetto, int all);
+struct pkglist *dipendenze (char *pacchetto);
+struct pkglist *dipendenti (char *pacchetto, int all);
 void stampa_dipendenze (char *pacchetto);
 void stampa_dipendenti (char *pacchetto, int all);

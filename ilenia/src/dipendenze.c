@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "db.h"
+#include "pkglist.h"
 #include "deplist.h"
 #include "lspacchetti.h"
 #include "lsports.h"
@@ -33,125 +33,123 @@
 #include "output.h"
 #include "ilenia.h"
 
-struct db *
+struct pkglist *
 dipendenze_pacchetto (char *pacchetto, char *collezione)
 {
-  struct db *thispkg = NULL;
-  struct db *dependencies = NULL;
-  thispkg = cerca (pacchetto, ports);
-  thispkg = cerca (collezione, thispkg);
+  struct pkglist *thispkg = NULL;
+  struct pkglist *dependencies = NULL;
+  thispkg = pkglist_find (pacchetto, ports);
+  thispkg = pkglist_find (collezione, thispkg);
   while (thispkg->depends != NULL)
     {
-      if (esiste (thispkg->depends->pkg, ports) == 0)
+      if (pkglist_exists (thispkg->depends->pkg, ports) == 0)
 	dependencies =
-	  inserisci_elemento_inverso (thispkg->depends->pkg, "",
-				      il_piu_aggiornato (thispkg->
-							 depends->pkg,
-							 ports), NULL,
-				      dependencies);
+	  pkglist_add_reversed (thispkg->depends->pkg, "",
+				pkglist_get_newer (thispkg->
+						   depends->pkg,
+						   ports), NULL,
+				dependencies);
       else
 	dependencies =
-	  inserisci_elemento_inverso (thispkg->depends->pkg, "",
-				      "not found", NULL, dependencies);
+	  pkglist_add_reversed (thispkg->depends->pkg, "",
+				"not found", NULL, dependencies);
       thispkg->depends = thispkg->depends->next;
     }
   return (dependencies);
 }
 
-struct db *
-cerca_dipendenze (struct db *_pacchetti)
+struct pkglist *
+cerca_dipendenze (struct pkglist *_pacchetti)
 {
-  struct db *dipendenze = NULL;
+  struct pkglist *dipendenze = NULL;
   while (_pacchetti != NULL)
     {
-      if (strcmp (_pacchetti->collezione, "not found") != 0)
+      if (strcmp (_pacchetti->repo, "not found") != 0)
 	{
-	  struct db *d = NULL;
-	  d = dipendenze_pacchetto (_pacchetti->nome, _pacchetti->collezione);
-	  d = inserisci_elemento_inverso (_pacchetti->nome, "",
-					  _pacchetti->collezione, NULL, d);
+	  struct pkglist *d = NULL;
+	  d = dipendenze_pacchetto (_pacchetti->name, _pacchetti->repo);
+	  d = pkglist_add_reversed (_pacchetti->name, "",
+				    _pacchetti->repo, NULL, d);
 	  while (d != NULL)
 	    {
-	      if (esiste (d->nome, dipendenze) != 0)
+	      if (pkglist_exists (d->name, dipendenze) != 0)
 		dipendenze =
-		  inserisci_elemento_inverso (d->nome, "",
-					      d->collezione, NULL,
-					      dipendenze);
-	      d = d->prossimo;
+		  pkglist_add_reversed (d->name, "",
+					d->repo, NULL, dipendenze);
+	      d = d->next;
 	    }
 	}
-      _pacchetti = _pacchetti->prossimo;
+      _pacchetti = _pacchetti->next;
     }
   return (dipendenze);
 }
 
-struct db *
+struct pkglist *
 dipendenze (char *pacchetto)
 {
-  struct db *d = NULL;
+  struct pkglist *d = NULL;
   char collezione[255];
   int i = -10;
-  if (esiste (pacchetto, ports) == 0)
+  if (pkglist_exists (pacchetto, ports) == 0)
     {
-      strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
-      d = inserisci_elemento_inverso (pacchetto, "", collezione, NULL, d);
+      strcpy (collezione, pkglist_get_newer (pacchetto, ports));
+      d = pkglist_add_reversed (pacchetto, "", collezione, NULL, d);
 
-      while (i != conta (d))
+      while (i != pkglist_len (d))
 	{
-	  i = conta (d);
+	  i = pkglist_len (d);
 	  d = cerca_dipendenze (d);
 	}
     }
   else
     {
-      d = inserisci_elemento (pacchetto, "", "not found", NULL, d);
+      d = pkglist_add (pacchetto, "", "not found", NULL, d);
     }
   return (d);
 }
 
-struct db *
-cerca_dipendenti (struct db *_pacchetti)
+struct pkglist *
+cerca_dipendenti (struct pkglist *_pacchetti)
 {
-  struct db *dependents = NULL;
+  struct pkglist *dependents = NULL;
   dependents = _pacchetti;
   while (_pacchetti != NULL)
     {
-      struct db *p = NULL;
+      struct pkglist *p = NULL;
       p = pacchetti;
       while (p != NULL)
 	{
 	  char repo[255];
-	  strcpy (repo, il_piu_aggiornato (p->nome, ports));
-	  struct db *tmp = NULL;
-	  if ((tmp = cerca (repo, cerca (p->nome, ports))))
+	  strcpy (repo, pkglist_get_newer (p->name, ports));
+	  struct pkglist *tmp = NULL;
+	  if ((tmp = pkglist_find (repo, pkglist_find (p->name, ports))))
 	    {
-	      if (exists (_pacchetti->nome, tmp->depends))
+	      if (exists (_pacchetti->name, tmp->depends))
 		{
-		  if (cerca (p->nome, dependents) == NULL)
+		  if (pkglist_find (p->name, dependents) == NULL)
 		    dependents =
-		      inserisci_elemento (p->nome, "", repo, NULL,
-					  dependents);
+		      pkglist_add (p->name, "", repo, NULL, dependents);
 		}
 	    }
-	  p = p->prossimo;
+	  p = p->next;
 	}
-      _pacchetti = _pacchetti->prossimo;
+      _pacchetti = _pacchetti->next;
     }
   return (dependents);
 }
 
-struct db *
+struct pkglist *
 dipendenti (char *pacchetto, int all)
 {
-  struct db *d = NULL;
+  struct pkglist *d = NULL;
   char collezione[255];
   int i = -10;
-  strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
-  d = inserisci_elemento (pacchetto, "", collezione, NULL, d);
+  strcpy (collezione, pkglist_get_newer (pacchetto, ports));
+  d = pkglist_add (pacchetto, "", collezione, NULL, d);
 
-  while (i != conta (d))
+  while (i != pkglist_len (d))
     {
-      i = conta (d);
+      i = pkglist_len (d);
       d = cerca_dipendenti (d);
       if (all == 0)
 	return (d);
@@ -162,20 +160,20 @@ dipendenti (char *pacchetto, int all)
 void
 stampa_dipendenze (char *pacchetto)
 {
-  struct db *d = NULL;
+  struct pkglist *d = NULL;
   d = dipendenze (pacchetto);
   while (d != NULL)
     {
-      if (strcmp (d->collezione, "not found") != 0)
+      if (strcmp (d->repo, "not found") != 0)
 	{
-	  printf ("%s [", d->nome);
-	  if (esiste (d->nome, pacchetti) == 0)
+	  printf ("%s [", d->name);
+	  if (pkglist_exists (d->name, pacchetti) == 0)
 	    {
-	      struct db *pa = NULL;
-	      pa = cerca (d->nome, pacchetti);
+	      struct pkglist *pa = NULL;
+	      pa = pkglist_find (d->name, pacchetti);
 	      printf ("installed]");
-	      if (strcmp (pa->versione, "alias") == 0)
-		printf (" (%s)\n", pa->collezione);
+	      if (strcmp (pa->version, "alias") == 0)
+		printf (" (%s)\n", pa->repo);
 	      else
 		printf ("\n");
 	    }
@@ -184,23 +182,23 @@ stampa_dipendenze (char *pacchetto)
 	}
       else
 	{
-	  printf ("%s [not found]\n", d->nome);
+	  printf ("%s [not found]\n", d->name);
 	}
-      d = d->prossimo;
+      d = d->next;
     }
 }
 
 void
 stampa_dipendenti (char *pacchetto, int all)
 {
-  struct db *d = NULL;
+  struct pkglist *d = NULL;
   d = dipendenti (pacchetto, all);
   while (d != NULL)
     {
-      if (strcmp (d->collezione, "not found") != 0)
+      if (strcmp (d->repo, "not found") != 0)
 	{
-	  printf ("%s\n", d->nome);
+	  printf ("%s\n", d->name);
 	}
-      d = d->prossimo;
+      d = d->next;
     }
 }
