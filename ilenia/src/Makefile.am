@@ -13,8 +13,8 @@ ilenia_SOURCES = \
 	main.c\
 	update.c\
 	update.h\
-	confronto.c\
-	confronto.h\
+	confront.c\
+	confront.h\
 	pkglist.c\
 	pkglist.h\
 	lspacchetti.c\
