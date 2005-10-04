@@ -1,5 +1,5 @@
 /***************************************************************************
- *            confronto.c
+ *            confront.c
  *
  *  Sat Jul 10 13:33:11 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
@@ -24,27 +24,26 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "pkglist.h"
 #include "manipola.h"
 #include "vercmp.h"
-#include "confronto.h"
+#include "confront.h"
 
 void
 prettyprint (char *str1, char *str2, char *str3, char *str4)
 {
-  char tmp[255];
-  strcpy (tmp, str1);
-  strcat (tmp, spazi (21 - strlen (str1)));
-  strcat (tmp, spazi (2));
-  strcat (tmp, spazi (17 - strlen (str2)));
-  strcat (tmp, str2);
-  strcat (tmp, spazi (2));
-  strcat (tmp, str3);
-  strcat (tmp, spazi (19 - strlen (str3)));
-  strcat (tmp, spazi (2));
-  strcat (tmp, spazi (16 - strlen (str4)));
-  strcat (tmp, str4);
-  printf ("%s\n", tmp);
+  str1 = mid (str1, 0, 26);
+  str2 = mid (str2, 0, 16);
+  str3 = mid (str3, 0, 28);
+  str4 = mid (str4, 0, 16);
+
+  strcat (str1, spazi (26 - strlen (str1)));
+  strcat (str2, spazi (18 - strlen (str2)));
+  strcat (str3, spazi (14 - strlen (str3)));
+  strcat (str4, spazi (18 - strlen (str4)));
+
+  printf ("%s %s %s %s\n", str1, str2, str3, str4);
 }
 
 struct pkglist *
@@ -55,7 +54,7 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
   struct pkglist *confront = NULL;
   if (print)
     printf
-      ("Name                   Installed Version  Repository               Port Version \n");
+      ("Name                       Installed Version  Repository     Port Version \n");
   while (pkgs != NULL)
     {
       paus = ports;
@@ -65,7 +64,7 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 	    {
 	      int test;
 	      int skip = 0;
-	      if (type == DIFFERENZE)
+	      if (type == DIFF)
 		{
 		  test = strcmp (pkgs->version, paus->version);
 		}
@@ -74,22 +73,24 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 		  test = vercmp (pkgs->version, paus->version);
 		}
 	      if ((pkgs->repo[0] == 'R')
-		  && (options != NO_REPO && options != NO_FAVORITE))
+		  && (options != NO_FAVORITE_REPO && options != NO_FAVORITES))
 		{
 		  if (strcmp (mid (pkgs->repo, 2, FINE), paus->repo) != 0)
 		    skip = 1;
 		}
 	      if ((pkgs->repo[0] == 'V')
-		  && (options != NO_VERSION && options != NO_FAVORITE))
+		  && (options != NO_FAVORITE_VERSION
+		      && options != NO_FAVORITES))
 		{
 		  if (strcmp (mid (pkgs->repo, 2, FINE), pkgs->version) == 0)
 		    skip = 1;
 		}
 	      if (test != 0 && skip != 1)
 		{
-		  confront = pkglist_add_ordered (pkgs->name,
-						  paus->version,
-						  paus->repo, NULL, confront);
+		  //confront = pkglist_add_ordered (pkgs->name,
+		  //                              paus->version,
+		  //                      paus->repo, NULL, confront);
+
 		  if (print)
 		    prettyprint (pkgs->name,
 				 pkgs->version, paus->repo, paus->version);
@@ -102,68 +103,60 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
   return (confront);
 }
 
+
 char *
 pkglist_get_newer (char *name, struct pkglist *p)
 {
-  char version[255] = "";
-  static char repo[255] = "";
+  char *version = NULL, *repo = NULL;
   while (p != NULL)
     {
       if (strcmp (name, p->name) == 0)
 	{
 	  if (strcmp (version, "") == 0)
 	    {
-	      strcpy (version, p->version);
-	      strcpy (repo, p->repo);
+	      version = strdup (p->version);
+	      repo = strdup (p->repo);
 	    }
 	  else
 	    {
 	      if (vercmp (version, p->version))
 		{
-		  strcpy (version, p->version);
-		  strcpy (repo, p->repo);
+		  version = strdup (p->version);
+		  repo = strdup (p->repo);
 		}
 	    }
 	}
       p = p->next;
     }
-  return ((char *) repo);
+  return (repo);
 }
 
 char *
 pkglist_get_from_version (char *name, char *version, struct pkglist *p)
 {
-  static char repo[255] = "";
   while (p != NULL)
     {
       if (strcmp (name, p->name) == 0)
 	{
 	  if (strcmp (version, p->version) == 0)
-	    {
-	      strcpy (repo, p->repo);
-	      return (p->repo);
-	    }
+	    return (p->repo);
 	}
       p = p->next;
     }
-  return ((char *) repo);
+  return (NULL);
 }
 
 char *
 pkglist_get_from_repo (char *name, char *repo, struct pkglist *p)
 {
-  static char version[255] = "";
   while (p != NULL)
     {
       if (strcmp (name, p->name) == 0)
 	{
 	  if (strcmp (repo, p->repo) == 0)
-	    {
-	      strcpy (version, p->version);
-	      return (p->version);
-	    }
+	    return (p->version);
 	}
       p = p->next;
     }
-  return ((char *) version);
+  return (NULL);
 }

@@ -29,7 +29,7 @@
 #include <string.h>
 #include "pkglist.h"
 #include "manipola.h"
-#include "confronto.h"
+#include "confront.h"
 #include "dipendenze.h"
 #include "ilenia.h"
 #include "lsports.h"
@@ -152,7 +152,8 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
 
   strcpy (collezione, pkglist_get_newer (pacchetto, ports));
 
-  if (opzioni_confronto != NO_REPO && opzioni_confronto != NO_FAVORITE)
+  if (opzioni_confronto != NO_FAVORITE_REPO
+      && opzioni_confronto != NO_FAVORITES)
     {
       p = prendi_favorite (REPO);
       if ((p = pkglist_find (pacchetto, p)))
@@ -161,7 +162,8 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
 	}
     }
 
-  if (opzioni_confronto != NO_VERSION && opzioni_confronto != NO_FAVORITE)
+  if (opzioni_confronto != NO_FAVORITE_VERSION && opzioni_confronto !=
+      NO_FAVORITES)
     {
       p = prendi_favorite (VERSIONE);
       if ((p = pkglist_find (pacchetto, p)))
@@ -255,7 +257,7 @@ aggiorna_pacchetti (int opzioni_confronto)
     }
   struct pkglist *p = NULL;
   struct pkglist *q = NULL;
-  p = pkglist_confront (pacchetti, ports, AGGIORNATI, opzioni_confronto, 0);
+  p = pkglist_confront (pacchetti, ports, UPDATED, opzioni_confronto, 0);
   while (p != NULL)
     {
       if (pkglist_exists (p->name, q) != 0)

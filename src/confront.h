@@ -1,5 +1,5 @@
 /***************************************************************************
- *            confronto.h
+ *            confront.h
  *
  *  Sat Jul 10 13:27:54 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
@@ -22,13 +22,13 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#define DIFFERENZE	3
-#define AGGIORNATI	4
+#define DIFF     3
+#define UPDATED	 4
 
-#define NORMALE		0
-#define NO_REPO		1
-#define NO_VERSION	2
-#define NO_FAVORITE	3
+#define REGULAR		     0
+#define NO_FAVORITE_REPO     1
+#define NO_FAVORITE_VERSION  2
+#define NO_FAVORITES	     3
 
 
 struct pkglist *pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,

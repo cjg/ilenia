@@ -4,7 +4,7 @@
 #include "deplist.h"
 #include "lspacchetti.h"
 #include "lsports.h"
-#include "confronto.h"
+#include "confront.h"
 #include "update.h"
 #include "output.h"
 #include "pkgutils.h"
@@ -73,13 +73,13 @@ main (int argc, char *argv[])
       else if (strcmp (argv[i], "-d") == 0 || strcmp (argv[i], "--diff") == 0)
 	{
 	  azioni++;
-	  azione[azioni] = DIFFERENZE;
+	  azione[azioni] = DIFF;
 	}
       else if (strcmp (argv[i], "-p") == 0
 	       || strcmp (argv[i], "--updated") == 0)
 	{
 	  azioni++;
-	  azione[azioni] = AGGIORNATI;
+	  azione[azioni] = UPDATED;
 	}
       else if (strcmp (argv[i], "-v") == 0
 	       || strcmp (argv[i], "--version") == 0)
@@ -99,11 +99,11 @@ main (int argc, char *argv[])
 	}
       else if (strcmp (argv[i], "--no-favorite-repo") == 0)
 	{
-	  opzioni_confronto += NO_REPO;
+	  opzioni_confronto += NO_FAVORITE_REPO;
 	}
       else if (strcmp (argv[i], "--no-favorite-version") == 0)
 	{
-	  opzioni_confronto += NO_VERSION;
+	  opzioni_confronto += NO_FAVORITE_VERSION;
 	}
       else if (strcmp (argv[i], "--no-deps") == 0)
 	{
@@ -193,8 +193,8 @@ main (int argc, char *argv[])
       if ((file = fopen (CACHE, "w")))
 	fclose (file);
     }
+
   aliases = aliaseslist_build ();
-  printf ("Aliaseslist built!\n");
   ports = lsports ();
   pacchetti = lspacchetti ();
 
@@ -282,9 +282,8 @@ main (int argc, char *argv[])
 		}
 	    }
 	  break;
-	case DIFFERENZE:
-	  pkglist_confront (pacchetti, ports, DIFFERENZE, opzioni_confronto,
-			    1);
+	case DIFF:
+	  pkglist_confront (pacchetti, ports, DIFF, opzioni_confronto, 1);
 	  break;
 	case RIMUOVI:
 	  if (opzioni_r != -1)
@@ -314,9 +313,8 @@ main (int argc, char *argv[])
 	      printf ("package(s)\n");
 	    }
 	  break;
-	case AGGIORNATI:
-	  pkglist_confront (pacchetti, ports, AGGIORNATI, opzioni_confronto,
-			    1);
+	case UPDATED:
+	  pkglist_confront (pacchetti, ports, UPDATED, opzioni_confronto, 1);
 	  break;
 	case VERSIONE:
 	  versione ();

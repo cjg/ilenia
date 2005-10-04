@@ -118,24 +118,22 @@ oldmid (char *s, int inizio, int lunghezza)
 char *
 mid (char *s, int start, int length)
 {
-  char *local_s;
-  local_s = strdup (s);
   int x, z = 0;
   if (length == -1)
-    length = strlen (local_s) - start;
-  if ((start + length) <= strlen (local_s))
+    length = strlen (s) - start;
+  if ((start + length) <= strlen (s))
     {
-      for (x = 0; x <= strlen (local_s); x++)
+      for (x = 0; x <= strlen (s); x++)
 	{
 	  if ((x >= start))
 	    {
-	      local_s[z] = local_s[x];
+	      s[z] = s[x];
 	      z++;
 	    }
 	}
     }
-  local_s[length] = '\0';
-  return (local_s);
+  s[length] = '\0';
+  return (s);
 }
 
 char *
