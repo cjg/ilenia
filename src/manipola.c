@@ -23,6 +23,7 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 #include "manipola.h"
 
 char *
@@ -118,7 +119,7 @@ char *
 mid (char *s, int start, int length)
 {
   char *local_s;
-  local_s = strdup(s);
+  local_s = strdup (s);
   int x, z = 0;
   if (length == -1)
     length = strlen (local_s) - start;
@@ -155,6 +156,36 @@ spazi (int n)
     }
   s[n] = '\0';
   return ((char *) s);
+}
+
+int
+count (char *s, int delim)
+{
+  int i, c = 0;
+  for (i = 0; i <= strlen (s); i++)
+    {
+      if (s[i] == delim)
+	c++;
+    }
+  return (c);
+}
+
+int
+split2 (char *s, char *delim, char *splitted[])
+{
+  int i = 0;
+  while (strlen (s) > 0)
+    {
+      char *tmp;
+      tmp = s;
+      strtok (tmp, delim);
+      splitted[i] = strdup (tmp);
+      s = mid (s, strlen (tmp), FINE);
+      i++;
+      tmp = NULL;
+      free (tmp);
+    }
+  return (i);
 }
 
 int

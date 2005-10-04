@@ -33,3 +33,5 @@ char *spazi (int n);
 char *sedchr (char *s, int trova, int sostituisci);
 char *sed (char *s, char *trova, char *sostituisci);
 int split (char *s, char *delim, char splitted[][MASSIMO]);
+int count (char *s, int delim);
+int split2 (char *s, char *delim, char *splitted[]);
