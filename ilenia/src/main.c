@@ -194,6 +194,7 @@ main (int argc, char *argv[])
 	fclose (file);
     }
   aliases = aliaseslist_build ();
+  printf ("Aliaseslist built!\n");
   ports = lsports ();
   pacchetti = lspacchetti ();
 
