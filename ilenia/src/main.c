@@ -8,7 +8,7 @@
 #include "update.h"
 #include "output.h"
 #include "pkgutils.h"
-#include "dipendenze.h"
+#include "dependencies.h"
 #include "repolist.h"
 #include "aliaslist.h"
 #include "ilenia.h"
@@ -215,7 +215,7 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_d; j++)
 		{
-		  stampa_dipendenze (opzione_d[j]);
+		  print_dependencies (opzione_d[j]);
 		}
 	    }
 	  else
@@ -305,7 +305,7 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_t; j++)
 		{
-		  stampa_dipendenti (opzione_t[j], all);
+		  print_dependents (opzione_t[j], all);
 		}
 	    }
 	  else

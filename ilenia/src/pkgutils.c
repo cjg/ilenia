@@ -30,7 +30,7 @@
 #include "pkglist.h"
 #include "manipola.h"
 #include "confront.h"
-#include "dipendenze.h"
+#include "dependencies.h"
 #include "ilenia.h"
 #include "lsports.h"
 #include "lspacchetti.h"
@@ -195,7 +195,7 @@ aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
   struct pkglist *d = NULL;
   if (opzioni_confronto >= 0)
     {
-      d = dipendenze (pacchetto);
+      d = get_dependencies (pacchetto);
       while (d->next != NULL)
 	{
 	  printf ("%s [", d->name);
@@ -330,7 +330,7 @@ pkgrm (char *pkg, int nocheckdeps, int removeall)
   struct pkglist *p = NULL;
   if (removeall)
     {
-      p = dipendenti (pkg, 1);
+      p = get_dependents (pkg, 1);
       while (p != NULL)
 	{
 	  do_pkgrm (p->name);
@@ -338,7 +338,7 @@ pkgrm (char *pkg, int nocheckdeps, int removeall)
 	}
       return (0);
     }
-  p = dipendenti (pkg, 0);
+  p = get_dependents (pkg, 0);
   if (pkglist_len (p) > 1)
     {
       if (nocheckdeps)
