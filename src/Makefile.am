@@ -29,8 +29,8 @@ ilenia_SOURCES = \
 	pkgutils.h\
 	vercmp.c\
 	vercmp.h\
-	dipendenze.c\
-	dipendenze.h\
+	dependencies.c\
+	dependencies.h\
 	ilenia.h\
 	deplist.c\
 	deplist.h\

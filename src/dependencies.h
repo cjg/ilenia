@@ -1,5 +1,5 @@
 /***************************************************************************
- *            dipendenze.h
+ *            dependencies.h
  *
  *  Sat Sep 11 18:04:47 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
@@ -22,7 +22,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct pkglist *dipendenze (char *pacchetto);
-struct pkglist *dipendenti (char *pacchetto, int all);
-void stampa_dipendenze (char *pacchetto);
-void stampa_dipendenti (char *pacchetto, int all);
+struct pkglist *get_dependencies (char *name);
+struct pkglist *get_dependents (char *name, int all);
+void print_dependencies (char *name);
+void print_dependents (char *name, int all);

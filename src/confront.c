@@ -87,10 +87,9 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 		}
 	      if (test != 0 && skip != 1)
 		{
-		  //confront = pkglist_add_ordered (pkgs->name,
-		  //                              paus->version,
-		  //                      paus->repo, NULL, confront);
-
+		  confront = pkglist_add_ordered (pkgs->name,
+						  paus->version,
+						  paus->repo, NULL, confront);
 		  if (print)
 		    prettyprint (pkgs->name,
 				 pkgs->version, paus->repo, paus->version);
@@ -107,12 +106,13 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 char *
 pkglist_get_newer (char *name, struct pkglist *p)
 {
-  char *version = NULL, *repo = NULL;
+  char *version = NULL;
+  static char *repo = NULL;
   while (p != NULL)
     {
       if (strcmp (name, p->name) == 0)
 	{
-	  if (strcmp (version, "") == 0)
+	  if (!version)
 	    {
 	      version = strdup (p->version);
 	      repo = strdup (p->repo);
