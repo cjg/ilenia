@@ -24,6 +24,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include "manipola.h"
@@ -35,19 +36,19 @@ get_value (char *s, char *var)
   char *tmp = "";
   if (strncmp (s, var, strlen (var)) == 0)
     {
-      char splitted_s[2][MASSIMO];
-      split (s, "=", splitted_s);
-      strcpy (splitted_s[0], trim (splitted_s[0]));
+      char *splitted_s[2];
+      split2 (s, "=", splitted_s);
+      splitted_s[0] = trim (splitted_s[0]);
       if (strcmp (splitted_s[0], var) == 0)
 	{
-	  strcpy (splitted_s[1], trim (splitted_s[1]));
-	  strcpy (splitted_s[1], mid (splitted_s[1], 1, FINE));
-	  strcpy (splitted_s[1], trim (splitted_s[1]));
+	  splitted_s[1] = trim (splitted_s[1]);
+	  splitted_s[1] = mid (splitted_s[1], 1, FINE);
+	  splitted_s[1] = trim (splitted_s[1]);
 	  if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
 	    {
-	      strcpy (splitted_s[1],
-		      mid (splitted_s[1], 1, strlen (splitted_s[1]) - 2));
-	      strcpy (splitted_s[1], trim (splitted_s[1]));
+	      splitted_s[1] = mid (splitted_s[1], 1, strlen (splitted_s[1]) -
+				   2);
+	      splitted_s[1] = trim (splitted_s[1]);
 	    }
 	  tmp = strdup (splitted_s[1]);
 	}
@@ -63,29 +64,27 @@ parse_ileniarc ()
   post_pkgadd = strdup ("");
   if ((rc = fopen ("/etc/ilenia.rc", "r")))
     {
-      char row[MASSIMO];
-      while (fgets (row, MASSIMO, rc))
+      size_t n = 0;
+      char *line = NULL;
+      int nread = getline (&line, &n, rc);
+      while (nread > 0)
 	{
-	  strcpy (row, trim (row));
-	  if (row[0] != '#')
+	  line = trim (line);
+	  if (line[0] != '#')
 	    {
-	      if (strncmp (row, "POST_PKGADD", 11) == 0)
+	      if (strstr (line, "POST_PKGADD"))
+		post_pkgadd = get_value (line, "POST_PKGADD");
+	      if (strstr (line, "ASK_FOR_UPDATE"))
 		{
-		  char splitted_row[2][MASSIMO];
-		  split (row, "=", splitted_row);
-		  strcpy (row, mid (splitted_row[1], 1, FINE));
-		  strcpy (row, trim (row));
-		  strcpy (row, mid (row, 1, strlen (row) - 2));
-		  post_pkgadd = strdup (row);
-		}
-	      if (strstr (row, "ASK_FOR_UPDATE"))
-		{
-		  if (strcasecmp (get_value (row, "ASK_FOR_UPDATE"), "No") ==
+		  if (strcasecmp (get_value (line, "ASK_FOR_UPDATE"), "No") ==
 		      0)
 		    ask_for_update = 0;
 		}
 	    }
+	  nread = getline (&line, &n, rc);
 	}
+      line = NULL;
+      free (line);
     }
   else
     printf ("Warning you don't have a ilenia.rc file.\n");
@@ -95,17 +94,19 @@ parse_ileniarc ()
 int
 ask (char *question, ...)
 {
-  char response[20];
   va_list args;
 
   va_start (args, question);
   vprintf (question, args);
   va_end (args);
 
-  if (fgets (response, 20, stdin))
+  size_t n = 0;
+  char *line = NULL;
+
+  if (getline (&line, &n, stdin))
     {
-      strcpy (response, trim (response));
-      if (!strcasecmp (response, "Y") || !strlen (response))
+      line = trim (line);
+      if (!strcasecmp (line, "Y") || !strlen (line))
 	return (1);
     }
   return (0);
