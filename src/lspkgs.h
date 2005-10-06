@@ -1,5 +1,5 @@
 /***************************************************************************
- *            lspacchetti.h
+ *            lspkgs.h
  *
  *  Sat Jul 10 11:44:51 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe
@@ -23,8 +23,8 @@
  */
 
 #define DB_FILE "/var/lib/pkg/db"
-#define VERSIONE        5
-#define REPO            2
+#define VERSION  5
+#define REPO     2
 
-struct pkglist *lspacchetti ();
-struct pkglist *prendi_favorite (int quale);
+struct pkglist *lspkgs ();
+struct pkglist *get_favorite (int favorite);

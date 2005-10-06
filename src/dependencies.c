@@ -26,8 +26,6 @@
 #include <string.h>
 #include "pkglist.h"
 #include "deplist.h"
-#include "lspacchetti.h"
-#include "lsports.h"
 #include "manipola.h"
 #include "confront.h"
 #include "output.h"

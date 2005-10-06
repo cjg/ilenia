@@ -32,8 +32,8 @@
 #include "confront.h"
 #include "dependencies.h"
 #include "ilenia.h"
-#include "lsports.h"
-#include "lspacchetti.h"
+//#include "lsports.h"
+#include "lspkgs.h"
 #include "repolist.h"
 #include "output.h"
 
@@ -155,7 +155,7 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   if (opzioni_confronto != NO_FAVORITE_REPO
       && opzioni_confronto != NO_FAVORITES)
     {
-      p = prendi_favorite (REPO);
+      p = get_favorite (REPO);
       if ((p = pkglist_find (pacchetto, p)))
 	{
 	  strcpy (collezione, p->repo);
@@ -165,7 +165,7 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   if (opzioni_confronto != NO_FAVORITE_VERSION && opzioni_confronto !=
       NO_FAVORITES)
     {
-      p = prendi_favorite (VERSIONE);
+      p = get_favorite (VERSION);
       if ((p = pkglist_find (pacchetto, p)))
 	{
 	  strcpy (collezione,
