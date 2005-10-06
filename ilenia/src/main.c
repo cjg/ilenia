@@ -2,7 +2,7 @@
 #include <string.h>
 #include "pkglist.h"
 #include "deplist.h"
-#include "lspacchetti.h"
+#include "lspkgs.h"
 #include "lsports.h"
 #include "confront.h"
 #include "update.h"
@@ -85,7 +85,7 @@ main (int argc, char *argv[])
 	       || strcmp (argv[i], "--version") == 0)
 	{
 	  azioni++;
-	  azione[azioni] = VERSIONE;
+	  azione[azioni] = VERSION;
 	}
       else if (strcmp (argv[i], "-h") == 0 || strcmp (argv[i], "--help") == 0)
 	{
@@ -196,7 +196,7 @@ main (int argc, char *argv[])
 
   ilenia_aliases = aliaseslist_build ();
   ilenia_ports = lsports ();
-  ilenia_pkgs = lspacchetti ();
+  ilenia_pkgs = lspkgs ();
 
   for (i = 0; i <= (azioni - rebuild_cache); i++)
     {
@@ -319,7 +319,7 @@ main (int argc, char *argv[])
 	  pkglist_confront (ilenia_pkgs, ilenia_ports, UPDATED,
 			    opzioni_confronto, 1);
 	  break;
-	case VERSIONE:
+	case VERSION:
 	  versione ();
 	  break;
 	case AIUTO:

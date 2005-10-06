@@ -17,8 +17,8 @@ ilenia_SOURCES = \
 	confront.h\
 	pkglist.c\
 	pkglist.h\
-	lspacchetti.c\
-	lspacchetti.h\
+	lspkgs.c\
+	lspkgs.h\
 	lsports.c\
 	lsports.h\
 	manipola.c\

@@ -81,15 +81,15 @@ trim (char *s)
 char *
 tab2spazi (char *s)
 {
-  static char saus[MASSIMO] = "";
+  //static char saus[MASSIMO] = "";
   int i;
-  strcpy (saus, s);
-  for (i = 0; i <= strlen (saus); i++)
+  //strcpy (saus, s);
+  for (i = 0; i <= strlen (s); i++)
     {
-      if (saus[i] == '\t')
-	saus[i] = ' ';
+      if (s[i] == '\t')
+	s[i] = ' ';
     }
-  return ((char *) saus);
+  return (s);
 }
 
 char *
