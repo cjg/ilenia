@@ -186,7 +186,7 @@ main (int argc, char *argv[])
   if (parse_ileniarc () != 0)
     return (1);
 
-  repository = build_repolist ();
+  ilenia_repos = build_repolist ();
   if (rebuild_cache)
     {
       FILE *file;
@@ -194,19 +194,19 @@ main (int argc, char *argv[])
 	fclose (file);
     }
 
-  aliases = aliaseslist_build ();
-  ports = lsports ();
-  pacchetti = lspacchetti ();
+  ilenia_aliases = aliaseslist_build ();
+  ilenia_ports = lsports ();
+  ilenia_pkgs = lspacchetti ();
 
   for (i = 0; i <= (azioni - rebuild_cache); i++)
     {
       switch (azione[i])
 	{
 	case REPOLIST:
-	  while (repository != NULL)
+	  while (ilenia_repos != NULL)
 	    {
-	      printf ("%s\n", repository->name);
-	      repository = repository->next;
+	      printf ("%s\n", ilenia_repos->name);
+	      ilenia_repos = ilenia_repos->next;
 	    }
 	  break;
 	case DIPENDENZE:
@@ -257,14 +257,15 @@ main (int argc, char *argv[])
 	  break;
 	case LSPORTS:
 	  if (opzioni_l == -1)
-	    print_db (ports);
+	    print_db (ilenia_ports);
 	  else
 	    {
 	      int j;
 	      for (j = 0; j <= opzioni_l; j++)
 		{
-		  if (repolist_exists (opzione_l[j], repository))
-		    print_db (pkglist_select_from_repo (opzione_l[j], ports));
+		  if (repolist_exists (opzione_l[j], ilenia_repos))
+		    print_db (pkglist_select_from_repo (opzione_l[j],
+							ilenia_ports));
 		}
 	    }
 	  break;
@@ -277,13 +278,14 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_s; j++)
 		{
-		  p = pkglist_find_like (opzione_s[j], ports);
+		  p = pkglist_find_like (opzione_s[j], ilenia_ports);
 		  print_db (p);
 		}
 	    }
 	  break;
 	case DIFF:
-	  pkglist_confront (pacchetti, ports, DIFF, opzioni_confronto, 1);
+	  pkglist_confront (ilenia_pkgs, ilenia_ports, DIFF,
+			    opzioni_confronto, 1);
 	  break;
 	case RIMUOVI:
 	  if (opzioni_r != -1)
@@ -314,7 +316,8 @@ main (int argc, char *argv[])
 	    }
 	  break;
 	case UPDATED:
-	  pkglist_confront (pacchetti, ports, UPDATED, opzioni_confronto, 1);
+	  pkglist_confront (ilenia_pkgs, ilenia_ports, UPDATED,
+			    opzioni_confronto, 1);
 	  break;
 	case VERSIONE:
 	  versione ();
