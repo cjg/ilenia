@@ -175,7 +175,7 @@ split2 (char *s, char *delim, char *splitted[])
   while (strlen (s) > 0)
     {
       char *tmp;
-      tmp = s;
+      tmp = strdup (s);
       strtok (tmp, delim);
       splitted[i] = strdup (tmp);
       s = mid (s, strlen (tmp), FINE);

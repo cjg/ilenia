@@ -106,7 +106,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct pkglist *p)
 	    }
 	  if (strlen (nome) && strlen (versione) && release)
 	    {
-	      strcpy (versione, sed (versione, " ", "_"));
+	      //strcpy (versione, sed (versione, " ", "_"));
 	      p = pkglist_add_ordered (nome, versione, collezione, d, p);
 	      char dependencies[MASSIMO] = "";
 	      if (d != NULL)
@@ -121,6 +121,8 @@ parsa_pkgfile (char *percorso, char *collezione, struct pkglist *p)
 
 	      fprintf (cachefile, "%s %s %s %s\n", nome, versione,
 		       collezione, dependencies);
+	      //printf ("%s %s %s %s\n", nome, versione,
+	      //       collezione, dependencies);
 	      strcpy (nome, "");
 	      strcpy (versione, "");
 	      release = 0;
@@ -223,7 +225,6 @@ parsa_httpup (char *percorso, struct repolist *p)
 		      prefix = strdup (PORTS_LOCATION);
 		      collezione = strcat (mad_prefix, collezione);
 		    }
-
 		  p = repolist_add (collezione, prefix, p);
 		}
 	    }
