@@ -108,7 +108,7 @@ lspacchetti ()
 	    }
 	  p = pkglist_add_ordered (nome, riga, tmp, NULL, p);
 	  struct aliaslist *a = NULL;
-	  a = aliaslist_get (nome, aliases);
+	  a = aliaslist_get (nome, ilenia_aliases);
 	  while (a != NULL)
 	    {
 	      if (strcmp (a->name, nome) != 0)

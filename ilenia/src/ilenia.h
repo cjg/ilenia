@@ -22,16 +22,17 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct pkglist *ports;
-struct pkglist *pacchetti;
-struct repolist *repository;
-struct aliaseslist *aliases;
+struct pkglist *ilenia_ports;
+struct pkglist *ilenia_pkgs;
+struct repolist *ilenia_repos;
+struct aliaseslist *ilenia_aliases;
+
 char *post_pkgadd;
 int ask_for_update;
 
 #define CACHE "/var/cache/ilenia"
 #define ALIAS_FILE "/etc/ports/alias"
 
-int parse_ileniarc ();
 char *get_value (char *s, char *var);
+int parse_ileniarc ();
 int ask (char *question, ...);

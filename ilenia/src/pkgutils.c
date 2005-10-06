@@ -147,10 +147,10 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
   char collezione[255];
   char port[255];
   struct pkglist *p;
-  if (pkglist_exists (pacchetto, pacchetti) == 0)
+  if (pkglist_exists (pacchetto, ilenia_pkgs) == 0)
     aggiornare = 1;
 
-  strcpy (collezione, pkglist_get_newer (pacchetto, ports));
+  strcpy (collezione, pkglist_get_newer (pacchetto, ilenia_ports));
 
   if (opzioni_confronto != NO_FAVORITE_REPO
       && opzioni_confronto != NO_FAVORITES)
@@ -169,11 +169,12 @@ aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
       if ((p = pkglist_find (pacchetto, p)))
 	{
 	  strcpy (collezione,
-		  pkglist_get_from_version (pacchetto, p->version, ports));
+		  pkglist_get_from_version (pacchetto, p->version,
+					    ilenia_ports));
 	}
     }
 
-  strcpy (port, repolist_find (collezione, repository)->path);
+  strcpy (port, repolist_find (collezione, ilenia_repos)->path);
   if (port[strlen (port)] != '/')
     strcat (port, "/");
   if (strncmp (collezione, "local", 5) != 0)
@@ -201,7 +202,7 @@ aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
 	  printf ("%s [", d->name);
 	  if (strcmp (d->repo, "not found") != 0)
 	    {
-	      if (pkglist_exists (d->name, pacchetti) != 0)
+	      if (pkglist_exists (d->name, ilenia_pkgs) != 0)
 		{
 		  printf ("install now]\n");
 		  if (aggiorna_pacchetto_ (opzioni_confronto, d->name) != 0)
@@ -232,7 +233,7 @@ aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
   else
     {
       opzioni_confronto *= -1;
-      if (pkglist_exists (pacchetto, ports) == 0)
+      if (pkglist_exists (pacchetto, ilenia_ports) == 0)
 	{
 	  if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
 	    return (-1);
@@ -257,7 +258,9 @@ aggiorna_pacchetti (int opzioni_confronto)
     }
   struct pkglist *p = NULL;
   struct pkglist *q = NULL;
-  p = pkglist_confront (pacchetti, ports, UPDATED, opzioni_confronto, 0);
+  p =
+    pkglist_confront (ilenia_pkgs, ilenia_ports, UPDATED, opzioni_confronto,
+		      0);
   while (p != NULL)
     {
       if (pkglist_exists (p->name, q) != 0)

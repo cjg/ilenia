@@ -408,7 +408,7 @@ lsports ()
   if ((cachefile = fopen (CACHE, "r")))
     {
       if (!fgets (riga, 255, cachefile))
-	if (build_cache (repository) != 0)
+	if (build_cache (ilenia_repos) != 0)
 	  return (NULL);
       while (fgets (riga, 255, cachefile))
 	{
