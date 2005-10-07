@@ -50,7 +50,11 @@ class Packages(list):
                 return
             for line in f_io.readlines():
                 if line[:12] == "PACKAGE NAME":
+                    if not ".tgz" in line:
+                        continue
+
                     line = line[13:].strip()[:-4]
+
                     try:
                         self._list.append(Package(line, repo))
                         self.append(self._list[len(self._list)-1].name)

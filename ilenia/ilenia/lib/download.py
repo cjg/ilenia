@@ -37,6 +37,8 @@ def get_url(pkg, repos):
                              "FILELIST.TXT"))
     lines = f_io.readlines()
     for line in lines:
+        if not ".tgz" in line:
+            continue
         if "/"+pkg.name+"-"+pkg.version in line:
             url = line[line.index("./")+1:]
             url = "%s/%s" % (repos.get_url(pkg.repo), url)
@@ -52,6 +54,8 @@ def get_md5sum(pkg):
                              "CHECKSUMS.md5"))
     lines = f_io.readlines()
     for line in lines:
+        if not ".tgz" in line:
+            continue
         if "/"+pkg.name+"-"+pkg.version in line:
             md5sum = line[:line.index(" ")].strip()
             return md5sum
