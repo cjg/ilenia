@@ -39,102 +39,6 @@ FILE *cachefile;
 
 #define PORTS_LOCATION "/usr/ports"
 
-struct deplist *
-deplist_from_deprow (char *deprow)
-{
-  struct deplist *d = NULL;
-  if (strlen (deprow) > 0)
-    {
-      char deps[255][MASSIMO];
-      int how_many_deps, i;
-      deprow = sed (deprow, ",", " ");
-      how_many_deps = split (deprow, " ", deps);
-      for (i = 0; i < how_many_deps; i++)
-	d = deplist_add (trim (deps[i]), d);
-    }
-  return (d);
-}
-
-struct pkglist *
-parsa_pkgfile (char *percorso, char *collezione, struct pkglist *p)
-{
-  FILE *pkgfile;
-  if ((pkgfile = fopen (percorso, "r")))
-    {
-      char riga[255] = "";
-      char *nome = "";
-      char *value = "";
-      char versione[255] = "";
-      int release = 0;
-      struct deplist *d = NULL;
-      while (fgets (riga, 255, pkgfile))
-	{
-	  strcpy (riga, trim (riga));
-	  if (riga[0] == '#')
-	    {
-	      strcpy (riga, mid (riga, 1, FINE));
-	      strcpy (riga, trim (riga));
-	      if (strncasecmp (riga, "Depends", 7) == 0)
-		{
-		  char deprow[MASSIMO];
-		  if (strstr (riga, ":"))
-		    {
-		      strcpy (riga, mid (strstr (riga, ":"), 1, FINE));
-		      strcpy (deprow, trim (riga));
-		      d = deplist_from_deprow (deprow);
-		    }
-		}
-	    }
-	  else if (strncmp (riga, "name", 4) == 0)
-	    {
-	      if (strlen (value = get_value (riga, "name")))
-		nome = strdup (value);
-	    }
-	  else if (strncmp (riga, "version", 7) == 0)
-	    {
-	      if (strlen (value = get_value (riga, "version")))
-		strcpy (versione, value);
-	    }
-	  else if (strncmp (riga, "release", 7) == 0)
-	    {
-	      if (strlen (value = get_value (riga, "release")))
-		{
-		  strcat (versione, "-");
-		  strcat (versione, value);
-		  release = 1;
-		}
-	    }
-	  if (strlen (nome) && strlen (versione) && release)
-	    {
-	      //strcpy (versione, sed (versione, " ", "_"));
-	      p = pkglist_add_ordered (nome, versione, collezione, d, p);
-	      char dependencies[MASSIMO] = "";
-	      if (d != NULL)
-		{
-		  while (d != NULL)
-		    {
-		      strcat (dependencies, d->name);
-		      strcat (dependencies, " ");
-		      d = d->next;
-		    }
-		}
-
-	      fprintf (cachefile, "%s %s %s %s\n", nome, versione,
-		       collezione, dependencies);
-	      //printf ("%s %s %s %s\n", nome, versione,
-	      //       collezione, dependencies);
-	      strcpy (nome, "");
-	      strcpy (versione, "");
-	      release = 0;
-	      fclose (pkgfile);
-	      return (p);
-	    }
-	}
-      fclose (pkgfile);
-    }
-  return (p);
-}
-
 struct repolist *
 parsa_cvsup (char *percorso, struct repolist *p)
 {
@@ -318,9 +222,102 @@ parse_local (char *path, struct repolist *p)
   return (p);
 }
 
+struct deplist *
+deplist_from_deprow (char *deprow)
+{
+  struct deplist *d = NULL;
+  if (strlen (deprow) > 0)
+    {
+      char deps[255][MASSIMO];
+      int how_many_deps, i;
+      deprow = sed (deprow, ",", " ");
+      how_many_deps = split (deprow, " ", deps);
+      for (i = 0; i < how_many_deps; i++)
+	d = deplist_add (trim (deps[i]), d);
+    }
+  return (d);
+}
 
-struct pkglist *
-leggi_dir (char *collezione, char *prefix, struct pkglist *p)
+int
+parse_pkgfile (char *filename, char *repo)
+{
+  FILE *file = NULL;
+  if ((file = fopen (filename, "r")))
+    {
+      size_t n = 0;
+      char *line = NULL;
+      int nread = getline (&line, &n, file);
+      struct deplist *d = NULL;
+      char *value, *name = NULL, *version = NULL;
+      char *dependencies = "";
+      int release = 0;
+      while (nread > 0)
+	{
+	  line = trim (line);
+	  if (line[0] == '#')
+	    {
+	      line = mid (line, 1, FINE);
+	      line = trim (line);
+
+	      if (strncasecmp (line, "Depends", 7) == 0)
+		{
+		  if (strstr (line, ":"))
+		    {
+		      line = mid (strstr (line, ":"), 1, FINE);
+		      line = trim (line);
+		      d = deplist_from_deprow (line);
+		    }
+		}
+	    }
+	  else if (strncmp (line, "name", 4) == 0)
+	    name = get_value (line, "name");
+	  else if (strncmp (line, "version", 7) == 0)
+	    version = get_value (line, "version");
+	  else if (strncmp (line, "release", 7) == 0)
+	    {
+	      if (strlen (value = get_value (line, "release")))
+		{
+		  strcat (version, "-");
+		  strcat (version, value);
+		  release = 1;
+		}
+	    }
+	  if (name && version && release)
+	    {
+	      printf ("%s\n", version);
+	      version = sed (version, " ", "_");
+	      printf ("%s\n", version);
+
+	      if (d != NULL)
+		{
+		  dependencies = strdup (d->name);
+		  strcat (dependencies, " ");
+		  d = d->next;
+		  while (d != NULL)
+		    {
+		      strcat (dependencies, d->name);
+		      strcat (dependencies, " ");
+		      d = d->next;
+		    }
+		}
+	      fprintf (cachefile, "%s %s %s %s\n", name, version,
+		       repo, dependencies);
+	      fclose (file);
+	      line = NULL;
+	      free (line);
+	      return (0);
+	    }
+	  line = NULL;
+	  n = 0;
+	  nread = getline (&line, &n, file);
+	}
+      fclose (file);
+    }
+  return (-1);
+}
+
+void
+read_from_dir (char *collezione, char *prefix)
 {
   DIR *dir;
   struct dirent *info_file;
@@ -344,11 +341,100 @@ leggi_dir (char *collezione, char *prefix, struct pkglist *p)
 	  if (S_ISDIR (tipo_file.st_mode) && info_file->d_name[0] != '.')
 	    {
 	      strcat (nome_file, "/Pkgfile");
-	      p = parsa_pkgfile (nome_file, collezione, p);
+	      parse_pkgfile (nome_file, collezione);
 	    }
 	}
     }
-  return (p);
+  //return (p);
+  /*
+     DIR *dir;
+     struct dirent *info_file;
+     struct stat file_type;
+     char path[strlen(repo_prefix)];
+     strcpy(path, repo_prefix);
+
+     if (strncmp (repo_name, "local", 5) != 0)
+     {
+     strcat (path, "/");
+     strcat (path, repo_name);
+     }
+
+     if ((dir = opendir (path)))
+     {
+     while ((info_file = readdir (dir)))
+     {
+     char *filename = strdup(path);
+     strcat (filename, "/");
+     strcat (filename, info_file->d_name);
+     stat (filename, &file_type);
+     if (S_ISDIR (file_type.st_mode) && info_file->d_name[0] != '.')
+     {
+     strcat (filename, "/Pkgfile");
+
+     char f[strlen(filename)];
+     strcpy(f, filename);
+     parse_pkgfile (f, repo_name);
+     }
+     }
+     }
+   */
+}
+
+int
+build_cache (struct repolist *r)
+{
+  printf ("Building cache!\n");
+  if (!(cachefile = fopen (CACHE, "w")))
+    {
+      return (-1);
+    }
+  while (r != NULL)
+    {
+      read_from_dir (r->name, r->path);
+      r = r->next;
+    }
+  fclose (cachefile);
+  chmod (CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  return (0);
+}
+
+struct pkglist *
+lsports ()
+{
+  FILE *cachefile;
+  struct pkglist *p = NULL;
+  if ((cachefile = fopen (CACHE, "r")))
+    {
+      size_t n = 0;
+      char *line = NULL;
+      int nread = getline (&line, &n, cachefile);
+
+      if (nread < 0)
+	{
+	  if (build_cache (ilenia_repos) != 0)
+	    return (NULL);
+	  nread = getline (&line, &n, cachefile);
+	}
+      while (nread > 0)
+	{
+	  int i, num = count (line, ' ');
+	  char *splitted_line[num];
+	  split2 (line, " ", splitted_line);
+	  struct deplist *d = NULL;
+	  for (i = 3; i < num; i++)
+	    {
+	      if (strlen (trim (splitted_line[i])) > 0)
+		d = deplist_add (trim (splitted_line[i]), d);
+	    }
+	  p = pkglist_add_ordered (trim (splitted_line[0]),
+				   trim (splitted_line[1]),
+				   trim (splitted_line[2]), d, p);
+	  nread = getline (&line, &n, cachefile);
+	}
+      fclose (cachefile);
+      return (p);
+    }
+  return (NULL);
 }
 
 struct repolist *
@@ -379,56 +465,4 @@ build_repolist ()
 	}
     }
   return (p);
-}
-
-int
-build_cache (struct repolist *r)
-{
-  struct pkglist *ports = NULL;
-  printf ("Building cache!\n");
-  if (!(cachefile = fopen (CACHE, "w")))
-    {
-      return (-1);
-    }
-  while (r != NULL)
-    {
-      ports = leggi_dir (r->name, r->path, ports);
-      r = r->next;
-    }
-  fclose (cachefile);
-  chmod (CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-  return (0);
-}
-
-struct pkglist *
-lsports ()
-{
-  FILE *cachefile;
-  struct pkglist *p = NULL;
-  char riga[255];
-  if ((cachefile = fopen (CACHE, "r")))
-    {
-      if (!fgets (riga, 255, cachefile))
-	if (build_cache (ilenia_repos) != 0)
-	  return (NULL);
-      while (fgets (riga, 255, cachefile))
-	{
-	  int len;
-	  char splitted_row[MASSIMO][MASSIMO];
-	  len = split (riga, " ", splitted_row);
-	  int i;
-	  struct deplist *d = NULL;
-	  for (i = 3; i < len; i++)
-	    {
-	      if (strlen (trim (splitted_row[i])) > 0)
-		d = deplist_add (trim (splitted_row[i]), d);
-	    }
-	  p = pkglist_add_ordered (trim (splitted_row[0]),
-				   trim (splitted_row[1]),
-				   trim (splitted_row[2]), d, p);
-	}
-      fclose (cachefile);
-      return (p);
-    }
-  return (NULL);
 }
