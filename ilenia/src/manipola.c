@@ -70,6 +70,7 @@ sedchr (char *s, int trova, int sostituisci)
 char *
 trim (char *s)
 {
+
   int n;
   while (*s && *s <= 32)
     ++s;
@@ -119,21 +120,23 @@ char *
 mid (char *s, int start, int length)
 {
   int x, z = 0;
+  char *S = NULL;
+  S = strdup (s);
   if (length == -1)
-    length = strlen (s) - start;
-  if ((start + length) <= strlen (s))
+    length = strlen (S) - start;
+  if ((start + length) <= strlen (S))
     {
-      for (x = 0; x <= strlen (s); x++)
+      for (x = 0; x <= strlen (S); x++)
 	{
 	  if ((x >= start))
 	    {
-	      s[z] = s[x];
+	      S[z] = S[x];
 	      z++;
 	    }
 	}
     }
-  s[length] = '\0';
-  return (s);
+  S[length] = '\0';
+  return (S);
 }
 
 char *
