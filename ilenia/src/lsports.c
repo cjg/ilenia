@@ -40,102 +40,39 @@ FILE *cachefile;
 #define PORTS_LOCATION "/usr/ports"
 
 struct repolist *
-parsa_cvsup (char *percorso, struct repolist *p)
+parse_local (char *path, struct repolist *r)
 {
   FILE *file;
-  if ((file = fopen (percorso, "r")))
-    {
-      char riga[255];
-      char prefix[255];
-      char mad_prefix[255] = "";
-      char collezione[255];
-      while (fgets (riga, 255, file))
-	{
-	  char *value = "";
-	  strcpy (riga, trim (riga));
-	  if (riga[0] != '#')
-	    {
-	      if (riga[0] == '*')
-		{
-		  if (strlen (value = get_value (riga, "*default prefix")))
-		    {
-		      strcpy (prefix, value);
-		      if (strncmp
-			  (prefix, PORTS_LOCATION,
-			   strlen (PORTS_LOCATION)) == 0
-			  && strlen (prefix) > strlen (PORTS_LOCATION))
-			{
-			  strcpy (mad_prefix,
-				  mid (prefix, strlen (PORTS_LOCATION) + 1,
-				       FINE));
-			  strcpy (mad_prefix, trim (mad_prefix));
-			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
-			    strcat (mad_prefix, "/");
-			  strcpy (prefix, PORTS_LOCATION);
-			}
 
-		    }
-		}
-	      else if (strlen (riga) > 0)
-		{
-		  if (strlen (mad_prefix) > 0)
-		    {
-		      strcpy (collezione, mad_prefix);
-		      strcat (collezione, riga);
-		    }
-		  else
-		    strcpy (collezione, riga);
-		  strcpy (collezione, strtok (collezione, " "));
-		  p = repolist_add (collezione, prefix, p);
-		}
-	    }
-	}
+  file = fopen (path, "r");
+  if (file == NULL)
+    return (r);
+
+  char *line = NULL;
+  char *repo;
+  char *prefix = NULL;
+  char *mad_prefix;
+  size_t n = 0;
+  ssize_t nread;
+
+  while ((nread = getline (&line, &n, file)) != 0)
+    {
+      trim (line);
+      if (line[0] == '#')
+	continue;
+      if (strstr (line, "PATH"))
+	prefix = get_value (line, "PATH");
     }
-  return (p);
+  repo = rindex (path, '/');
+  repo = mid (repo, 0, strlen (repo) - strlen (index (repo, '.')));
+  mad_prefix = strdup ("local");
+  repo = strcat (mad_prefix, repo);
+  r = repolist_add (repo, prefix, r);
+
+  return (r);
 }
 
-struct repolist *
-parsa_httpup (char *percorso, struct repolist *p)
-{
-  FILE *file;
-  if ((file = fopen (percorso, "r")))
-    {
-      char riga[255];
-      while (fgets (riga, 255, file))
-	{
-	  strcpy (riga, trim (riga));
-	  char *value = "";
-	  char *collezione = "";
-	  char *prefix = "";
-	  char *mad_prefix = "";
-	  if (riga[0] != '#')
-	    {
-	      if (strlen (value = get_value (riga, "ROOT_DIR")) > 0)
-		{
-		  collezione = strdup (value);
-		  collezione = strdup (rindex (collezione, '/'));
-		  collezione = strdup (mid (collezione, 1, FINE));
-		  prefix = strdup (value);
-		  prefix =
-		    mid (prefix, 0, strlen (prefix) - strlen (collezione));
-		  if (strncmp
-		      (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)) == 0
-		      && strlen (prefix) > strlen (PORTS_LOCATION) + 1)
-		    {
-		      mad_prefix =
-			mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
-		      if (mad_prefix[strlen (mad_prefix) - 1] != '/')
-			mad_prefix = strcat (mad_prefix, "/");
-		      prefix = strdup (PORTS_LOCATION);
-		      collezione = strcat (mad_prefix, collezione);
-		    }
-		  p = repolist_add (collezione, prefix, p);
-		}
-	    }
-	}
-    }
-  return (p);
-}
+// not changed yet
 
 struct repolist *
 parse_cvs (char *percorso, struct repolist *p)
@@ -160,8 +97,8 @@ parse_cvs (char *percorso, struct repolist *p)
 		      prefix = strdup (value);
 		      if (strncmp
 			  (prefix, PORTS_LOCATION,
-			   strlen (PORTS_LOCATION)) == 0
-			  && strlen (prefix) > strlen (PORTS_LOCATION))
+			   strlen (PORTS_LOCATION))
+			  == 0 && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  mad_prefix =
 			    mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
@@ -189,52 +126,130 @@ parse_cvs (char *percorso, struct repolist *p)
 }
 
 struct repolist *
-parse_local (char *path, struct repolist *p)
+parse_httpup (char *path, struct repolist *r)
 {
   FILE *file;
-  if ((file = fopen (path, "r")))
+  char *line = NULL;
+  size_t n = 0;
+  ssize_t nread;
+
+  file = fopen (path, "r");
+
+  if (file == NULL)
+    return (r);
+
+  while ((nread = getline (&line, &n, file)) != 0)
     {
-      char row[255];
-      char *prefix = "";
-      char *mad_prefix = "";
-      char *collezione = "";
-      char *value = "";
-      while (fgets (row, 255, file))
+      char *prefix;
+      char *mad_prefix;
+      char *repo;
+
+      trim (line);
+
+      if (line[0] == '#')
+	continue;
+
+      if (strstr (line, "ROOT_DIR") == NULL)
+	continue;
+
+      repo = get_value (line, "ROOT_DIR");
+      rindex (repo, '/');
+      repo = mid (repo, 1, FINE);
+
+      prefix = get_value (line, "ROOT_DIR");
+      prefix = mid (prefix, 0, strlen (prefix) - strlen (repo));
+
+      if (strncmp
+	  (prefix, PORTS_LOCATION,
+	   strlen (PORTS_LOCATION)) == 0
+	  && strlen (prefix) > strlen (PORTS_LOCATION) + 1)
 	{
-	  strcpy (row, trim (row));
-	  if (row[0] != '#')
-	    {
-	      if (strncmp (row, "PATH", 4) == 0)
-		{
-		  if (strlen (value = get_value (row, "PATH")))
-		    prefix = strdup (value);
-		}
-	    }
+	  mad_prefix = mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
+	  strcat (mad_prefix, "/");
+	  prefix = strdup (PORTS_LOCATION);
+	  repo = strcat (mad_prefix, repo);
+	  sed (repo, "//", "/");
 	}
-      collezione = rindex (path, '/');
-      collezione =
-	mid (collezione, 0,
-	     strlen (collezione) - strlen (index (collezione, '.')));
-      mad_prefix = strdup ("local");
-      collezione = strcat (mad_prefix, strdup (collezione));
-      p = repolist_add (collezione, prefix, p);
+      r = repolist_add (repo, prefix, r);
     }
-  return (p);
+  return (r);
+}
+
+struct repolist *
+parse_cvsup (char *path, struct repolist *r)
+{
+  FILE *file;
+  char *line = NULL;
+  size_t n = 0;
+  ssize_t nread;
+
+  file = fopen (path, "r");
+  if (file == NULL)
+    return (r);
+
+  char *prefix = NULL;
+  char *mad_prefix = NULL;
+  char *repo;
+
+  while ((nread = getline (&line, &n, file)) != -1)
+    {
+      trim (line);
+      if (line[0] == '#')
+	continue;
+
+      if (strstr (line, "*default prefix"))
+	{
+	  prefix = get_value (line, "*default prefix");
+	  if (strlen (prefix) <= strlen (PORTS_LOCATION))
+	    continue;
+	  if (strncmp (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)))
+	    continue;
+	  mad_prefix = mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
+	  trim (mad_prefix);
+	  strcat (mad_prefix, "/");
+	  prefix = strdup (PORTS_LOCATION);
+	}
+      else if (nread)
+	{
+	  if (mad_prefix)
+	    {
+	      repo = strdup (mad_prefix);
+	      strcat (repo, line);
+	      sed (repo, "//", "/");
+	    }
+	  else
+	    repo = strdup (line);
+
+	  strtok (repo, " ");
+	  r = repolist_add (repo, prefix, r);
+	}
+    }
+
+  if (line)
+    free (line);
+  fclose (file);
+  return (r);
 }
 
 struct deplist *
 deplist_from_deprow (char *deprow)
 {
   struct deplist *d = NULL;
-  if (strlen (deprow) > 0)
-    {
-      char deps[255][MASSIMO];
-      int how_many_deps, i;
-      deprow = sed (deprow, ",", " ");
-      how_many_deps = split (deprow, " ", deps);
-      for (i = 0; i < how_many_deps; i++)
-	d = deplist_add (trim (deps[i]), d);
-    }
+  if (strlen (deprow) <= 0)
+    return (NULL);
+
+  int n, i;
+
+  deprow = sed (deprow, ",", " ");
+
+  n = count (deprow, ' ');
+
+  char *deps[n];
+
+  split2 (deprow, " ", deps);
+
+  for (i = 0; i < n; i++)
+    d = deplist_add (trim (deps[i]), d);
   return (d);
 }
 
@@ -305,35 +320,33 @@ parse_pkgfile (char *filename, char *repo)
 }
 
 int
-read_from_dir (char *collezione, char *prefix)
+read_from_dir (char *repo_name, char *prefix)
 {
   DIR *dir;
   struct dirent *info_file;
-  struct stat tipo_file;
-  char percorso[255];
-  char nome_file[255];
-  strcpy (percorso, prefix);
-  if (strncmp (collezione, "local", 5) != 0)
+  struct stat stat_file;
+  char *path;
+  path = strdup (prefix);
+  if (strncmp (repo_name, "local", 5) != 0)
     {
-      strcat (percorso, "/");
-      strcat (percorso, collezione);
+      strcat (path, "/");
+      strcat (path, repo_name);
     }
 
-  dir = opendir (percorso);
-  printf ("%s\n", percorso);
+  dir = opendir (path);
+  printf ("%s\n", path);
   if (dir == NULL)
     return (EXIT_FAILURE);
 
   while ((info_file = readdir (dir)))
     {
-      strcpy (nome_file, percorso);
-      strcat (nome_file, "/");
-      strcat (nome_file, info_file->d_name);
-      stat (nome_file, &tipo_file);
-      if (S_ISDIR (tipo_file.st_mode) && info_file->d_name[0] != '.')
+      char filename[strlen (path) + strlen (info_file->d_name) + 9];
+      sprintf (filename, "%s/%s", path, info_file->d_name);
+      stat (filename, &stat_file);
+      if (S_ISDIR (stat_file.st_mode) && info_file->d_name[0] != '.')
 	{
-	  strcat (nome_file, "/Pkgfile");
-	  parse_pkgfile (nome_file, collezione);
+	  strcat (filename, "/Pkgfile");
+	  parse_pkgfile (filename, repo_name);
 	}
     }
   closedir (dir);
@@ -402,29 +415,38 @@ lsports ()
 struct repolist *
 build_repolist ()
 {
-  struct repolist *p = NULL;
-  DIR *etc_ports;
+  struct repolist *r = NULL;
+  DIR *dir;
   struct dirent *info_file;
-  char filename[255];
-  char extension[255];
-  etc_ports = opendir ("/etc/ports");
-  while ((info_file = readdir (etc_ports)))
+  char *extension;
+
+  dir = opendir ("/etc/ports");
+  if (dir == NULL)
+    return (NULL);
+
+  while ((info_file = readdir (dir)))
     {
-      if (strstr (info_file->d_name, "."))
-	{
-	  strcpy (extension, strstr (info_file->d_name, "."));
-	  strcpy (extension, mid (extension, 1, FINE));
-	  strcpy (filename, "/etc/ports/");
-	  strcat (filename, info_file->d_name);
-	  if (strcmp (extension, "cvsup") == 0)
-	    p = parsa_cvsup (filename, p);
-	  else if (strcmp (extension, "httpup") == 0)
-	    p = parsa_httpup (filename, p);
-	  else if (strcmp (extension, "cvs") == 0)
-	    p = parse_cvs (filename, p);
-	  else if (strcmp (extension, "local") == 0)
-	    p = parse_local (filename, p);
-	}
+      if (strstr (info_file->d_name, ".") == NULL)
+	continue;
+
+      extension = strstr (info_file->d_name, ".");
+      extension = mid (extension, 1, FINE);
+
+      char filename[strlen (info_file->d_name) + 11];
+
+      sprintf (filename, "/etc/ports/%s", info_file->d_name);
+
+      if (strcmp (extension, "cvsup") == 0)
+	r = parse_cvsup (filename, r);
+      else if (strcmp (extension, "httpup") == 0)
+	r = parse_httpup (filename, r);
+      else if (strcmp (extension, "cvs") == 0)
+	r = parse_cvs (filename, r);
+      else if (strcmp (extension, "local") == 0)
+	r = parse_local (filename, r);
     }
-  return (p);
+
+  closedir (dir);
+
+  return (r);
 }
