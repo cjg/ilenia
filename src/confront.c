@@ -87,9 +87,11 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 		}
 	      if (test != 0 && skip != 1)
 		{
-		  confront = pkglist_add_ordered (pkgs->name,
-						  paus->version,
-						  paus->repo, NULL, confront);
+		  confront =
+		    pkglist_add_ordered (pkgs->
+					 name,
+					 paus->
+					 version, paus->repo, NULL, confront);
 		  if (print)
 		    prettyprint (pkgs->name,
 				 pkgs->version, paus->repo, paus->version);

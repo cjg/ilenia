@@ -117,26 +117,24 @@ oldmid (char *s, int inizio, int lunghezza)
 }
 
 char *
-mid (char *s, int start, int length)
+mid (char s[], int start, int length)
 {
   int x, z = 0;
-  char *S = NULL;
-  S = strdup (s);
   if (length == -1)
-    length = strlen (S) - start;
-  if ((start + length) <= strlen (S))
+    length = strlen (s) - start;
+  if ((start + length) <= strlen (s))
     {
-      for (x = 0; x <= strlen (S); x++)
+      for (x = 0; x <= strlen (s); x++)
 	{
 	  if ((x >= start))
 	    {
-	      S[z] = S[x];
+	      s[z] = s[x];
 	      z++;
 	    }
 	}
     }
-  S[length] = '\0';
-  return (S);
+  s[length] = '\0';
+  return (s);
 }
 
 char *

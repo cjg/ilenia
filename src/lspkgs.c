@@ -48,49 +48,49 @@ lspkgs ()
 
   size_t n = 0;
   char *line = NULL;
-  int nread = getline (&line, &n, file);
+  ssize_t nread;
   char *name = NULL;
 
-  while (nread > 0)
+  while (((nread = getline (&line, &n, file)) != -1))
     {
-      /*
-         line = mid (line, 0, strlen (line) - 1);
-         if (new_record && !name)
-         name = strdup (line);
-         else if (new_record)
-         {
-         char *tmp;
-         if ((paus = pkglist_find (name, favoriterepo)) != NULL)
-         {
-         tmp = strdup ("R ");
-         strcat (tmp, paus->repo);
-         }
-         else if ((paus = pkglist_find (name, favoriteversion)) != NULL)
-         {
-         tmp = strdup ("V ");
-         strcat (tmp, paus->version);
-         }
-         else
-         {
-         tmp = strdup ("installed");
-         }
-         p = pkglist_add_ordered (name, line, tmp, NULL, p);
-         struct aliaslist *a = NULL;
-         a = aliaslist_get (name, ilenia_aliases);
-         while (a != NULL)
-         {
-         if (strcmp (a->name, name) != 0)
-         p = pkglist_add_ordered (a->name, "alias", name, NULL, p);
-         a = a->next;
-         }
-         name = NULL;
-         new_record = 0;
-         }
+      line[strlen (line) - 1] = '\0';
 
-         if (line[1] == '\0')
-         new_record = 1;
-       */
-      nread = getline (&line, &n, file);
+      if (new_record && !name)
+	name = strdup (line);
+      else if (new_record)
+	{
+	  char *tmp;
+	  if ((paus = pkglist_find (name, favoriterepo)) != NULL)
+	    {
+	      tmp = strdup ("R ");
+	      strcat (tmp, paus->repo);
+	    }
+	  else if ((paus = pkglist_find (name, favoriteversion)) != NULL)
+	    {
+	      tmp = strdup ("V ");
+	      strcat (tmp, paus->version);
+	    }
+	  else
+	    {
+	      tmp = strdup ("installed");
+	    }
+	  p = pkglist_add_ordered (name, line, tmp, NULL, p);
+	  struct aliaslist *a = NULL;
+	  a = aliaslist_get (name, ilenia_aliases);
+	  while (a != NULL)
+	    {
+	      if (strcmp (a->name, name) != 0)
+		p = pkglist_add_ordered (a->name, "alias", name, NULL, p);
+	      a = a->next;
+	    }
+
+	  name = NULL;
+	  new_record = 0;
+	}
+
+      if (line[1] == '\0')
+	new_record = 1;
+
     }
   if (line)
     free (line);
