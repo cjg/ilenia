@@ -27,24 +27,28 @@
 #include "manipulator.h"
 #include "pkglist.h"
 #include "../config.h"
-#include "deplist.h"
 
 void
-print_db (struct pkglist *p)
+pkglist_print (struct pkglist *p)
 {
   //       33                                20                   20
   printf
     ("Package                           Version              Repository\n");
   while (p != NULL)
     {
-      printf ("%s %s %s\n", p->name, p->version, p->repo);
+      printf ("%s%s %s%s %s%s\n", mid (p->name, 0, 33),
+	      spaces (33 - strlen (mid (p->name, 0, 33))),
+	      mid (p->version, 0, 20),
+	      spaces (20 - strlen (mid (p->version, 0, 20))),
+	      mid (p->repo, 0, 20),
+	      spaces (20 - strlen (mid (p->repo, 0, 20))));
       p = p->next;
     }
   printf ("\n");
 }
 
 void
-aiuto ()
+help ()
 {
   printf ("usage: ilenia [options] [collections] [packages]\n");
   printf ("options:\n");
@@ -74,7 +78,7 @@ aiuto ()
 }
 
 void
-versione ()
+version ()
 {
   printf ("ilenia version %s\n", VERSION);
 }
