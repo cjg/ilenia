@@ -21,8 +21,8 @@ ilenia_SOURCES = \
 	lspkgs.h\
 	lsports.c\
 	lsports.h\
-	manipola.c\
-	manipola.h\
+	manipulator.c\
+	manipulator.h\
 	output.c\
 	output.h\
 	pkgutils.c\
