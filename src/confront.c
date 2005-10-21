@@ -38,10 +38,10 @@ prettyprint (char *str1, char *str2, char *str3, char *str4)
   str3 = mid (str3, 0, 28);
   str4 = mid (str4, 0, 16);
 
-  strcat (str1, spazi (26 - strlen (str1)));
-  strcat (str2, spazi (18 - strlen (str2)));
-  strcat (str3, spazi (14 - strlen (str3)));
-  strcat (str4, spazi (18 - strlen (str4)));
+  strcat (str1, spaces (26 - strlen (str1)));
+  strcat (str2, spaces (18 - strlen (str2)));
+  strcat (str3, spaces (14 - strlen (str3)));
+  strcat (str4, spaces (18 - strlen (str4)));
 
   printf ("%s %s %s %s\n", str1, str2, str3, str4);
 }
@@ -75,14 +75,14 @@ pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
 	      if ((pkgs->repo[0] == 'R')
 		  && (options != NO_FAVORITE_REPO && options != NO_FAVORITES))
 		{
-		  if (strcmp (mid (pkgs->repo, 2, FINE), paus->repo) != 0)
+		  if (strcmp (mid (pkgs->repo, 2, END), paus->repo) != 0)
 		    skip = 1;
 		}
 	      if ((pkgs->repo[0] == 'V')
 		  && (options != NO_FAVORITE_VERSION
 		      && options != NO_FAVORITES))
 		{
-		  if (strcmp (mid (pkgs->repo, 2, FINE), pkgs->version) == 0)
+		  if (strcmp (mid (pkgs->repo, 2, END), pkgs->version) == 0)
 		    skip = 1;
 		}
 	      if (test != 0 && skip != 1)

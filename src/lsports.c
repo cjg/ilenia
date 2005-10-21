@@ -101,7 +101,7 @@ parse_cvs (char *percorso, struct repolist *p)
 			  == 0 && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  mad_prefix =
-			    mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
+			    mid (prefix, strlen (PORTS_LOCATION) + 1, END);
 			  if (mad_prefix[strlen (mad_prefix) - 1] != '/')
 			    mad_prefix = strcat (mad_prefix, "/");
 			  mad_prefix = strdup (mad_prefix);
@@ -154,7 +154,7 @@ parse_httpup (char *path, struct repolist *r)
 
       repo = get_value (line, "ROOT_DIR");
       rindex (repo, '/');
-      repo = mid (repo, 1, FINE);
+      repo = mid (repo, 1, END);
 
       prefix = get_value (line, "ROOT_DIR");
       prefix = mid (prefix, 0, strlen (prefix) - strlen (repo));
@@ -164,7 +164,7 @@ parse_httpup (char *path, struct repolist *r)
 	   strlen (PORTS_LOCATION)) == 0
 	  && strlen (prefix) > strlen (PORTS_LOCATION) + 1)
 	{
-	  mad_prefix = mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
+	  mad_prefix = mid (prefix, strlen (PORTS_LOCATION) + 1, END);
 	  strcat (mad_prefix, "/");
 	  prefix = strdup (PORTS_LOCATION);
 	  repo = strcat (mad_prefix, repo);
@@ -204,7 +204,7 @@ parse_cvsup (char *path, struct repolist *r)
 	    continue;
 	  if (strncmp (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)))
 	    continue;
-	  mad_prefix = mid (prefix, strlen (PORTS_LOCATION) + 1, FINE);
+	  mad_prefix = mid (prefix, strlen (PORTS_LOCATION) + 1, END);
 	  trim (mad_prefix);
 	  strcat (mad_prefix, "/");
 	  prefix = strdup (PORTS_LOCATION);
@@ -246,7 +246,7 @@ deplist_from_deprow (char *deprow)
 
   char *deps[n];
 
-  split2 (deprow, " ", deps);
+  split (deprow, " ", deps);
 
   for (i = 0; i < n; i++)
     d = deplist_add (trim (deps[i]), d);
@@ -277,14 +277,14 @@ parse_pkgfile (char *filename, char *repo)
 
       if (l[0] == '#')
 	{
-	  l = mid (l, 1, FINE);
+	  l = mid (l, 1, END);
 	  l = trim (l);
 
 	  if (strncasecmp (l, "Depends", 7) == 0)
 	    {
 	      if (strstr (l, ":"))
 		{
-		  l = mid (strstr (l, ":"), 1, FINE);
+		  l = mid (strstr (l, ":"), 1, END);
 		  l = trim (l);
 		  d = deplist_from_deprow (l);
 		}
@@ -395,7 +395,7 @@ lsports ()
     {
       int i, num = count (line, ' ');
       char *splitted_line[num];
-      split2 (line, " ", splitted_line);
+      split (line, " ", splitted_line);
       struct deplist *d = NULL;
       for (i = 3; i < num; i++)
 	{
@@ -430,7 +430,7 @@ build_repolist ()
 	continue;
 
       extension = strstr (info_file->d_name, ".");
-      extension = mid (extension, 1, FINE);
+      extension = mid (extension, 1, END);
 
       char filename[strlen (info_file->d_name) + 11];
 

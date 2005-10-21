@@ -37,12 +37,12 @@ get_value (char *s, char *var)
   if (strncmp (s, var, strlen (var)) == 0)
     {
       char *splitted_s[2];
-      split2 (s, "=", splitted_s);
+      split (s, "=", splitted_s);
       splitted_s[0] = trim (splitted_s[0]);
       if (strcmp (splitted_s[0], var) == 0)
 	{
 	  splitted_s[1] = trim (splitted_s[1]);
-	  splitted_s[1] = mid (splitted_s[1], 1, FINE);
+	  splitted_s[1] = mid (splitted_s[1], 1, END);
 	  splitted_s[1] = trim (splitted_s[1]);
 	  if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
 	    {

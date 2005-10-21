@@ -122,7 +122,7 @@ get_favorite (int favorite)
 	  line = trim (line);
 	  if ((strcmp (line, "") != 0) && (line[0] != '#'))
 	    {
-	      line = tab2spazi (line);
+	      sedchr (line, '\t', ' ');
 	      char *favorite_value = index (line, ' ');
 	      char *name = mid (line, 0,
 				strlen (line) - strlen (favorite_value));
