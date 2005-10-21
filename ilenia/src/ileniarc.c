@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include "manipola.h"
+#include "manipulator.h"
 #include "ilenia.h"
 
 char *

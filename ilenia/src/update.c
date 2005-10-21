@@ -30,7 +30,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-#include "manipola.h"
+#include "manipulator.h"
 #include "repolist.h"
 #include "ilenia.h"
 

@@ -24,7 +24,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "manipola.h"
+#include "manipulator.h"
 
 char *
 trim (char *s)

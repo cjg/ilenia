@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "pkglist.h"
-#include "manipola.h"
+#include "manipulator.h"
 #include "vercmp.h"
 #include "confront.h"
 

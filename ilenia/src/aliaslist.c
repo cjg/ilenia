@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include "aliaslist.h"
 #include "ilenia.h"
-#include "manipola.h"
+#include "manipulator.h"
 
 struct aliaslist *
 aliaslist_add (char *name, struct aliaslist *a)
