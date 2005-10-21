@@ -26,7 +26,7 @@
 #include <string.h>
 #include "pkglist.h"
 #include "deplist.h"
-#include "manipola.h"
+#include "manipulator.h"
 #include "confront.h"
 #include "output.h"
 #include "ilenia.h"

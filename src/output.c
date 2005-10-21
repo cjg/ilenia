@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "manipola.h"
+#include "manipulator.h"
 #include "pkglist.h"
 #include "../config.h"
 #include "deplist.h"

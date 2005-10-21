@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "pkglist.h"
-#include "manipola.h"
+#include "manipulator.h"
 #include "confront.h"
 #include "dependencies.h"
 #include "ilenia.h"

@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "lspkgs.h"
-#include "manipola.h"
+#include "manipulator.h"
 #include "pkglist.h"
 #include "aliaslist.h"
 #include "ilenia.h"

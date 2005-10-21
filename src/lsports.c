@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include "manipola.h"
+#include "manipulator.h"
 #include "pkglist.h"
 #include "deplist.h"
 #include "repolist.h"
