@@ -1,5 +1,5 @@
 /***************************************************************************
- *            manipola.c
+ *            manipulator.c
  *
  *  Sat Jul 10 12:51:53 2004
  *  Copyright  2004 - 2005  Coviello Giuseppe

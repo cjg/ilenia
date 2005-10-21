@@ -28,7 +28,7 @@ main (int argc, char *argv[])
 {
   if (argc < 2)
     {
-      aiuto ();
+      help ();
       return (0);
     }
   int i;
@@ -180,7 +180,7 @@ main (int argc, char *argv[])
 
   if (azioni < 0)
     {
-      aiuto ();
+      help ();
       return (0);
     }
   if (parse_ileniarc () != 0)
@@ -257,15 +257,15 @@ main (int argc, char *argv[])
 	  break;
 	case LSPORTS:
 	  if (opzioni_l == -1)
-	    print_db (ilenia_ports);
+	    pkglist_print (ilenia_ports);
 	  else
 	    {
 	      int j;
 	      for (j = 0; j <= opzioni_l; j++)
 		{
 		  if (repolist_exists (opzione_l[j], ilenia_repos))
-		    print_db (pkglist_select_from_repo
-			      (opzione_l[j], ilenia_ports));
+		    pkglist_print (pkglist_select_from_repo
+				   (opzione_l[j], ilenia_ports));
 		}
 	    }
 	  break;
@@ -279,7 +279,7 @@ main (int argc, char *argv[])
 	      for (j = 0; j <= opzioni_s; j++)
 		{
 		  p = pkglist_find_like (opzione_s[j], ilenia_ports);
-		  print_db (p);
+		  pkglist_print (p);
 		}
 	    }
 	  break;
@@ -320,10 +320,10 @@ main (int argc, char *argv[])
 			    opzioni_confronto, 1);
 	  break;
 	case VERSION:
-	  versione ();
+	  version ();
 	  break;
 	case AIUTO:
-	  aiuto ();
+	  help ();
 	  break;
 	}
     }

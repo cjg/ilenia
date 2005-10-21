@@ -284,7 +284,7 @@ aggiorna_pacchetti (int opzioni_confronto)
    */
   if (ask_for_update)
     {
-      print_db (q);
+      pkglist_print (q);
       if (!ask ("Are you sure to update the above packages? [y/n] "))
 	return (1);
     }
