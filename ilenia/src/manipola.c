@@ -27,47 +27,6 @@
 #include "manipola.h"
 
 char *
-sed (char *s, char *trova, char *sostituisci)
-{
-  int i, j = 0;
-  static char local_s[MASSIMO] = "";
-  for (i = 0; i <= MASSIMO; i++)
-    local_s[i] = '\0';
-  for (i = 0; i <= (strlen (s) - strlen (trova)); i++)
-    {
-      if (strcmp (mid (s, i, strlen (trova)), trova) == 0)
-	{
-	  strcat (local_s, sostituisci);
-	  j += strlen (sostituisci);
-	  i += strlen (sostituisci) - 1;
-	}
-      else
-	{
-	  local_s[i] = s[i];
-	  j++;
-	}
-    }
-  local_s[j] = '\0';
-  return ((char *) local_s);
-}
-
-char *
-sedchr (char *s, int trova, int sostituisci)
-{
-  int i;
-  static char local_s[MASSIMO];
-  for (i = 0; i < strlen (s); i++)
-    {
-      if (s[i] == trova)
-	local_s[i] = sostituisci;
-      else
-	local_s[i] = s[i];
-    }
-  local_s[i] = '\0';
-  return ((char *) local_s);
-}
-
-char *
 trim (char *s)
 {
 
@@ -80,81 +39,85 @@ trim (char *s)
 }
 
 char *
-tab2spazi (char *s)
-{
-  //static char saus[MASSIMO] = "";
-  int i;
-  //strcpy (saus, s);
-  for (i = 0; i <= strlen (s); i++)
-    {
-      if (s[i] == '\t')
-	s[i] = ' ';
-    }
-  return (s);
-}
-
-char *
-oldmid (char *s, int inizio, int lunghezza)
-{
-  static char local_s[MASSIMO] = "";
-  strcpy (local_s, s);
-  int x, z = 0;
-  if (lunghezza == FINE)
-    lunghezza = strlen (local_s) - inizio;
-  if ((inizio + lunghezza) <= strlen (local_s))
-    {
-      for (x = 0; x <= strlen (local_s); x++)
-	{
-	  if ((x >= inizio))
-	    {
-	      local_s[z] = local_s[x];
-	      z++;
-	    }
-	}
-    }
-  local_s[lunghezza] = '\0';
-  return ((char *) local_s);
-}
-
-char *
 mid (char s[], int start, int length)
 {
   int x, z = 0;
   if (length == -1)
     length = strlen (s) - start;
-  if ((start + length) <= strlen (s))
+  if ((start + length) > strlen (s))
+    return (s);
+
+  for (x = 0; x <= strlen (s); x++)
     {
-      for (x = 0; x <= strlen (s); x++)
-	{
-	  if ((x >= start))
-	    {
-	      s[z] = s[x];
-	      z++;
-	    }
-	}
+      if (x < start)
+	continue;
+      s[z] = s[x];
+      z++;
     }
+
   s[length] = '\0';
   return (s);
 }
 
 char *
-mid_ (char *s, int inizio)
+spaces (int n)
 {
-  int lunghezza = strlen (s) - inizio;
-  return (mid (s, inizio, lunghezza));
+  char s[n];
+  int x;
+  for (x = 0; x < n; x++)
+    s[x] = ' ';
+  s[n] = '\0';
+  return (strdup (s));
 }
 
 char *
-spazi (int n)
+sed (char s[], char *find, char *replace)
 {
-  static char s[MASSIMO] = "";
-  int x;
-  for (x = 0; x < n; x++)
+  int i, j = 0;
+  char *s_copy;
+  s_copy = strdup (s);
+  /*
+     static char local_s[MASSIMO] = "";
+     for (i = 0; i <= MASSIMO; i++)
+     local_s[i] = '\0';
+   */
+  for (i = 0; i <= (strlen (s_copy) - strlen (find)); i++)
     {
-      s[x] = ' ';
+      if (strcmp (mid (s_copy, i, strlen (find)), find) == 0)
+	{
+	  strcat (s, replace);
+	  j += strlen (replace);
+	  i += strlen (replace) - 1;
+	}
+      else
+	{
+	  s[i] = s_copy[i];
+	  j++;
+	}
     }
-  s[n] = '\0';
-  return ((char *) s);
+  s[j] = '\0';
+  if (s_copy)
+    free (s_copy);
+  return s;
+}
+
+char *
+sedchr (char s[], int find, int replace)
+{
+  int i;
+  char *s_copy;
+  s_copy = strdup (s);
+  for (i = 0; i < strlen (s_copy); i++)
+    {
+      if (s_copy[i] == find)
+	s[i] = replace;
+      else
+	s[i] = s_copy[i];
+    }
+  s[i] = '\0';
+  if (s_copy)
+    free (s_copy);
+  return s;
 }
 
 int
@@ -170,7 +133,7 @@ count (char *s, int delim)
 }
 
 int
-split2 (char *s, char *delim, char *splitted[])
+split (char *s, char *delim, char *splitted[])
 {
   int i = 0;
   while (strlen (s) > 0)
@@ -179,28 +142,10 @@ split2 (char *s, char *delim, char *splitted[])
       tmp = strdup (s);
       strtok (tmp, delim);
       splitted[i] = strdup (tmp);
-      s = mid (s, strlen (tmp), FINE);
+      s = mid (s, strlen (tmp), END);
       i++;
-      tmp = NULL;
-      free (tmp);
-    }
-  return (i);
-}
-
-int
-split (char *s, char *delim, char splitted[][MASSIMO])
-{
-  char local_s[MASSIMO];
-  char tmp[MASSIMO];
-  strcpy (local_s, s);
-  int i = 0;
-  while (strlen (local_s) > 0)
-    {
-      strcpy (tmp, local_s);
-      strtok (tmp, delim);
-      strcpy (splitted[i], tmp);
-      strcpy (local_s, mid (local_s, strlen (tmp), FINE));
-      i++;
+      if (tmp)
+	free (tmp);
     }
   return (i);
 }

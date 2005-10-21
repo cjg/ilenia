@@ -111,7 +111,7 @@ aliaseslist_build ()
 	      struct aliaslist *a = NULL;
 	      num_alias = count (line, ' ');
 	      char *alias[num_alias];
-	      split2 (line, " ", alias);
+	      split (line, " ", alias);
 	      for (i = 0; i < num_alias; i++)
 		a = aliaslist_add (trim (alias[i]), a);
 	      s = aliaseslist_add (a, s);

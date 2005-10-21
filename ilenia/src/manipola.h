@@ -22,16 +22,12 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#define FINE -1
-#define MASSIMO 2555
+#define END -1
 
 char *trim (char *s);
-char *tab2spazi (char *s);
 char *mid (char *stringa, int inizio, int lunghezza);
-char *mid_ (char *stringa, int inizio);
-char *spazi (int n);
-char *sedchr (char *s, int trova, int sostituisci);
-char *sed (char *s, char *trova, char *sostituisci);
-int split (char *s, char *delim, char splitted[][MASSIMO]);
+char *spaces (int n);
+char *sed (char *s, char *find, char *replace);
+char *sedchr (char *s, int find, int replace);
 int count (char *s, int delim);
-int split2 (char *s, char *delim, char *splitted[]);
+int split (char *s, char *delim, char *splitted[]);
