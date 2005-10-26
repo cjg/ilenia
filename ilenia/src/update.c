@@ -30,6 +30,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#include "utils.h"
 #include "manipulator.h"
 #include "repolist.h"
 #include "ilenia.h"
@@ -37,70 +38,45 @@
 int
 cvsup (char *filename)
 {
-  int status;
-  pid_t pid = fork ();
-  if (pid == 0)
-    execl ("/usr/bin/cvsup", "", "-g", "-L", "1", "-r", "0", "-c",
-	   ".cvsup", filename, 0);
-  else if (pid < 0)
-    status = -1;
-  else
-    {
-      while ((waitpid (pid, &status, 0) == 0))
-	{
-	}
-    }
-  return (status);
+  char *args[] = { "", "-g", "-L", "1", "-r", "0", "-c", ".cvsup", filename,
+    NULL
+  };
+  return (exec (NULL, "/usr/bin/cvsup", args));
 }
 
 int
 httpup (char *filename)
 {
   FILE *file;
-
   if (!(file = fopen (filename, "r")))
-    return (-1);
-
+    return (EXIT_FAILURE);
   size_t n = 0;
   char *line = NULL;
-  int nread = getline (&line, &n, file);
+  int nread;
   char *root_dir = NULL;
   char *url = NULL;
-  while (nread > 0)
+  while ((nread = getline (&line, &n, file)) > 0)
     {
       line = trim (line);
-
       if (strncmp (line, "ROOT_DIR", 8) == 0)
 	root_dir = get_value (line, "ROOT_DIR");
       else if (strncmp (line, "URL", 3) == 0)
 	url = get_value (line, "URL");
-
-      nread = getline (&line, &n, file);
     }
-
-  line = NULL;
-  free (line);
 
   if (!(strlen (root_dir) && strlen (url)))
-    return (-1);
+    return (EXIT_FAILURE);
 
-  int status;
-  pid_t pid = fork ();
-  if (pid == 0)
-    execl ("/usr/bin/httpup", "", "sync", url, root_dir, 0);
-  else if (pid < 0)
-    status = -1;
-  else
-    {
-      while ((waitpid (pid, &status, 0) == 0))
-	{
-	}
-    }
+  char *args[] = {
+    "", "sync", url, root_dir, NULL
+  };
 
-  root_dir = NULL;
-  url = NULL;
-  free (root_dir);
-  free (url);
+  int status = exec (NULL, "/usr/bin/httpup", args);
+
+  if (root_dir)
+    free (root_dir);
+  if (url)
+    free (url);
 
   return (status);
 }
@@ -108,19 +84,10 @@ httpup (char *filename)
 int
 cvs (char *path)
 {
-  int status;
-  pid_t pid = fork ();
-  if (pid == 0)
-    execl ("/etc/ports/drivers/cvs", "", path, 0);
-  else if (pid < 0)
-    status = -1;
-  else
-    {
-      while ((waitpid (pid, &status, 0) == 0))
-	{
-	}
-    }
-  return (status);
+  char *args[] = {
+    "", path, NULL
+  };
+  return (exec (NULL, "/etc/ports/drivers/cvs", args));
 }
 
 
@@ -135,38 +102,29 @@ update_repo (char *name)
 
   FILE *file;
   char filename[20 + strlen (name)];
-
   if ((file = fopen (CACHE, "w")))
     {
       fclose (file);
     }
 
+  sprintf (filename, "/etc/ports/%s.local", name);
+  if (is_file (filename) == EXIT_SUCCESS)
+    return (EXIT_SUCCESS);
+
   sprintf (filename, "/etc/ports/%s.cvsup", name);
-  if ((file = fopen (filename, "r")))
-    {
-      cvsup (filename);
-      fclose (file);
-      return (0);
-    }
+  if (is_file (filename) == EXIT_SUCCESS)
+    return (cvsup (filename));
 
   sprintf (filename, "/etc/ports/%s.httpup", name);
-  if ((file = fopen (filename, "r")))
-    {
-      httpup (filename);
-      fclose (file);
-      return (0);
-    }
+  if (is_file (filename) == EXIT_SUCCESS)
+    return (httpup (filename));
 
   sprintf (filename, "/etc/ports/%s.cvs", name);
-  if ((file = fopen (filename, "r")))
-    {
-      cvs (filename);
-      fclose (file);
-      return (0);
-    }
+  if (is_file (filename) == EXIT_SUCCESS)
+    return (cvs (filename));
 
   printf ("ilenia: %s not found\n\n", name);
-  return (-1);
+  return (EXIT_FAILURE);
 }
 
 int
@@ -175,14 +133,13 @@ update_all_repos ()
   if (getuid () != 0)
     {
       printf ("ilenia: only root can update the ports tree\n\n");
-      return (-1);
+      return (EXIT_FAILURE);
     }
 
   int status = 0;
   DIR *dir;
   struct dirent *info_file;
   FILE *file;
-
   if ((file = fopen (CACHE, "w")))
     {
       fclose (file);
@@ -191,16 +148,15 @@ update_all_repos ()
   dir = opendir ("/etc/ports");
   while ((info_file = readdir (dir)))
     {
-      if (strstr (info_file->d_name, "."))
-	{
-	  char *name = NULL;
-	  name = mid (info_file->d_name, 0, strlen (info_file->d_name) -
-		      strlen (strstr (info_file->d_name, ".")));
-	  if (strlen (name))
-	    update_repo (name);
-	  name = NULL;
-	  free (name);
-	}
+      if (strstr (info_file->d_name, ".") == NULL)
+	continue;
+      char *name = NULL;
+      name =
+	mid (info_file->d_name, 0,
+	     strlen (info_file->d_name) -
+	     strlen (strstr (info_file->d_name, ".")));
+      if (strlen (name))
+	update_repo (name);
     }
 
   return (status);

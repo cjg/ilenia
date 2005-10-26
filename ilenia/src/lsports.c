@@ -318,7 +318,7 @@ parse_pkgfile (char *filename, char *repo)
   if (!(name && version && release))
     return (EXIT_FAILURE);
 
-  version = sed (version, " ", "_");
+  version = sedchr (version, ' ', '_');
 
   fprintf (cachefile, "%s %s-%s %s", name, version, release, repo);
 
@@ -342,9 +342,9 @@ read_from_dir (char *repo_name, char *prefix)
   DIR *dir;
   struct dirent *info_file;
   struct stat stat_file;
-  char *path;
+  char path[strlen (prefix) + strlen (repo_name) + 1];
 
-  path = strdup (prefix);
+  strcpy (path, prefix);
   if (strncmp (repo_name, "local", 5) != 0)
     {
       strcat (path, "/");
@@ -381,7 +381,7 @@ build_cache (struct repolist *r)
     }
   while (r != NULL)
     {
-      printf ("rfd %s %i\n", r->name, read_from_dir (r->name, r->path));
+      read_from_dir (r->name, r->path);
       r = r->next;
     }
   fclose (cachefile);
