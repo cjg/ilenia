@@ -38,31 +38,7 @@
 #include "lspkgs.h"
 #include "repolist.h"
 #include "output.h"
-
-int
-exec (char *wdir, char *command, char *args[])
-{
-  int status;
-  pid_t pid = fork ();
-  if (pid == 0)
-    {
-      if (wdir)
-	chdir (wdir);
-      execv (command, args);
-      exit (EXIT_FAILURE);
-    }
-  else if (pid < 0)
-    {
-      status = EXIT_FAILURE;
-    }
-  else
-    {
-      while ((waitpid (pid, &status, 0) == 0))
-	{
-	}
-    }
-  return (status);
-}
+#include "utils.h"
 
 int
 do_post_pkgadd (char *path)
@@ -88,14 +64,20 @@ do_post_pkgadd (char *path)
 void
 installscript (char *path, char *script)
 {
-  int file = 0;
-  char filename[strlen (path) + strlen (script) + 10];
-  sprintf (filename, "%s/%s", path, script);
-  file = open (filename, O_RDONLY);
-  if (file == 0)
-    return;
-  close (file);
-  exec (path, script, NULL);
+  /*
+     int file = 0;
+     char filename[strlen(path) + strlen(script) + 10];
+     sprintf(filename, "%s/%s", path, script);
+     file = open(filename, O_RDONLY);
+     if (file == 0)
+     return;
+     close(file);
+   */
+  char *filepath = strdup (path);
+  strcat (filepath, "/");
+  strcat (filepath, script);
+  if (is_file (filepath) == EXIT_SUCCESS)
+    exec (path, script, NULL);
 }
 
 int
