@@ -25,6 +25,8 @@
 struct pkglist *ilenia_ports;
 struct pkglist *ilenia_pkgs;
 struct repolist *ilenia_repos;
+struct pkglist *ilenia_favoriterepo;
+struct pkglist *ilenia_favoriteversion;
 struct aliaseslist *ilenia_aliases;
 
 char *post_pkgadd;
@@ -33,6 +35,6 @@ int ask_for_update;
 #define CACHE "/var/cache/ilenia"
 #define ALIAS_FILE "/etc/ports/alias"
 
-char *get_value (char *s, char *var);
+char *get_value (char s[], char *var);
 int parse_ileniarc ();
 int ask (char *question, ...);

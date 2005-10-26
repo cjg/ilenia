@@ -25,14 +25,13 @@
 #define DIFF     3
 #define UPDATED	 4
 
-#define REGULAR		     0
-#define NO_FAVORITE_REPO     1
-#define NO_FAVORITE_VERSION  2
-#define NO_FAVORITES	     3
+#define REGULAR		     1
+#define NO_FAVORITE_REPO     2
+#define NO_FAVORITE_VERSION  3
+#define NO_FAVORITES	     5
 
-
-struct pkglist *pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
-				  int type, int options, int print);
+struct pkglist *pkglist_confront (int type, int options, int print);
 char *pkglist_get_newer (char *name, struct pkglist *p);
+char *pkglist_get_newer_favorite (char *name, int option);
 char *pkglist_get_from_version (char *nome, char *version, struct pkglist *p);
 char *pkglist_get_from_repo (char *name, char *repo, struct pkglist *p);

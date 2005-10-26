@@ -29,14 +29,16 @@
 #include "deplist.h"
 
 struct pkglist *
-pkglist_add (char *name, char *version, char *repo, struct deplist *d,
-	     struct pkglist *p)
+pkglist_add (char *name, char *version, char *repo,
+	     struct deplist *d, struct pkglist *p)
 {
   struct pkglist *paus = NULL;
   paus = (struct pkglist *) malloc (sizeof (struct pkglist));
   strcpy (paus->name, name);
-  strcpy (paus->version, version);
-  strcpy (paus->repo, repo);
+  if (version)
+    strcpy (paus->version, version);
+  if (repo)
+    strcpy (paus->repo, repo);
   paus->depends = d;
   if (p == NULL)
     {
@@ -52,16 +54,18 @@ pkglist_add (char *name, char *version, char *repo, struct deplist *d,
 }
 
 struct pkglist *
-pkglist_add_ordered (char *name, char *version, char *repo, struct deplist *d,
-		     struct pkglist *p)
+pkglist_add_ordered (char *name, char *version, char *repo,
+		     struct deplist *d, struct pkglist *p)
 {
   struct pkglist *paus1 = NULL;
   struct pkglist *paus2 = NULL;
   int pos;
   paus1 = (struct pkglist *) malloc (sizeof (struct pkglist));
   strcpy (paus1->name, name);
-  strcpy (paus1->version, version);
-  strcpy (paus1->repo, repo);
+  if (version)
+    strcpy (paus1->version, version);
+  if (repo)
+    strcpy (paus1->repo, repo);
   paus1->depends = d;
   if (p == NULL)
     {
@@ -100,8 +104,10 @@ pkglist_add_reversed (char *name, char *version,
   struct pkglist *paus1 = NULL;
   paus1 = (struct pkglist *) malloc (sizeof (struct pkglist));
   strcpy (paus1->name, name);
-  strcpy (paus1->version, version);
-  strcpy (paus1->repo, repo);
+  if (version)
+    strcpy (paus1->version, version);
+  if (repo)
+    strcpy (paus1->repo, repo);
   paus1->depends = d;
   if (p == NULL)
     {
@@ -170,8 +176,9 @@ pkglist_select_from_repo (char *repo, struct pkglist *p)
   while (p != NULL)
     {
       if (strcmp (p->repo, repo) == 0)
-	paus = pkglist_add_ordered (p->name, p->version, p->repo,
-				    p->depends, paus);
+	paus =
+	  pkglist_add_ordered (p->name, p->version,
+			       p->repo, p->depends, paus);
       p = p->next;
     }
   return (paus);

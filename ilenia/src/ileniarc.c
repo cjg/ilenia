@@ -31,7 +31,7 @@
 #include "ilenia.h"
 
 char *
-get_value (char *s, char *var)
+get_value (char s[], char *var)
 {
   char *tmp = "";
   if (strncmp (s, var, strlen (var)) == 0)
@@ -46,8 +46,8 @@ get_value (char *s, char *var)
 	  splitted_s[1] = trim (splitted_s[1]);
 	  if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
 	    {
-	      splitted_s[1] = mid (splitted_s[1], 1, strlen (splitted_s[1]) -
-				   2);
+	      splitted_s[1] =
+		mid (splitted_s[1], 1, strlen (splitted_s[1]) - 2);
 	      splitted_s[1] = trim (splitted_s[1]);
 	    }
 	  tmp = strdup (splitted_s[1]);
@@ -76,8 +76,8 @@ parse_ileniarc ()
 		post_pkgadd = get_value (line, "POST_PKGADD");
 	      if (strstr (line, "ASK_FOR_UPDATE"))
 		{
-		  if (strcasecmp (get_value (line, "ASK_FOR_UPDATE"), "No") ==
-		      0)
+		  if (strcasecmp
+		      (get_value (line, "ASK_FOR_UPDATE"), "No") == 0)
 		    ask_for_update = 0;
 		}
 	    }

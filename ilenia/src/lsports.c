@@ -55,8 +55,9 @@ parse_local (char *path, struct repolist *r)
   size_t n = 0;
   ssize_t nread;
 
-  while ((nread = getline (&line, &n, file)) != 0)
+  while ((nread = getline (&line, &n, file)) != -1)
     {
+      line[strlen (line) - 1] = '\0';
       trim (line);
       if (line[0] == '#')
 	continue;
@@ -64,8 +65,8 @@ parse_local (char *path, struct repolist *r)
 	prefix = get_value (line, "PATH");
     }
   repo = rindex (path, '/');
-  repo = mid (repo, 0, strlen (repo) - strlen (index (repo, '.')));
-  mad_prefix = strdup ("local");
+  repo = mid (repo, 1, strlen (repo) - strlen (index (repo, '.')) - 1);
+  mad_prefix = strdup ("local/");
   repo = strcat (mad_prefix, repo);
   r = repolist_add (repo, prefix, r);
 
@@ -78,6 +79,7 @@ struct repolist *
 parse_cvs (char *percorso, struct repolist *p)
 {
   FILE *file;
+
   if ((file = fopen (percorso, "r")))
     {
       char riga[255];
@@ -85,6 +87,7 @@ parse_cvs (char *percorso, struct repolist *p)
       char *mad_prefix = "";
       char *collezione = "";
       char *value = "";
+
       while (fgets (riga, 255, file))
 	{
 	  strcpy (riga, trim (riga));
@@ -96,8 +99,10 @@ parse_cvs (char *percorso, struct repolist *p)
 		    {
 		      prefix = strdup (value);
 		      if (strncmp
-			  (prefix, PORTS_LOCATION,
-			   strlen (PORTS_LOCATION))
+			  (prefix,
+			   PORTS_LOCATION,
+			   strlen
+			   (PORTS_LOCATION))
 			  == 0 && strlen (prefix) > strlen (PORTS_LOCATION))
 			{
 			  mad_prefix =
@@ -138,25 +143,26 @@ parse_httpup (char *path, struct repolist *r)
   if (file == NULL)
     return (r);
 
-  while ((nread = getline (&line, &n, file)) != 0)
+  while ((nread = getline (&line, &n, file)) != -1)
     {
       char *prefix;
-      char *mad_prefix;
+      char *mad_prefix = NULL;
       char *repo;
+      line[strlen (line) - 1] = '\0';
+      //trim(line);
 
-      trim (line);
-
-      if (line[0] == '#')
+      if (line[0] == '#' || strlen (line) == 0)
 	continue;
 
       if (strstr (line, "ROOT_DIR") == NULL)
 	continue;
 
       repo = get_value (line, "ROOT_DIR");
-      rindex (repo, '/');
+      prefix = strdup (repo);
+
+      repo = rindex (repo, '/');
       repo = mid (repo, 1, END);
 
-      prefix = get_value (line, "ROOT_DIR");
       prefix = mid (prefix, 0, strlen (prefix) - strlen (repo));
 
       if (strncmp
@@ -171,6 +177,7 @@ parse_httpup (char *path, struct repolist *r)
 	  sed (repo, "//", "/");
 	}
       r = repolist_add (repo, prefix, r);
+      return (r);
     }
   return (r);
 }
@@ -193,13 +200,16 @@ parse_cvsup (char *path, struct repolist *r)
 
   while ((nread = getline (&line, &n, file)) != -1)
     {
+      line[strlen (line) - 1] = '\0';
       trim (line);
-      if (line[0] == '#')
+      if (line[0] == '#' || strlen (line) == 0)
 	continue;
 
       if (strstr (line, "*default prefix"))
 	{
 	  prefix = get_value (line, "*default prefix");
+	  if (prefix == NULL)
+	    continue;
 	  if (strlen (prefix) <= strlen (PORTS_LOCATION))
 	    continue;
 	  if (strncmp (prefix, PORTS_LOCATION, strlen (PORTS_LOCATION)))
@@ -208,8 +218,13 @@ parse_cvsup (char *path, struct repolist *r)
 	  trim (mad_prefix);
 	  strcat (mad_prefix, "/");
 	  prefix = strdup (PORTS_LOCATION);
+
 	}
-      else if (nread)
+
+      if (line[0] == '*')
+	continue;
+
+      if (strlen (line))
 	{
 	  if (mad_prefix)
 	    {
@@ -235,6 +250,7 @@ struct deplist *
 deplist_from_deprow (char *deprow)
 {
   struct deplist *d = NULL;
+
   if (strlen (deprow) <= 0)
     return (NULL);
 
@@ -273,6 +289,7 @@ parse_pkgfile (char *filename, char *repo)
   while ((nread = getline (&line, &n, file)) != -1)
     {
       char *l;
+
       l = strdup (trim (line));
 
       if (l[0] == '#')
@@ -326,6 +343,7 @@ read_from_dir (char *repo_name, char *prefix)
   struct dirent *info_file;
   struct stat stat_file;
   char *path;
+
   path = strdup (prefix);
   if (strncmp (repo_name, "local", 5) != 0)
     {
@@ -334,13 +352,13 @@ read_from_dir (char *repo_name, char *prefix)
     }
 
   dir = opendir (path);
-  printf ("%s\n", path);
   if (dir == NULL)
     return (EXIT_FAILURE);
 
   while ((info_file = readdir (dir)))
     {
       char filename[strlen (path) + strlen (info_file->d_name) + 9];
+
       sprintf (filename, "%s/%s", path, info_file->d_name);
       stat (filename, &stat_file);
       if (S_ISDIR (stat_file.st_mode) && info_file->d_name[0] != '.')
@@ -376,6 +394,7 @@ lsports ()
 {
   FILE *file;
   struct pkglist *p = NULL;
+
   file = fopen (CACHE, "r");
   if (file == NULL)
     return (NULL);
@@ -395,8 +414,10 @@ lsports ()
     {
       int i, num = count (line, ' ');
       char *splitted_line[num];
+
       split (line, " ", splitted_line);
       struct deplist *d = NULL;
+
       for (i = 3; i < num; i++)
 	{
 	  if (strlen (trim (splitted_line[i])) > 0)
@@ -426,23 +447,23 @@ build_repolist ()
 
   while ((info_file = readdir (dir)))
     {
+
       if (strstr (info_file->d_name, ".") == NULL)
 	continue;
 
       extension = strstr (info_file->d_name, ".");
-      extension = mid (extension, 1, END);
 
       char filename[strlen (info_file->d_name) + 11];
 
       sprintf (filename, "/etc/ports/%s", info_file->d_name);
 
-      if (strcmp (extension, "cvsup") == 0)
+      if (strcmp (extension, ".cvsup") == 0)
 	r = parse_cvsup (filename, r);
-      else if (strcmp (extension, "httpup") == 0)
+      else if (strcmp (extension, ".httpup") == 0)
 	r = parse_httpup (filename, r);
-      else if (strcmp (extension, "cvs") == 0)
+      else if (strcmp (extension, ".cvs") == 0)
 	r = parse_cvs (filename, r);
-      else if (strcmp (extension, "local") == 0)
+      else if (strcmp (extension, ".local") == 0)
 	r = parse_local (filename, r);
     }
 

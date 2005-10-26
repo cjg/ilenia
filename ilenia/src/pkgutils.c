@@ -22,7 +22,10 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -32,331 +35,259 @@
 #include "confront.h"
 #include "dependencies.h"
 #include "ilenia.h"
-//#include "lsports.h"
 #include "lspkgs.h"
 #include "repolist.h"
 #include "output.h"
 
 int
-esegui_script (char *path, char *script)
+exec (char *wdir, char *command, char *args[])
 {
+  int status;
   pid_t pid = fork ();
-  int stato;
   if (pid == 0)
     {
-      chdir (path);
-      execl ("/bin/bash", "", script, 0);
+      if (wdir)
+	chdir (wdir);
+      execv (command, args);
+      exit (EXIT_FAILURE);
     }
   else if (pid < 0)
     {
-      stato = -1;
+      status = EXIT_FAILURE;
     }
   else
     {
-      while ((waitpid (pid, &stato, 0) == 0))
+      while ((waitpid (pid, &status, 0) == 0))
 	{
 	}
     }
-  return (stato);
+  return (status);
 }
 
 int
-compila_e (int aggiorna, char *port)
+do_post_pkgadd (char *path)
 {
-  int stato;
-  char azione[255];
-  char install_script[255];
+  if (post_pkgadd == NULL)
+    return (EXIT_SUCCESS);
+
   FILE *file;
-  if (aggiorna)
-    {
-      strcpy (azione, "-u");
-    }
-  else
-    {
-      strcpy (azione, "-i");
-    }
-  strcpy (install_script, port);
-  strcat (install_script, "/pre-install");
-  if ((file = fopen (install_script, "r")))
-    {
-      fclose (file);
-      if (esegui_script (port, "pre-install") != 0)
-	return (-1);
-    }
+  file = fopen ("/tmp/post_pkgadd.sh", "w");
+  if (file == NULL)
+    return (EXIT_FAILURE);
 
-  pid_t pid = fork ();
-  if (pid == 0)
-    {
-      chdir (port);
-      execl ("/usr/bin/pkgmk", "", "-d", "-f", azione, 0);
-    }
-  else if (pid < 0)
-    {
-      stato = -1;
-    }
-  else
-    {
-      while ((waitpid (pid, &stato, 0) == 0))
-	{
-	}
-    }
-  if (stato != 0)
-    return (stato);
-  strcpy (install_script, port);
-  strcat (install_script, "/post-install");
-  if ((file = fopen (install_script, "r")))
-    {
-      fclose (file);
-      if (esegui_script (port, "post-install") != 0)
-	return (-1);
-    }
-  if (post_pkgadd)
-    {
-      FILE *post_pkgadd_sh;
-      if ((post_pkgadd_sh = fopen ("/tmp/post_pkgadd.sh", "w")))
-	{
-	  fprintf (post_pkgadd_sh, "#!/bin/sh\n\n%s\n\n# End of file",
-		   post_pkgadd);
-	  fclose (post_pkgadd_sh);
+  fprintf (file, "#!/bin/sh\n\n%s\n\n# End of file", post_pkgadd);
+  fclose (file);
 
-	  pid = fork ();
-	  if (pid == 0)
-	    {
-	      chdir (port);
-	      execl ("/bin/sh", "", "/tmp/post_pkgadd.sh", 0);
-	    }
-	  else if (pid < 0)
-	    stato = -1;
-	  else
-	    {
-	      while ((waitpid (pid, &stato, 0) == 0))
-		{
-		}
-	    }
-	  if (stato != 0)
-	    return (stato);
-	}
-    }
-  return (0);
+  char *args[2];
+  args[0] = NULL;
+  args[1] = strdup ("/tmp/post_pkgadd.sh");
+
+  return (exec (path, "/bin/sh", args));
 }
 
-int
-aggiorna_pacchetto_ (int opzioni_confronto, char *pacchetto)
+void
+installscript (char *path, char *script)
 {
-  int aggiornare = 0;
-  char collezione[255];
-  char port[255];
-  struct pkglist *p;
-  if (pkglist_exists (pacchetto, ilenia_pkgs) == 0)
-    aggiornare = 1;
-
-  strcpy (collezione, pkglist_get_newer (pacchetto, ilenia_ports));
-
-  if (opzioni_confronto != NO_FAVORITE_REPO
-      && opzioni_confronto != NO_FAVORITES)
-    {
-      p = get_favorite (REPO);
-      if ((p = pkglist_find (pacchetto, p)))
-	{
-	  strcpy (collezione, p->repo);
-	}
-    }
-
-  if (opzioni_confronto != NO_FAVORITE_VERSION && opzioni_confronto !=
-      NO_FAVORITES)
-    {
-      p = get_favorite (VERSION);
-      if ((p = pkglist_find (pacchetto, p)))
-	{
-	  strcpy (collezione,
-		  pkglist_get_from_version (pacchetto, p->version,
-					    ilenia_ports));
-	}
-    }
-
-  strcpy (port, repolist_find (collezione, ilenia_repos)->path);
-  if (port[strlen (port)] != '/')
-    strcat (port, "/");
-  if (strncmp (collezione, "local", 5) != 0)
-    strcat (port, collezione);
-  strcat (port, "/");
-  strcat (port, pacchetto);
-  return (compila_e (aggiornare, port));
+  int file = 0;
+  char filename[strlen (path) + strlen (script) + 10];
+  sprintf (filename, "%s/%s", path, script);
+  file = open (filename, O_RDONLY);
+  if (file == 0)
+    return;
+  close (file);
+  exec (path, script, NULL);
 }
 
+int
+build_install_pkg (int option, char *name)
+{
+  struct repolist *r;
+  char *path;
+  char *install_action;
+  char *repo = pkglist_get_newer_favorite (name, option);
+
+  if (repo == NULL)
+    {
+      printf ("Error: %s not found or locked!\n", name);
+      return (EXIT_FAILURE);
+    }
+
+  r = repolist_find (repo, ilenia_repos);
+
+  if (pkglist_find (name, ilenia_pkgs))
+    install_action = strdup ("-u");
+  else
+    install_action = strdup ("-i");
+
+  path = strdup (r->path);
+  if (path[strlen (path) - 1] != '/')
+    strcat (path, "/");
+
+  if (strstr (r->name, "local") == NULL)
+    {
+      strcat (path, r->name);
+      strcat (path, "/");
+    }
+
+  strcat (path, name);
+
+  installscript (path, "pre-install");
+
+  char *args[] = { "", "-d", install_action, NULL };
+
+  if (exec (path, "/usr/bin/pkgmk", args) != EXIT_SUCCESS)
+    return (EXIT_FAILURE);
+
+  installscript (path, "post-install");
+
+  do_post_pkgadd (path);
+
+  return (EXIT_SUCCESS);
+}
 
 int
-aggiorna_pacchetto (int opzioni_confronto, char *pacchetto)
+update_pkg (int option, char *name)
 {
   if (getuid () != 0)
     {
       printf ("ilenia: only root can update or install packages\n\n");
       return (-1);
     }
+
   struct pkglist *d = NULL;
-  if (opzioni_confronto >= 0)
+  if (option >= 0)
+    d = get_dependencies (name);
+
+  while (d != NULL)
     {
-      d = get_dependencies (pacchetto);
-      while (d->next != NULL)
+      printf ("%s [", d->name);
+      if (strcmp (d->repo, "not found") == 0)
 	{
-	  printf ("%s [", d->name);
-	  if (strcmp (d->repo, "not found") != 0)
-	    {
-	      if (pkglist_exists (d->name, ilenia_pkgs) != 0)
-		{
-		  printf ("install now]\n");
-		  if (aggiorna_pacchetto_ (opzioni_confronto, d->name) != 0)
-		    return (-1);
-		}
-	      else
-		{
-		  printf ("installed]\n");
-		}
-	    }
-	  else
-	    {
-	      printf ("not found]\n");
-	    }
+	  printf ("not found]\n");
 	  d = d->next;
+	  continue;
 	}
-      if (strcmp (d->repo, "not found") != 0)
+
+      if (pkglist_exists (d->name, ilenia_pkgs) == 0)
 	{
-	  if (aggiorna_pacchetto_ (opzioni_confronto, d->name) != 0)
-	    return (-1);
+	  printf ("installed]\n");
+	  d = d->next;
+	  continue;
 	}
-      else
-	{
-	  printf ("%s [not found]\n", d->name);
-	  return (-1);
-	}
+
+      printf ("install now]\n");
+      if (build_install_pkg (option, d->name) != 0)
+	return (EXIT_FAILURE);
+      d = d->next;
     }
-  else
+
+  if (pkglist_exists (name, ilenia_ports) != 0)
     {
-      opzioni_confronto *= -1;
-      if (pkglist_exists (pacchetto, ilenia_ports) == 0)
-	{
-	  if (aggiorna_pacchetto_ (opzioni_confronto, pacchetto) != 0)
-	    return (-1);
-	}
-      else
-	{
-	  printf ("%s [not found]\n", pacchetto);
-	  return (-1);
-	}
+      printf ("%s [not found]\n", name);
+      return (EXIT_FAILURE);
     }
-  return (0);
+
+  printf ("%s [install now]\n", name);
+
+  if (build_install_pkg (option, name) != 0)
+    return (EXIT_FAILURE);
+
+  return (EXIT_SUCCESS);
 }
 
-
 int
-aggiorna_pacchetti (int opzioni_confronto)
+update_system (int options)
 {
   if (getuid () != 0)
     {
       printf ("ilenia: only root can update or install packages\n\n");
       return (-1);
     }
+
   struct pkglist *p = NULL;
   struct pkglist *q = NULL;
-  p =
-    pkglist_confront (ilenia_pkgs, ilenia_ports, UPDATED, opzioni_confronto,
-		      0);
-  while (p != NULL)
-    {
-      if (pkglist_exists (p->name, q) != 0)
-	{
-	  char *repo = pkglist_get_newer (p->name, p);
-	  q =
-	    pkglist_add_ordered (p->name,
-				 pkglist_get_from_repo (p->name, repo, p),
-				 repo, NULL, q);
-	}
-      p = p->next;
-    }
-  if (pkglist_len (q) < 1)
+
+  p = pkglist_confront (UPDATED, options, 0);
+
+  if (pkglist_len (p) < 1)
     {
       printf ("All packages are up-to-date\n");
-      return (0);
+      return (EXIT_SUCCESS);
     }
+
+  while (p != NULL)
+    {
+      if (pkglist_exists (p->name, q) == 0)
+	continue;
+
+      char *repo = pkglist_get_newer (p->name, ilenia_ports);
+      char *version = pkglist_get_from_repo (p->name, repo,
+					     ilenia_ports);
+
+      q = pkglist_add_ordered (p->name, version, repo, NULL, q);
+      p = p->next;
+    }
+
   /*
-     someone wants that ilenia ask them if they're sure to update all packages,
-     I hate this feature, then I've to add another feature that bypass this feature
+   * someone wants that ilenia ask them if they're sure to update all 
+   * packages, I hate this feature, then I've to add another feature 
+   * that bypass this feature
    */
   if (ask_for_update)
     {
       pkglist_print (q);
-      if (!ask ("Are you sure to update the above packages? [y/n] "))
-	return (1);
+      if (!ask ("Are you sure to update the above packages? [Y/n] "))
+	return (EXIT_SUCCESS);
     }
+
   while (q != NULL)
     {
-      if (aggiorna_pacchetto_ (opzioni_confronto, q->name) != 0)
-	return (-1);
+      if (build_install_pkg (options, q->name) != EXIT_SUCCESS)
+	return (EXIT_FAILURE);
       q = q->next;
     }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }
 
-int
-do_pkgrm (char *pkg)
-{
-  int stato;
-  pid_t pid = fork ();
-  if (pid == 0)
-    {
-      printf ("Removing %s\n", pkg);
-      execl ("/usr/bin/pkgrm", "pkgrm", pkg, 0);
-    }
-  else if (pid < 0)
-    {
-      stato = -1;
-    }
-  else
-    {
-      while ((waitpid (pid, &stato, 0) == 0))
-	{
-	}
-    }
-  if (stato != 0)
-    return (stato);
-  return (0);
-}
 
 int
-pkgrm (char *pkg, int nocheckdeps, int removeall)
+remove_pkg (char *name, int checkdeps, int all)
 {
   if (getuid () != 0)
     {
       printf ("ilenia: only root can remove packages\n\n");
       return (-1);
     }
+
   struct pkglist *p = NULL;
-  if (removeall)
+
+  p = get_dependents (name, 0);
+
+
+  if (pkglist_len (p) > 1 && checkdeps && !all)
     {
-      p = get_dependents (pkg, 1);
-      while (p != NULL)
-	{
-	  do_pkgrm (p->name);
-	  p = p->next;
-	}
-      return (0);
+      printf
+	("ilenia: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T --all%s to see a list of the packages that need %s.\n",
+	 name, name, name, name);
+      return (EXIT_FAILURE);
     }
-  p = get_dependents (pkg, 0);
-  if (pkglist_len (p) > 1)
+
+  p = NULL;
+
+  if (all)
+    p = get_dependents (name, 1);
+  else
+    p = pkglist_add_reversed (name, NULL, NULL, NULL, p);
+
+  while (p)
     {
-      if (nocheckdeps)
-	{
-	  do_pkgrm (pkg);
-	  return (0);
-	}
-      else
-	{
-	  printf
-	    ("ilenia: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T %s to see a list of the packages that need %s.\n",
-	     pkg, pkg, pkg, pkg);
-	  return (-1);
-	}
+      printf ("Removing %s ...\n", p->name);
+      char *args[] = { "pkgrm", p->name, NULL };
+      if (exec (NULL, "/usr/bin/pkgrm", args) != EXIT_SUCCESS)
+	return (EXIT_FAILURE);
+      p = p->next;
     }
-  do_pkgrm (pkg);
-  return (0);
+
+  return (EXIT_SUCCESS);
 }
