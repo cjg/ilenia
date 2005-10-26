@@ -35,66 +35,41 @@ struct pkglist *
 lspkgs ()
 {
   FILE *file = fopen (DB_FILE, "r");
-
-  int new_record = 1;
-
   struct pkglist *p = NULL;
-  struct pkglist *paus = NULL;
-  struct pkglist *favoriterepo = NULL;
-  struct pkglist *favoriteversion = NULL;
-
-  favoriterepo = get_favorite (REPO);
-  favoriteversion = get_favorite (VERSION);
-
-  size_t n = 0;
   char *line = NULL;
-  ssize_t nread;
   char *name = NULL;
+  size_t n = 0;
+  ssize_t nread;
+  int newrecord = 1;
 
   while (((nread = getline (&line, &n, file)) != -1))
     {
       line[strlen (line) - 1] = '\0';
 
-      if (new_record && !name)
-	name = strdup (line);
-      else if (new_record)
+      if (line[0] == '\0')
 	{
-	  char *tmp;
-	  if ((paus = pkglist_find (name, favoriterepo)) != NULL)
-	    {
-	      tmp = strdup ("R ");
-	      strcat (tmp, paus->repo);
-	    }
-	  else if ((paus = pkglist_find (name, favoriteversion)) != NULL)
-	    {
-	      tmp = strdup ("V ");
-	      strcat (tmp, paus->version);
-	    }
-	  else
-	    {
-	      tmp = strdup ("installed");
-	    }
-	  p = pkglist_add_ordered (name, line, tmp, NULL, p);
-	  struct aliaslist *a = NULL;
-	  a = aliaslist_get (name, ilenia_aliases);
-	  while (a != NULL)
-	    {
-	      if (strcmp (a->name, name) != 0)
-		p = pkglist_add_ordered (a->name, "alias", name, NULL, p);
-	      a = a->next;
-	    }
-
-	  name = NULL;
-	  new_record = 0;
+	  newrecord = 1;
+	  continue;
 	}
 
-      if (line[1] == '\0')
-	new_record = 1;
+      if (!newrecord)
+	continue;
 
+      if (name == NULL)
+	name = strdup (line);
+      else
+	{
+	  p = pkglist_add_ordered (name, line, NULL, NULL, p);
+	  name = NULL;
+	  newrecord = 0;
+	}
     }
+
   if (line)
     free (line);
+
   fclose (file);
+
   return (p);
 }
 
@@ -110,30 +85,38 @@ get_favorite (int favorite)
     filename = strdup ("/etc/ports/favoriterepo");
   else
     filename = strdup ("/etc/ports/favoriteversion");
+  file = fopen (filename, "r");
+  if (file == NULL)
+    return (NULL);
 
-  if ((file = fopen (filename, "r")))
+  size_t n = 0;
+  char *line = NULL;
+  int nread;
+  char *favoriterow[2];
+
+  while ((nread = getline (&line, &n, file)) > 0)
     {
-      size_t n = 0;
-      char *line = NULL;
-      int nread = getline (&line, &n, file);
+      line = trim (line);
+      if ((strcmp (line, "") == 0) || (line[0] == '#'))
+	continue;
 
-      while (nread > 0)
-	{
-	  line = trim (line);
-	  if ((strcmp (line, "") != 0) && (line[0] != '#'))
-	    {
-	      sedchr (line, '\t', ' ');
-	      char *favorite_value = index (line, ' ');
-	      char *name = mid (line, 0,
-				strlen (line) - strlen (favorite_value));
-	      favorite_value = trim (favorite_value);
-	      p = pkglist_add_ordered (name, favorite_value,
-				       favorite_value, NULL, p);
-	    }
-	  nread = getline (&line, &n, file);
-	}
-      if (line)
-	free (line);
+      sedchr (line, '\t', ' ');
+
+      while (strstr (line, "  "))
+	sed (line, "  ", " ");
+
+      split (line, " ", favoriterow);
+
+      p = pkglist_add_ordered (favoriterow[0],
+			       trim (favoriterow[1]),
+			       trim (favoriterow[1]), NULL, p);
     }
+
+  if (line)
+    free (line);
+
+  if (filename)
+    free (filename);
+
   return (p);
 }

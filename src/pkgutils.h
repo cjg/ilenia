@@ -23,6 +23,6 @@
  */
 
 #define NODEPS -1
-int aggiorna_pacchetto (int opzioni_confronto, char *pacchetto);
-int aggiorna_pacchetti (int opzioni_confronto);
-int pkgrm (char *pkg, int nocheckdeps, int removeall);
+int update_pkg (int options, char *name);
+int update_system (int options);
+int remove_pkg (char *name, int checkdeps, int all);

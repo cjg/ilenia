@@ -29,6 +29,7 @@
 #include "manipulator.h"
 #include "vercmp.h"
 #include "confront.h"
+#include "ilenia.h"
 
 void
 prettyprint (char *str1, char *str2, char *str3, char *str4)
@@ -47,90 +48,138 @@ prettyprint (char *str1, char *str2, char *str3, char *str4)
 }
 
 struct pkglist *
-pkglist_confront (struct pkglist *pkgs, struct pkglist *ports,
-		  int type, int options, int print)
+pkglist_confront (int type, int options, int print)
 {
-  struct pkglist *paus = NULL;
-  struct pkglist *confront = NULL;
+  struct pkglist *p = NULL;
+
   if (print)
     printf
       ("Name                       Installed Version  Repository     Port Version \n");
-  while (pkgs != NULL)
-    {
-      paus = ports;
-      while (paus != NULL)
-	{
-	  if (strcmp (paus->name, pkgs->name) == 0)
-	    {
-	      int test;
-	      int skip = 0;
-	      if (type == DIFF)
-		{
-		  test = strcmp (pkgs->version, paus->version);
-		}
-	      else
-		{
-		  test = vercmp (pkgs->version, paus->version);
-		}
-	      if ((pkgs->repo[0] == 'R')
-		  && (options != NO_FAVORITE_REPO && options != NO_FAVORITES))
-		{
-		  if (strcmp (mid (pkgs->repo, 2, END), paus->repo) != 0)
-		    skip = 1;
-		}
-	      if ((pkgs->repo[0] == 'V')
-		  && (options != NO_FAVORITE_VERSION
-		      && options != NO_FAVORITES))
-		{
-		  if (strcmp (mid (pkgs->repo, 2, END), pkgs->version) == 0)
-		    skip = 1;
-		}
-	      if (test != 0 && skip != 1)
-		{
-		  confront =
-		    pkglist_add_ordered (pkgs->
-					 name,
-					 paus->
-					 version, paus->repo, NULL, confront);
-		  if (print)
-		    prettyprint (pkgs->name,
-				 pkgs->version, paus->repo, paus->version);
-		}
-	    }
-	  paus = paus->next;
-	}
-      pkgs = pkgs->next;
-    }
-  return (confront);
-}
 
+  while (ilenia_pkgs)
+    {
+      char *repo = pkglist_get_newer_favorite (ilenia_pkgs->name, options);
+
+      if (repo == NULL)
+	{
+	  ilenia_pkgs = ilenia_pkgs->next;
+	  continue;
+	}
+
+      char *version = pkglist_get_from_repo (ilenia_pkgs->name, repo,
+					     ilenia_ports);
+      int test;
+
+      if (type == DIFF)
+	test = strcmp (ilenia_pkgs->version, version);
+      else
+	test = vercmp (ilenia_pkgs->version, version);
+
+      if (test == 0)
+	{
+	  ilenia_pkgs = ilenia_pkgs->next;
+	  continue;
+	}
+
+      p = pkglist_add_ordered (ilenia_pkgs->name, version, repo, NULL, p);
+      if (print)
+	prettyprint (ilenia_pkgs->name, ilenia_pkgs->version, repo, version);
+
+      ilenia_pkgs = ilenia_pkgs->next;
+    }
+
+  return (p);
+}
 
 char *
 pkglist_get_newer (char *name, struct pkglist *p)
 {
   char *version = NULL;
-  static char *repo = NULL;
+  char *repo = NULL;
   while (p != NULL)
     {
-      if (strcmp (name, p->name) == 0)
+      if (strcmp (name, p->name) != 0)
 	{
-	  if (!version)
-	    {
-	      version = strdup (p->version);
-	      repo = strdup (p->repo);
-	    }
-	  else
-	    {
-	      if (vercmp (version, p->version))
-		{
-		  version = strdup (p->version);
-		  repo = strdup (p->repo);
-		}
-	    }
+	  p = p->next;
+	  continue;
+	}
+
+      if (version == NULL)
+	{
+	  version = strdup (p->version);
+	  repo = strdup (p->repo);
+	  p = p->next;
+	  continue;
+	}
+
+      if (vercmp (version, p->version))
+	{
+	  version = strdup (p->version);
+	  repo = strdup (p->repo);
 	}
       p = p->next;
     }
-  return (repo);
+
+  if (repo)
+    return (strdup (repo));
+
+  return (NULL);
+}
+
+char *
+pkglist_get_newer_favorite (char *name, int option)
+{
+  char *repo = NULL;
+  char *version = NULL;
+  struct pkglist *p = NULL;
+
+  if (option != NO_FAVORITE_REPO && option != NO_FAVORITES)
+    {
+      p = pkglist_find (name, ilenia_favoriterepo);
+      if (p)
+	repo = p->repo;
+      p = NULL;
+    }
+
+  if (option != NO_FAVORITE_VERSION && option != NO_FAVORITES)
+    {
+      p = pkglist_find (name, ilenia_favoriteversion);
+      if (p)
+	version = p->version;
+      p = NULL;
+    }
+
+  if (repo && version)
+    {
+      if (strcmp (pkglist_get_from_repo (name, repo, ilenia_ports), version))
+	{
+	  printf ("Fix your favorite!\n");
+	  exit (EXIT_FAILURE);
+	}
+    }
+
+  if (repo == NULL && version == NULL)
+    repo = pkglist_get_newer (name, ilenia_ports);
+
+  if (version)
+    {
+      repo = pkglist_get_from_version (name, version, ilenia_ports);
+      if (repo == NULL)
+	printf ("Warning: %s with version %s not found!\n", name, version);
+    }
+
+  if (repo)
+    {
+      if (strcmp (repo, "!lock") == 0)
+	return (NULL);
+
+      if (pkglist_get_from_repo (name, repo, ilenia_ports) == NULL)
+	printf ("Warning: %s in repo %s not found!\n", name, repo);
+      else
+	return (strdup (repo));
+    }
+
+  return (NULL);
 }
 
 char *

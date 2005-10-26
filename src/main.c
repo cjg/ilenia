@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   int opzioni_t = -1;
   int opzioni_s = -1;
   int opzioni_confronto = 0;
-  int controlla_dipendenze = 0;
+  int controlla_dipendenze = 1;
   int all = 0;
   int rebuild_cache = 0;
   for (i = 1; i < argc; i++)
@@ -194,6 +194,8 @@ main (int argc, char *argv[])
 	fclose (file);
     }
 
+  ilenia_favoriterepo = get_favorite (REPO);
+  ilenia_favoriteversion = get_favorite (VERSION);
   ilenia_aliases = aliaseslist_build ();
   ilenia_ports = lsports ();
   ilenia_pkgs = lspkgs ();
@@ -205,7 +207,8 @@ main (int argc, char *argv[])
 	case REPOLIST:
 	  while (ilenia_repos != NULL)
 	    {
-	      printf ("%s\n", ilenia_repos->name);
+	      printf ("name %s path %s\n", ilenia_repos->name,
+		      ilenia_repos->path);
 	      ilenia_repos = ilenia_repos->next;
 	    }
 	  break;
@@ -233,12 +236,12 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_p; j++)
 		{
-		  aggiorna_pacchetto (opzioni, opzione_p[j]);
+		  update_pkg (opzioni, opzione_p[j]);
 		}
 	    }
 	  else
 	    {
-	      aggiorna_pacchetti (opzioni);
+	      update_system (opzioni);
 	    }
 	  break;
 	case AGGIORNA:
@@ -284,8 +287,7 @@ main (int argc, char *argv[])
 	    }
 	  break;
 	case DIFF:
-	  pkglist_confront (ilenia_pkgs, ilenia_ports, DIFF,
-			    opzioni_confronto, 1);
+	  pkglist_confront (DIFF, opzioni_confronto, 1);
 	  break;
 	case RIMUOVI:
 	  if (opzioni_r != -1)
@@ -293,7 +295,7 @@ main (int argc, char *argv[])
 	      int j;
 	      for (j = 0; j <= opzioni_r; j++)
 		{
-		  pkgrm (opzione_r[j], controlla_dipendenze, all);
+		  remove_pkg (opzione_r[j], controlla_dipendenze, all);
 		}
 	    }
 	  else
@@ -316,8 +318,7 @@ main (int argc, char *argv[])
 	    }
 	  break;
 	case UPDATED:
-	  pkglist_confront (ilenia_pkgs, ilenia_ports, UPDATED,
-			    opzioni_confronto, 1);
+	  pkglist_confront (UPDATED, opzioni_confronto, 1);
 	  break;
 	case VERSION:
 	  version ();
