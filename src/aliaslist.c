@@ -104,7 +104,7 @@ aliaseslist_build ()
       int nread = getline (&line, &n, aliasfile);
       while (nread > 0)
 	{
-	  line = trim (line);
+	  trim (line);
 	  if (strlen (line) > 0 && line[0] != '#')
 	    {
 	      int i, num_alias;
@@ -113,7 +113,11 @@ aliaseslist_build ()
 	      char *alias[num_alias];
 	      split (line, " ", alias);
 	      for (i = 0; i < num_alias; i++)
-		a = aliaslist_add (trim (alias[i]), a);
+		{
+		  trim (alias[i]);
+
+		  a = aliaslist_add (alias[i], a);
+		}
 	      s = aliaseslist_add (a, s);
 	    }
 	  nread = getline (&line, &n, aliasfile);

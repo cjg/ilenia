@@ -38,17 +38,17 @@ get_value (char s[], char *var)
     {
       char *splitted_s[2];
       split (s, "=", splitted_s);
-      splitted_s[0] = trim (splitted_s[0]);
+      trim (splitted_s[0]);
       if (strcmp (splitted_s[0], var) == 0)
 	{
-	  splitted_s[1] = trim (splitted_s[1]);
+	  trim (splitted_s[1]);
 	  splitted_s[1] = mid (splitted_s[1], 1, END);
-	  splitted_s[1] = trim (splitted_s[1]);
+	  trim (splitted_s[1]);
 	  if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
 	    {
 	      splitted_s[1] =
 		mid (splitted_s[1], 1, strlen (splitted_s[1]) - 2);
-	      splitted_s[1] = trim (splitted_s[1]);
+	      trim (splitted_s[1]);
 	    }
 	  tmp = strdup (splitted_s[1]);
 	}
@@ -69,7 +69,7 @@ parse_ileniarc ()
       int nread = getline (&line, &n, rc);
       while (nread > 0)
 	{
-	  line = trim (line);
+	  trim (line);
 	  if (line[0] != '#')
 	    {
 	      if (strstr (line, "POST_PKGADD"))
@@ -105,7 +105,7 @@ ask (char *question, ...)
 
   if (getline (&line, &n, stdin))
     {
-      line = trim (line);
+      trim (line);
       if (!strcasecmp (line, "Y") || !strlen (line))
 	return (1);
     }

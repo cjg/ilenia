@@ -57,7 +57,7 @@ httpup (char *filename)
   char *url = NULL;
   while ((nread = getline (&line, &n, file)) > 0)
     {
-      line = trim (line);
+      trim (line);
       if (strncmp (line, "ROOT_DIR", 8) == 0)
 	root_dir = get_value (line, "ROOT_DIR");
       else if (strncmp (line, "URL", 3) == 0)

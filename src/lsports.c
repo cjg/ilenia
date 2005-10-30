@@ -90,7 +90,10 @@ parse_cvs (char *percorso, struct repolist *p)
 
       while (fgets (riga, 255, file))
 	{
-	  strcpy (riga, trim (riga));
+	  char *tmp;
+	  tmp = strdup (riga);
+	  trim (tmp);
+	  strcpy (riga, tmp);
 	  if (riga[0] != '#')
 	    {
 	      if (strncmp (riga, "LOCAL_PATH", 10) == 0)
@@ -149,7 +152,7 @@ parse_httpup (char *path, struct repolist *r)
       char *mad_prefix = NULL;
       char *repo;
       line[strlen (line) - 1] = '\0';
-      //trim(line);
+      trim (line);
 
       if (line[0] == '#' || strlen (line) == 0)
 	continue;
@@ -256,16 +259,20 @@ deplist_from_deprow (char *deprow)
 
   int n, i;
 
-  deprow = sed (deprow, ",", " ");
+  deprow = sedchr (deprow, ',', ' ');
 
+  while (strstr (deprow, "  "))
+    deprow = sed (deprow, "  ", " ");
   n = count (deprow, ' ');
 
   char *deps[n];
-
   split (deprow, " ", deps);
 
   for (i = 0; i < n; i++)
-    d = deplist_add (trim (deps[i]), d);
+    {
+      trim (deps[i]);
+      d = deplist_add (deps[i], d);
+    }
   return (d);
 }
 
@@ -282,37 +289,36 @@ parse_pkgfile (char *filename, char *repo)
   char *name = NULL, *version = NULL, *release = NULL;
 
   file = fopen (filename, "r");
-
   if (file == NULL)
     return (EXIT_FAILURE);
 
   while ((nread = getline (&line, &n, file)) != -1)
     {
-      char *l;
-
-      l = strdup (trim (line));
-
-      if (l[0] == '#')
+      trim (line);
+      if (line[0] == '#')
 	{
-	  l = mid (l, 1, END);
-	  l = trim (l);
+	  line = mid (line, 1, END);
+	  trim (line);
 
-	  if (strncasecmp (l, "Depends", 7) == 0)
-	    {
-	      if (strstr (l, ":"))
-		{
-		  l = mid (strstr (l, ":"), 1, END);
-		  l = trim (l);
-		  d = deplist_from_deprow (l);
-		}
-	    }
+	  if (strstr (line, "Depends") == NULL)
+	    continue;
+	  if (strstr (line, ":") == NULL)
+	    continue;
+
+	  line = strstr (line, ":");
+
+	  line = mid (line, 1, END);
+	  trim (line);
+	  d = deplist_from_deprow (line);
+	  line = NULL;
+
 	}
-      else if (strncmp (l, "name", 4) == 0)
-	name = get_value (l, "name");
-      else if (strncmp (l, "version", 7) == 0)
-	version = get_value (l, "version");
-      else if (strncmp (l, "release", 7) == 0)
-	release = get_value (l, "release");
+      else if (strncmp (line, "name", 4) == 0)
+	name = get_value (line, "name");
+      else if (strncmp (line, "version", 7) == 0)
+	version = get_value (line, "version");
+      else if (strncmp (line, "release", 7) == 0)
+	release = get_value (line, "release");
     }
 
   if (!(name && version && release))
@@ -325,11 +331,12 @@ parse_pkgfile (char *filename, char *repo)
   while (d != NULL)
     {
       fprintf (cachefile, " %s", d->name);
+      //printf(" %s", d->name);
       d = d->next;
     }
 
   fprintf (cachefile, "\n");
-
+  //printf("\n");
   if (line)
     free (line);
   fclose (file);
@@ -386,7 +393,8 @@ build_cache (struct repolist *r)
     }
   fclose (cachefile);
   chmod (CACHE, S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-  return (0);
+  printf ("cache built!\n");
+  return (EXIT_SUCCESS);
 }
 
 struct pkglist *
@@ -420,12 +428,15 @@ lsports ()
 
       for (i = 3; i < num; i++)
 	{
-	  if (strlen (trim (splitted_line[i])) > 0)
-	    d = deplist_add (trim (splitted_line[i]), d);
+	  trim (splitted_line[i]);
+	  if (strlen (splitted_line[i]) > 0)
+	    d = deplist_add (splitted_line[i], d);
 	}
-      p = pkglist_add_ordered (trim (splitted_line[0]),
-			       trim (splitted_line[1]),
-			       trim (splitted_line[2]), d, p);
+      trim (splitted_line[0]);
+      trim (splitted_line[1]);
+      trim (splitted_line[2]);
+      p = pkglist_add_ordered (splitted_line[0],
+			       splitted_line[1], splitted_line[2], d, p);
       nread = getline (&line, &n, file);
     }
 

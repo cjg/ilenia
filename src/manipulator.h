@@ -24,8 +24,10 @@
 
 #define END -1
 
-char *trim (char *s);
-char *mid (char *stringa, int inizio, int lunghezza);
+void ltrim (char *s);
+void rtrim (char *s);
+void trim (char *s);
+char *mid (char *s, int start, int length);
 char *spaces (int n);
 char *sed (char *s, char *find, char *replace);
 char *sedchr (char *s, int find, int replace);
