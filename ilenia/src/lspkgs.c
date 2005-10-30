@@ -96,7 +96,7 @@ get_favorite (int favorite)
 
   while ((nread = getline (&line, &n, file)) > 0)
     {
-      line = trim (line);
+      trim (line);
       if ((strcmp (line, "") == 0) || (line[0] == '#'))
 	continue;
 
@@ -106,10 +106,9 @@ get_favorite (int favorite)
 	sed (line, "  ", " ");
 
       split (line, " ", favoriterow);
-
+      trim (favoriterow[1]);
       p = pkglist_add_ordered (favoriterow[0],
-			       trim (favoriterow[1]),
-			       trim (favoriterow[1]), NULL, p);
+			       favoriterow[1], favoriterow[1], NULL, p);
     }
 
   if (line)

@@ -22,83 +22,105 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include "manipulator.h"
 
-char *
+/*
+char *trim(char s[])
+{
+	int n;
+	while (*s && *s <= 32)
+		++s;
+	for (n = strlen(s) - 1; n >= 0 && s[n] <= 32; --n)
+		s[n] = 0;
+	return s;
+}*/
+
+void
+ltrim (char *s)
+{
+  char *str = s;
+
+  while (isspace (*str))
+    str++;
+
+  while ((*s++ = *str++));
+}
+
+void
+rtrim (char *s)
+{
+  char *str = s;
+  register int i;
+
+  for (i = strlen (str) - 1; isspace (*(str + i)); i--)
+    *(str + i) = '\0';
+
+  while ((*s++ = *str++));
+}
+
+void
 trim (char *s)
 {
-
-  int n;
-  while (*s && *s <= 32)
-    ++s;
-  for (n = strlen (s) - 1; n >= 0 && s[n] <= 32; --n)
-    s[n] = 0;
-  return s;
+  ltrim (s);
+  rtrim (s);
 }
 
 char *
 mid (char s[], int start, int length)
 {
-  int x, z = 0;
   if (length == -1)
     length = strlen (s) - start;
-  if ((start + length) > strlen (s))
-    return (s);
 
-  for (x = 0; x <= strlen (s); x++)
-    {
-      if (x < start)
-	continue;
-      s[z] = s[x];
-      z++;
-    }
-
+  strncpy (s, s + start, length);
   s[length] = '\0';
-  return (s);
+
+  return s;
 }
 
 char *
 spaces (int n)
 {
   char s[n];
-  int x;
-  for (x = 0; x < n; x++)
-    s[x] = ' ';
+  memset (s, ' ', n);
   s[n] = '\0';
   return (strdup (s));
 }
 
+
 char *
-sed (char s[], char *find, char *replace)
+sed (char *s, char *find, char *replace)
 {
-  int i, j = 0;
-  char *s_copy;
-  s_copy = strdup (s);
-  /*
-     static char local_s[MASSIMO] = "";
-     for (i = 0; i <= MASSIMO; i++)
-     local_s[i] = '\0';
-   */
-  for (i = 0; i <= (strlen (s_copy) - strlen (find)); i++)
+  char *tmp = strdup (s);
+  s = (char *) malloc (strlen (tmp));
+  int i = 0;
+  while (*tmp)
     {
-      if (strcmp (mid (s_copy, i, strlen (find)), find) == 0)
+      if (strncmp (tmp, find, strlen (find)) != 0)
 	{
-	  strcat (s, replace);
-	  j += strlen (replace);
-	  i += strlen (replace) - 1;
+	  s[i++] = *tmp;
+	  tmp++;
+	  continue;
 	}
-      else
-	{
-	  s[i] = s_copy[i];
-	  j++;
-	}
+      if (strlen (replace) > 1)
+	s = (char *) realloc (s,
+			      strlen (s) + strlen (tmp) + strlen (replace));
+      int z;
+      for (z = 0; z < strlen (replace); z++)
+	s[i++] = replace[z];
+
+      tmp += strlen (find);
+
+      s[i++] = *tmp;
+      tmp++;
     }
-  s[j] = '\0';
-  if (s_copy)
-    free (s_copy);
-  return s;
+
+  s[i] = '\0';
+  tmp = NULL;
+  free (tmp);
+  return (s);
 }
 
 char *
