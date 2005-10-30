@@ -22,4 +22,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#define NO_HIGHER 0
+#define LOCAL_HIGHER 0
+#define PORT_HIGHER 1
+
 int vercmp (char *installato, char *port);
