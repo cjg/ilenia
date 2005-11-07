@@ -39,6 +39,56 @@ FILE *cachefile;
 
 #define PORTS_LOCATION "/usr/ports"
 
+struct repolist *parse_rsync(char *path, struct repolist *r)
+{
+	FILE *file;
+	file = fopen(path, "r");
+	if (file == NULL)
+		return (r);
+	char *line = NULL;
+	size_t n = 0;
+	ssize_t nread;
+
+	while ((nread = getline(&line, &n, file)) != -1) {
+		char *prefix;
+		char *mad_prefix = NULL;
+		char *repo;
+		line[strlen(line) - 1] = '\0';
+		trim(line);
+
+		if (line[0] == '#' || strlen(line) == 0)
+			continue;
+
+		if (strstr(line, "destination") == NULL)
+			continue;
+
+		repo = get_value(line, "destination");
+		prefix = strdup(repo);
+
+		repo = rindex(repo, '/');
+		repo = mid(repo, 1, END);
+
+		prefix = mid(prefix, 0, strlen(prefix) - strlen(repo));
+
+		if (strncmp
+		    (prefix, PORTS_LOCATION,
+		     strlen(PORTS_LOCATION)) == 0
+		    && strlen(prefix) > strlen(PORTS_LOCATION) + 1) {
+			mad_prefix =
+			    mid(prefix, strlen(PORTS_LOCATION) + 1, END);
+			strcat(mad_prefix, "/");
+			prefix = strdup(PORTS_LOCATION);
+			repo = strcat(mad_prefix, repo);
+			sed(repo, "//", "/");
+		}
+		r = repolist_add(repo, prefix, r);
+		fclose(file);
+		return (r);
+	}
+	fclose(file);
+	return (r);
+}
+
 struct repolist *parse_local(char *path, struct repolist *r)
 {
 	FILE *file;
@@ -332,12 +382,10 @@ int parse_pkgfile(char *filename, char *repo)
 
 	while (d != NULL) {
 		fprintf(cachefile, " %s", d->name);
-		//printf(" %s", d->name);
 		d = d->next;
 	}
 
 	fprintf(cachefile, "\n");
-	//printf("\n");
 	if (line)
 		free(line);
 	fclose(file);
@@ -420,7 +468,7 @@ struct pkglist *lsports()
 		split(line, " ", splitted_line);
 		struct deplist *d = NULL;
 
-		for (i = 3; i < num; i++) {
+		for (i = 3; i <= num; i++) {
 			trim(splitted_line[i]);
 			if (strlen(splitted_line[i]) > 0)
 				d = deplist_add(splitted_line[i], d);
@@ -468,6 +516,8 @@ struct repolist *build_repolist()
 			r = parse_cvs(filename, r);
 		else if (strcmp(extension, ".local") == 0)
 			r = parse_local(filename, r);
+		else if (strcmp(extension, ".rsync") == 0)
+			r = parse_rsync(filename, r);
 	}
 
 	closedir(dir);
