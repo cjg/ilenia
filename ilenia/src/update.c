@@ -87,6 +87,12 @@ int cvs(char *path)
 	return (exec(NULL, "/etc/ports/drivers/cvs", args));
 }
 
+int rsync(char *path)
+{
+	char *args[] = { "", path, NULL };
+	return (exec(NULL, "/etc/ports/drivers/rsync", args));
+}
+
 
 int update_repo(char *name)
 {
@@ -116,6 +122,10 @@ int update_repo(char *name)
 	sprintf(filename, "/etc/ports/%s.cvs", name);
 	if (is_file(filename) == EXIT_SUCCESS)
 		return (cvs(filename));
+
+	sprintf(filename, "/etc/ports/%s.rsync", name);
+	if (is_file(filename) == EXIT_SUCCESS)
+		return (rsync(filename));
 
 	printf("ilenia: %s not found\n\n", name);
 	return (EXIT_FAILURE);
