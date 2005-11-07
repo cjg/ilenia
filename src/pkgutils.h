@@ -23,6 +23,6 @@
  */
 
 #define NODEPS -1
-int update_pkg (int options, char *name);
-int update_system (int options);
-int remove_pkg (char *name, int checkdeps, int all);
+int update_pkg(int options, char *name);
+int update_system(int options);
+int remove_pkg(char *name, int checkdeps, int all);

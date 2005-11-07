@@ -26,4 +26,4 @@
 #define LOCAL_HIGHER 0
 #define PORT_HIGHER 1
 
-int vercmp (char *installato, char *port);
+int vercmp(char *installato, char *port);

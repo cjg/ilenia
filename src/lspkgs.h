@@ -26,5 +26,5 @@
 #define FAVORITE_VERSION  5
 #define FAVORITE_REPO     2
 
-struct pkglist *lspkgs ();
-struct pkglist *get_favorite (int favorite);
+struct pkglist *lspkgs();
+struct pkglist *get_favorite(int favorite);

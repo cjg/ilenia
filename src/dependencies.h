@@ -22,7 +22,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct pkglist *get_dependencies (char *name);
-struct pkglist *get_dependents (char *name, int all);
-void print_dependencies (char *name);
-void print_dependents (char *name, int all);
+struct pkglist *get_dependencies(char *name);
+struct pkglist *get_dependents(char *name, int all);
+void print_dependencies(char *name);
+void print_dependents(char *name, int all);

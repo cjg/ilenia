@@ -26,33 +26,27 @@
 #include <string.h>
 #include "deplist.h"
 
-struct deplist *
-deplist_add (char *name, struct deplist *d)
+struct deplist *deplist_add(char *name, struct deplist *d)
 {
-  struct deplist *daus = NULL;
-  daus = (struct deplist *) malloc (sizeof (struct deplist));
-  strcpy (daus->name, name);
-  if (d == NULL)
-    {
-      d = daus;
-      d->next = NULL;
-    }
-  else
-    {
-      daus->next = d;
-      d = daus;
-    }
-  return (d);
+	struct deplist *daus = NULL;
+	daus = (struct deplist *) malloc(sizeof(struct deplist));
+	strcpy(daus->name, name);
+	if (d == NULL) {
+		d = daus;
+		d->next = NULL;
+	} else {
+		daus->next = d;
+		d = daus;
+	}
+	return (d);
 }
 
-int
-deplist_exists (char *param, struct deplist *d)
+int deplist_exists(char *param, struct deplist *d)
 {
-  while (d != NULL)
-    {
-      if (strcmp (d->name, param) == 0)
-	return (1);
-      d = d->next;
-    }
-  return (0);
+	while (d != NULL) {
+		if (strcmp(d->name, param) == 0)
+			return (1);
+		d = d->next;
+	}
+	return (0);
 }

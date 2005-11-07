@@ -70,7 +70,7 @@ char *mid(char s[], int start, int length)
 	if (length == -1)
 		length = strlen(s) - start;
 
-	strncpy(s, s+start, length);
+	strncpy(s, s + start, length);
 	s[length] = '\0';
 
 	return s;
@@ -80,7 +80,7 @@ char *spaces(int n)
 {
 	char s[n];
 	memset(s, ' ', n);
-	s[n]='\0';
+	s[n] = '\0';
 	return (strdup(s));
 }
 
@@ -103,7 +103,7 @@ char *sed(char *s, char *find, char *replace)
 		int z;
 		for (z = 0; z < strlen(replace); z++)
 			s[i++] = replace[z];
-		
+
 		tmp += strlen(find);
 
 		s[i++] = *tmp;

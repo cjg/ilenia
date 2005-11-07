@@ -22,24 +22,23 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct pkglist
-{
-  char name[255];
-  char version[255];
-  char repo[255];
-  struct deplist *depends;
-  struct pkglist *next;
+struct pkglist {
+	char name[255];
+	char version[255];
+	char repo[255];
+	struct deplist *depends;
+	struct pkglist *next;
 };
 
-struct pkglist *pkglist_add (char *name, char *version, char *repo,
-			     struct deplist *d, struct pkglist *p);
-struct pkglist *pkglist_add_ordered (char *name, char *version, char *repo,
+struct pkglist *pkglist_add(char *name, char *version, char *repo,
+			    struct deplist *d, struct pkglist *p);
+struct pkglist *pkglist_add_ordered(char *name, char *version, char *repo,
+				    struct deplist *d, struct pkglist *p);
+struct pkglist *pkglist_add_reversed(char *name, char *version, char *repo,
 				     struct deplist *d, struct pkglist *p);
-struct pkglist *pkglist_add_reversed (char *name, char *version, char *repo,
-				      struct deplist *d, struct pkglist *p);
-struct pkglist *pkglist_add_deplist (struct deplist *d, struct pkglist *p);
-struct pkglist *pkglist_find (char *param, struct pkglist *p);
-struct pkglist *pkglist_find_like (char *param, struct pkglist *p);
-struct pkglist *pkglist_select_from_repo (char *repo, struct pkglist *p);
-int pkglist_len (struct pkglist *p);
-int pkglist_exists (char *param, struct pkglist *p);
+struct pkglist *pkglist_add_deplist(struct deplist *d, struct pkglist *p);
+struct pkglist *pkglist_find(char *param, struct pkglist *p);
+struct pkglist *pkglist_find_like(char *param, struct pkglist *p);
+struct pkglist *pkglist_select_from_repo(char *repo, struct pkglist *p);
+int pkglist_len(struct pkglist *p);
+int pkglist_exists(char *param, struct pkglist *p);

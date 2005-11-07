@@ -93,9 +93,9 @@ struct pkglist *pkglist_add_reversed(char *name, char *version,
 	struct pkglist *paus1 = NULL;
 	paus1 = (struct pkglist *) malloc(sizeof(struct pkglist));
 	strcpy(paus1->name, name);
-	if(version)
+	if (version)
 		strcpy(paus1->version, version);
-	if(repo)
+	if (repo)
 		strcpy(paus1->repo, repo);
 	paus1->depends = d;
 	if (p == NULL) {

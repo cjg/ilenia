@@ -22,22 +22,20 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct aliaslist
-{
-  char name[255];
-  struct aliaslist *next;
+struct aliaslist {
+	char name[255];
+	struct aliaslist *next;
 };
 
-struct aliaseslist
-{
-  struct aliaslist *alias;
-  struct aliaseslist *next;
+struct aliaseslist {
+	struct aliaslist *alias;
+	struct aliaseslist *next;
 };
 
-struct aliaslist *aliaslist_add (char *name, struct aliaslist *a);
-struct aliaslist *aliaslist_get (char *param, struct aliaseslist *s);
-int aliaslist_exists (char *param, struct aliaslist *a);
+struct aliaslist *aliaslist_add(char *name, struct aliaslist *a);
+struct aliaslist *aliaslist_get(char *param, struct aliaseslist *s);
+int aliaslist_exists(char *param, struct aliaslist *a);
 
-struct aliaseslist *aliaseslist_add (struct aliaslist *a,
-				     struct aliaseslist *s);
-struct aliaseslist *aliaseslist_build ();
+struct aliaseslist *aliaseslist_add(struct aliaslist *a,
+				    struct aliaseslist *s);
+struct aliaseslist *aliaseslist_build();

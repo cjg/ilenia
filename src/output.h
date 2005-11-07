@@ -23,6 +23,6 @@
  */
 
 
-void pkglist_print (struct pkglist *p);
-void help ();
-void version ();
+void pkglist_print(struct pkglist *p);
+void help();
+void version();

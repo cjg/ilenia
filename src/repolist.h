@@ -22,13 +22,12 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct repolist
-{
-  char name[255];
-  char path[255];
-  struct repolist *next;
+struct repolist {
+	char name[255];
+	char path[255];
+	struct repolist *next;
 };
 
-struct repolist *repolist_add (char *name, char *path, struct repolist *r);
-struct repolist *repolist_find (char *param, struct repolist *r);
-int repolist_exists (char *param, struct repolist *r);
+struct repolist *repolist_add(char *name, char *path, struct repolist *r);
+struct repolist *repolist_find(char *param, struct repolist *r);
+int repolist_exists(char *param, struct repolist *r);

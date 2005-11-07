@@ -22,5 +22,5 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-int update_repo (char *name);
-int update_all_repos ();
+int update_repo(char *name);
+int update_all_repos();
