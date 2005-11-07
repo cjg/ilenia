@@ -29,101 +29,86 @@
 #include "ilenia.h"
 #include "manipulator.h"
 
-struct aliaslist *
-aliaslist_add (char *name, struct aliaslist *a)
+struct aliaslist *aliaslist_add(char *name, struct aliaslist *a)
 {
-  struct aliaslist *aaus = NULL;
-  aaus = (struct aliaslist *) malloc (sizeof (struct aliaslist));
-  strcpy (aaus->name, name);
-  if (a == NULL)
-    {
-      a = aaus;
-      a->next = NULL;
-    }
-  else
-    {
-      aaus->next = a;
-      a = aaus;
-    }
-  return (a);
-}
-
-struct aliaslist *
-aliaslist_get (char *param, struct aliaseslist *s)
-{
-  while (s != NULL)
-    {
-      if (aliaslist_exists (param, s->alias))
-	return (s->alias);
-      s = s->next;
-    }
-  return (NULL);
-}
-
-int
-aliaslist_exists (char *param, struct aliaslist *a)
-{
-  while (a != NULL)
-    {
-      if (strcmp (a->name, param) == 0)
-	return (1);
-      a = a->next;
-    }
-  return (0);
-}
-
-struct aliaseslist *
-aliaseslist_add (struct aliaslist *a, struct aliaseslist *s)
-{
-  struct aliaseslist *saus = NULL;
-  saus = (struct aliaseslist *) malloc (sizeof (struct aliaseslist));
-  saus->alias = a;
-  if (s == NULL)
-    {
-      s = saus;
-      s->next = NULL;
-    }
-  else
-    {
-      saus->next = s;
-      s = saus;
-    }
-  return (s);
-}
-
-struct aliaseslist *
-aliaseslist_build ()
-{
-  struct aliaseslist *s = NULL;
-  FILE *aliasfile;
-
-  if ((aliasfile = fopen (ALIAS_FILE, "r")))
-    {
-      size_t n = 0;
-      char *line = NULL;
-      int nread = getline (&line, &n, aliasfile);
-      while (nread > 0)
-	{
-	  trim (line);
-	  if (strlen (line) > 0 && line[0] != '#')
-	    {
-	      int i, num_alias;
-	      struct aliaslist *a = NULL;
-	      num_alias = count (line, ' ');
-	      char *alias[num_alias];
-	      split (line, " ", alias);
-	      for (i = 0; i < num_alias; i++)
-		{
-		  trim (alias[i]);
-
-		  a = aliaslist_add (alias[i], a);
-		}
-	      s = aliaseslist_add (a, s);
-	    }
-	  nread = getline (&line, &n, aliasfile);
+	struct aliaslist *aaus = NULL;
+	aaus = (struct aliaslist *) malloc(sizeof(struct aliaslist));
+	strcpy(aaus->name, name);
+	if (a == NULL) {
+		a = aaus;
+		a->next = NULL;
+	} else {
+		aaus->next = a;
+		a = aaus;
 	}
-      line = NULL;
-      free (line);
-    }
-  return (s);
+	return (a);
+}
+
+struct aliaslist *aliaslist_get(char *param, struct aliaseslist *s)
+{
+	while (s != NULL) {
+		if (aliaslist_exists(param, s->alias))
+			return (s->alias);
+		s = s->next;
+	}
+	return (NULL);
+}
+
+int aliaslist_exists(char *param, struct aliaslist *a)
+{
+	while (a != NULL) {
+		if (strcmp(a->name, param) == 0)
+			return (1);
+		a = a->next;
+	}
+	return (0);
+}
+
+struct aliaseslist *aliaseslist_add(struct aliaslist *a,
+				    struct aliaseslist *s)
+{
+	struct aliaseslist *saus = NULL;
+	saus = (struct aliaseslist *) malloc(sizeof(struct aliaseslist));
+	saus->alias = a;
+	if (s == NULL) {
+		s = saus;
+		s->next = NULL;
+	} else {
+		saus->next = s;
+		s = saus;
+	}
+	return (s);
+}
+
+struct aliaseslist *aliaseslist_build()
+{
+	struct aliaseslist *s = NULL;
+	FILE *aliasfile;
+
+	if ((aliasfile = fopen(ALIAS_FILE, "r"))) {
+		size_t n = 0;
+		char *line = NULL;
+		int nread = getline(&line, &n, aliasfile);
+		while (nread > 0) {
+			trim(line);
+			if (strlen(line) > 0 && line[0] != '#') {
+				int i, num_alias;
+				struct aliaslist *a = NULL;
+				num_alias = count(line, ' ');
+				char *alias[num_alias];
+				split(line, " ", alias);
+				for (i = 0; i < num_alias; i++) {
+					trim(alias[i]);
+
+					a = aliaslist_add(alias[i],
+							  a);
+				}
+				s = aliaseslist_add(a, s);
+			}
+			nread = getline(&line, &n, aliasfile);
+		}
+		line = NULL;
+		free(line);
+	}
+	return (s);
 }

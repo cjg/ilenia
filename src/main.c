@@ -1,332 +1,272 @@
-#include <stdio.h>
-#include <string.h>
-#include "pkglist.h"
-#include "deplist.h"
-#include "lspkgs.h"
-#include "lsports.h"
-#include "confront.h"
-#include "update.h"
-#include "output.h"
-#include "pkgutils.h"
-#include "dependencies.h"
-#include "repolist.h"
-#include "aliaslist.h"
+/***************************************************************************
+ *            main.c
+ *
+ *  Sun Oct 30 12:33:33 2005
+ *  Copyright  2005  Coviello Giuseppe
+ *  immigrant@email.it
+ ****************************************************************************/
+
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+#include <argp.h>
+#include <stdlib.h>
+#include "../config.h"
 #include "ilenia.h"
+#include "lsports.h"
+#include "lspkgs.h"
+#include "aliaslist.h"
+#include "update.h"
+#include "repolist.h"
+#include "pkglist.h"
+#include "output.h"
+#include "confront.h"
+#include "dependencies.h"
+#include "pkgutils.h"
 
-#define AGGIORNA	1
-#define LSPORTS		2
-#define AIUTO		6
-#define AGGIORNA_P	7
-#define DIPENDENZE      8
-#define RIMUOVI         9
-#define DEPENDENT      10
-#define REPOLIST       11
-#define SEARCH         12
+const char *argp_program_version = VERSION;
+const char *argp_program_bug_address = "<immigrant@email.it>";
+static char doc[] = "Package manager for CRUX";
+static char args_doc[] = "ARG1";
 
-int
-main (int argc, char *argv[])
+#define OPT_CACHE 1
+#define OPT_REPOSITORY_LIST 2
+#define OPT_NO_FAVORITE_REPO 3
+#define OPT_NO_FAVORITE_VERSION 4
+#define OPT_NO_DEPS 5
+#define OPT_ALL 6
+
+static struct argp_option options[] = {
+	{"update", 'u', "REPO", OPTION_ARG_OPTIONAL, "Update ports tree"},
+	{"list", 'l', "REPO", OPTION_ARG_OPTIONAL, "List ports"},
+	{"search", 's', "PACKAGE", 0, "Search for ports"},
+	{"diff", 'd', 0, 0, "List version differences"},
+	{"updated", 'p', 0, 0, "List ports with newer version"},
+	{"depedencies", 'D', "PACKAGE", 0,
+	 "List dependencies of a package"},
+	{"update-pkg", 'U', "PACKAGE", OPTION_ARG_OPTIONAL,
+	 "Update or install a package with dependencies"},
+	{"dependents", 'T', "PACKAGE", 0,
+	 "List dependents of a package\n"},
+	{"remove", 'R', "PACKAGE", 0,
+	 "Remove a package checking dependencies"},
+	{"cache", OPT_CACHE, 0, 0, "Rebuild the cache"},
+	{"repository-list", OPT_REPOSITORY_LIST, 0, 0,
+	 "List repository that ilenia are using"},
+	{"no-favorite-repo", OPT_NO_FAVORITE_REPO, 0, 0,
+	 "Ignore the user's favorite repos"},
+	{"no-favorite-version", OPT_NO_FAVORITE_VERSION, 0, 0,
+	 "Ignore the user's favorite versions"},
+	{"no-deps", OPT_NO_DEPS, 0, 0, "Do not check dependencies"},
+	{"all", OPT_ALL, 0, 0, "Shows or remove all dependents packages"},
+	{0}
+};
+
+struct arguments {
+	int update;
+	char *update_repo;
+	int list;
+	char *list_repo;
+	char *search_package;
+	int diff;
+	int updated;
+	char *dependencies_package;
+	int update_pkg;
+	char *update_pkg_package;
+	char *dependents_package;
+	char *remove_package;
+	int cache;
+	int repository_list;
+	int no_favorite_repo;
+	int no_favorite_version;
+	int no_deps;
+	int all;
+};
+
+static error_t parse_opt(int key, char *arg, struct argp_state *state)
 {
-  if (argc < 2)
-    {
-      help ();
-      return (0);
-    }
-  int i;
-  int azione[argc];
-  char opzione[argc][255];
-  char opzione_p[argc][255];
-  char opzione_d[argc][255];
-  char opzione_l[argc][255];
-  char opzione_r[argc][255];
-  char opzione_t[argc][255];
-  char opzione_s[argc][255];
-  int azioni = -1;
-  int opzioni = -1;
-  int opzioni_p = -1;
-  int opzioni_d = -1;
-  int opzioni_l = -1;
-  int opzioni_r = -1;
-  int opzioni_t = -1;
-  int opzioni_s = -1;
-  int opzioni_confronto = 0;
-  int controlla_dipendenze = 1;
-  int all = 0;
-  int rebuild_cache = 0;
-  for (i = 1; i < argc; i++)
-    {
-      if (strcmp (argv[i], "-u") == 0 || strcmp (argv[i], "--update") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = AGGIORNA;
-	}
-      else if (strcmp (argv[i], "-l") == 0 || strcmp (argv[i], "--list") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = LSPORTS;
-	}
-      else if (strcmp (argv[i], "-s") == 0
-	       || strcmp (argv[i], "--search") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = SEARCH;
-	}
-      else if (strcmp (argv[i], "-d") == 0 || strcmp (argv[i], "--diff") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = DIFF;
-	}
-      else if (strcmp (argv[i], "-p") == 0
-	       || strcmp (argv[i], "--updated") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = UPDATED;
-	}
-      else if (strcmp (argv[i], "-v") == 0
-	       || strcmp (argv[i], "--version") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = VERSION;
-	}
-      else if (strcmp (argv[i], "-h") == 0 || strcmp (argv[i], "--help") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = AIUTO;
-	}
-      else if (strcmp (argv[i], "--repository-list") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = REPOLIST;
-	}
-      else if (strcmp (argv[i], "--no-favorite-repo") == 0)
-	{
-	  opzioni_confronto += NO_FAVORITE_REPO;
-	}
-      else if (strcmp (argv[i], "--no-favorite-version") == 0)
-	{
-	  opzioni_confronto += NO_FAVORITE_VERSION;
-	}
-      else if (strcmp (argv[i], "--no-deps") == 0)
-	{
-	  controlla_dipendenze = NODEPS;
-	}
-      else if (strcmp (argv[i], "--all") == 0)
-	{
-	  all = 1;
-	}
-      else if (strcmp (argv[i], "-U") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = AGGIORNA_P;
-	}
-      else if (strcmp (argv[i], "-D") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = DIPENDENZE;
-	}
-      else if (strcmp (argv[i], "-R") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = RIMUOVI;
-	}
-      else if (strcmp (argv[i], "-T") == 0)
-	{
-	  azioni++;
-	  azione[azioni] = DEPENDENT;
-	}
-      else if (strcmp (argv[i], "--cache") == 0)
-	{
-	  azioni++;
-	  rebuild_cache = 1;
-	}
-      else
-	{
-	  if (azione[azioni] == AGGIORNA)
-	    {
-	      opzioni++;
-	      strcpy (opzione[opzioni], argv[i]);
-	    }
-	  else if (azione[azioni] == AGGIORNA_P)
-	    {
-	      opzioni_p++;
-	      strcpy (opzione_p[opzioni_p], argv[i]);
-	    }
-	  else if (azione[azioni] == DIPENDENZE)
-	    {
-	      opzioni_d++;
-	      strcpy (opzione_d[opzioni_d], argv[i]);
-	    }
-	  else if (azione[azioni] == LSPORTS)
-	    {
-	      opzioni_l++;
-	      strcpy (opzione_l[opzioni_l], argv[i]);
-	    }
-	  else if (azione[azioni] == SEARCH)
-	    {
-	      opzioni_s++;
-	      strcpy (opzione_s[opzioni_s], argv[i]);
-	    }
-	  else if (azione[azioni] == RIMUOVI)
-	    {
-	      opzioni_r++;
-	      strcpy (opzione_r[opzioni_r], argv[i]);
-	    }
-	  else if (azione[azioni] == DEPENDENT)
-	    {
-	      opzioni_t++;
-	      strcpy (opzione_t[opzioni_t], argv[i]);
-	    }
-	}
-    }
+	struct arguments *arguments = state->input;
 
-  if (azioni < 0)
-    {
-      help ();
-      return (0);
-    }
-  if (parse_ileniarc () != 0)
-    return (1);
-
-  ilenia_repos = build_repolist ();
-  if (rebuild_cache)
-    {
-      FILE *file;
-      if ((file = fopen (CACHE, "w")))
-	fclose (file);
-    }
-
-  ilenia_favoriterepo = get_favorite (REPO);
-  ilenia_favoriteversion = get_favorite (VERSION);
-  ilenia_aliases = aliaseslist_build ();
-  ilenia_ports = lsports ();
-  ilenia_pkgs = lspkgs ();
-
-  for (i = 0; i <= (azioni - rebuild_cache); i++)
-    {
-      switch (azione[i])
-	{
-	case REPOLIST:
-	  while (ilenia_repos != NULL)
-	    {
-	      printf ("name %s path %s\n", ilenia_repos->name,
-		      ilenia_repos->path);
-	      ilenia_repos = ilenia_repos->next;
-	    }
-	  break;
-	case DIPENDENZE:
-	  if (opzioni_d != -1)
-	    {
-	      int j;
-	      for (j = 0; j <= opzioni_d; j++)
-		{
-		  print_dependencies (opzione_d[j]);
-		}
-	    }
-	  else
-	    {
-	      printf ("pacchetto\n");
-	    }
-	  break;
-	case AGGIORNA_P:
-	  if (opzioni_confronto)
-	    opzioni = opzioni_confronto * controlla_dipendenze;
-	  else
-	    opzioni = controlla_dipendenze;
-	  if (opzioni_p != -1)
-	    {
-	      int j;
-	      for (j = 0; j <= opzioni_p; j++)
-		{
-		  update_pkg (opzioni, opzione_p[j]);
-		}
-	    }
-	  else
-	    {
-	      update_system (opzioni);
-	    }
-	  break;
-	case AGGIORNA:
-	  if (opzioni < 0)
-	    {
-	      update_all_repos ();
-	    }
-	  else
-	    {
-	      int j;
-	      for (j = 0; j <= opzioni; j++)
-		{
-		  update_repo (opzione[j]);
-		}
-	    }
-	  break;
-	case LSPORTS:
-	  if (opzioni_l == -1)
-	    pkglist_print (ilenia_ports);
-	  else
-	    {
-	      int j;
-	      for (j = 0; j <= opzioni_l; j++)
-		{
-		  if (repolist_exists (opzione_l[j], ilenia_repos))
-		    pkglist_print (pkglist_select_from_repo
-				   (opzione_l[j], ilenia_ports));
-		}
-	    }
-	  break;
-	case SEARCH:
-	  if (opzioni_s == -1)
-	    printf ("What can I search?\n");
-	  else
-	    {
-	      struct pkglist *p = NULL;
-	      int j;
-	      for (j = 0; j <= opzioni_s; j++)
-		{
-		  p = pkglist_find_like (opzione_s[j], ilenia_ports);
-		  pkglist_print (p);
-		}
-	    }
-	  break;
-	case DIFF:
-	  pkglist_confront (DIFF, opzioni_confronto, 1);
-	  break;
-	case RIMUOVI:
-	  if (opzioni_r != -1)
-	    {
-	      int j;
-	      for (j = 0; j <= opzioni_r; j++)
-		{
-		  remove_pkg (opzione_r[j], controlla_dipendenze, all);
-		}
-	    }
-	  else
-	    {
-	      printf ("package(s)\n");
-	    }
-	  break;
-	case DEPENDENT:
-	  if (opzioni_t != -1)
-	    {
-	      int j;
-	      for (j = 0; j <= opzioni_t; j++)
-		{
-		  print_dependents (opzione_t[j], all);
-		}
-	    }
-	  else
-	    {
-	      printf ("package(s)\n");
-	    }
-	  break;
-	case UPDATED:
-	  pkglist_confront (UPDATED, opzioni_confronto, 1);
-	  break;
-	case VERSION:
-	  version ();
-	  break;
-	case AIUTO:
-	  help ();
-	  break;
+	switch (key) {
+	case 'u':
+		arguments->update = 1;
+		arguments->update_repo = arg;
+		break;
+	case 'l':
+		arguments->list = 1;
+		arguments->list_repo = arg;
+		break;
+	case 's':
+		arguments->search_package = arg;
+		break;
+	case 'd':
+		arguments->diff = 1;
+		break;
+	case 'p':
+		arguments->updated = 1;
+		break;
+	case 'D':
+		arguments->dependencies_package = arg;
+		break;
+	case 'U':
+		arguments->update_pkg = 1;
+		arguments->update_pkg_package = arg;
+		break;
+	case 'T':
+		arguments->dependents_package = arg;
+		break;
+	case 'R':
+		arguments->remove_package = arg;
+		break;
+	case OPT_CACHE:
+		arguments->cache = 1;
+		break;
+	case OPT_REPOSITORY_LIST:
+		arguments->repository_list = 1;
+		break;
+	case OPT_NO_FAVORITE_REPO:
+		arguments->no_favorite_repo = NO_FAVORITE_REPO;
+		break;
+	case OPT_NO_FAVORITE_VERSION:
+		arguments->no_favorite_version = NO_FAVORITE_VERSION;
+		break;
+	case OPT_NO_DEPS:
+		arguments->no_deps = -1;
+		break;
+	case OPT_ALL:
+		arguments->all = 1;
+		break;
+	default:
+		return ARGP_ERR_UNKNOWN;
 	}
-    }
-  return (0);
+	return 0;
+}
+
+static struct argp argp = { options, parse_opt, args_doc, doc };
+
+int main(int argc, char **argv)
+{
+	struct arguments arguments;
+
+	arguments.update = 0;
+	arguments.update_repo = NULL;
+	arguments.list = 0;
+	arguments.list_repo = NULL;
+	arguments.search_package = NULL;
+	arguments.diff = 0;
+	arguments.updated = 0;
+	arguments.dependencies_package = NULL;
+	arguments.update_pkg = 0;
+	arguments.update_pkg_package = NULL;
+	arguments.dependents_package = NULL;
+	arguments.remove_package = NULL;
+	arguments.cache = 0;
+	arguments.repository_list = 0;
+	arguments.no_favorite_repo = 0;
+	arguments.no_favorite_version = 0;
+	arguments.no_deps = 1;
+	arguments.all = 0;
+
+	if (argc < 2) {
+		char *fake_arg[2];
+		fake_arg[0] = "ilenia";
+		fake_arg[1] = "--help";
+		argp_parse(&argp, 2, fake_arg, 0, 0, &arguments);
+	}
+
+	argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
+	if (parse_ileniarc() != 0)
+		return (EXIT_FAILURE);
+
+	ilenia_repos = build_repolist();
+
+	if (arguments.cache) {
+		FILE *file;
+		if ((file = fopen(CACHE, "w")))
+			fclose(file);
+	}
+
+	ilenia_favoriterepo = get_favorite(FAVORITE_REPO);
+	ilenia_favoriteversion = get_favorite(FAVORITE_VERSION);
+	ilenia_aliases = aliaseslist_build();
+	ilenia_ports = lsports();
+	ilenia_pkgs = lspkgs();
+
+	if (arguments.update_repo != NULL) {
+		update_repo(arguments.update_repo);
+		arguments.update = 0;
+	}
+
+	if (arguments.update)
+		update_all_repos();
+
+	if (arguments.list_repo != NULL) {
+		if (repolist_exists(arguments.list_repo, ilenia_repos))
+			pkglist_print(pkglist_select_from_repo
+				      (arguments.list_repo, ilenia_ports));
+		arguments.list = 0;
+	}
+
+	if (arguments.list)
+		pkglist_print(ilenia_ports);
+
+	if (arguments.search_package != NULL)
+		pkglist_print(pkglist_find_like(arguments.search_package,
+						ilenia_ports));
+
+	int confront_options =
+	    arguments.no_favorite_repo + arguments.no_favorite_version;
+
+	int update_options = arguments.no_deps;
+	if (confront_options)
+		update_options = confront_options * update_options;
+
+	if (arguments.diff)
+		pkglist_confront(DIFF, confront_options, 1);
+
+	if (arguments.updated)
+		pkglist_confront(UPDATED, confront_options, 1);
+
+	if (arguments.dependencies_package != NULL)
+		print_dependencies(arguments.dependencies_package);
+
+	if (arguments.update_pkg_package != NULL) {
+		update_pkg(update_options, arguments.update_pkg_package);
+		arguments.update_pkg = 0;
+	}
+
+	if (arguments.update_pkg)
+		update_system(update_options);
+
+	if (arguments.dependents_package != NULL)
+		print_dependents(arguments.dependents_package,
+				 arguments.all);
+
+	if (arguments.remove_package != NULL)
+		remove_pkg(arguments.dependents_package, arguments.no_deps,
+			   arguments.all);
+
+	if (arguments.repository_list) {
+		while (ilenia_repos != NULL) {
+			printf("name %s path %s\n", ilenia_repos->name,
+			       ilenia_repos->path);
+			ilenia_repos = ilenia_repos->next;
+		}
+	}
+
+	exit(EXIT_SUCCESS);
 }

@@ -25,13 +25,12 @@
 #include <string.h>
 #include "vercmp.h"
 
-int
-vercmp (char *installato, char *port)
+int vercmp(char *installato, char *port)
 {
-  int i = strverscmp (installato, port);
-  if (i > 0)
-    return (LOCAL_HIGHER);
-  else if (i < 0)
-    return (PORT_HIGHER);
-  return (NO_HIGHER);
+	int i = strverscmp(installato, port);
+	if (i > 0)
+		return (LOCAL_HIGHER);
+	else if (i < 0)
+		return (PORT_HIGHER);
+	return (NO_HIGHER);
 }

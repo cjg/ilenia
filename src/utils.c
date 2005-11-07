@@ -29,39 +29,31 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-
-int
-exec (char *wdir, char *command, char *args[])
+ 
+int exec(char *wdir, char *command, char *args[])
 {
-  int status;
-  pid_t pid = fork ();
-  if (pid == 0)
-    {
-      if (wdir)
-	chdir (wdir);
-      execv (command, args);
-      exit (EXIT_FAILURE);
-    }
-  else if (pid < 0)
-    {
-      status = EXIT_FAILURE;
-    }
-  else
-    {
-      while ((waitpid (pid, &status, 0) == 0))
-	{
+	int status;
+	pid_t pid = fork();
+	if (pid == 0) {
+		if (wdir)
+			chdir(wdir);
+		execv(command, args);
+		exit(EXIT_FAILURE);
+	} else if (pid < 0) {
+		status = EXIT_FAILURE;
+	} else {
+		while ((waitpid(pid, &status, 0) == 0)) {
+		}
 	}
-    }
-  return (status);
+	return (status);
 }
 
-int
-is_file (char *filepath)
+int is_file(char *filepath)
 {
-  int file = 0;
-  file = open (filepath, O_RDONLY);
-  if (file == -1)
-    return (EXIT_FAILURE);
-  close (file);
-  return (EXIT_SUCCESS);
+	int file = 0;
+	file = open(filepath, O_RDONLY);
+	if (file == -1)
+		return(EXIT_FAILURE);
+	close(file);
+	return(EXIT_SUCCESS);
 }
