@@ -70,7 +70,7 @@ int httpup(char *filename)
 	};
 
 	int status = exec(NULL, "/usr/bin/httpup", args);
-	
+
 	if (root_dir)
 		free(root_dir);
 	if (url)
@@ -94,7 +94,7 @@ int update_repo(char *name)
 		printf("ilenia: only root can update the ports tree\n\n");
 		return (-1);
 	}
-	
+
 	FILE *file;
 	char filename[20 + strlen(name)];
 	if ((file = fopen(CACHE, "w"))) {
@@ -103,20 +103,20 @@ int update_repo(char *name)
 
 	sprintf(filename, "/etc/ports/%s.local", name);
 	if (is_file(filename) == EXIT_SUCCESS)
-		return(EXIT_SUCCESS);
-	
+		return (EXIT_SUCCESS);
+
 	sprintf(filename, "/etc/ports/%s.cvsup", name);
 	if (is_file(filename) == EXIT_SUCCESS)
 		return (cvsup(filename));
-	
+
 	sprintf(filename, "/etc/ports/%s.httpup", name);
 	if (is_file(filename) == EXIT_SUCCESS)
 		return (httpup(filename));
-	
+
 	sprintf(filename, "/etc/ports/%s.cvs", name);
 	if (is_file(filename) == EXIT_SUCCESS)
 		return (cvs(filename));
-	
+
 	printf("ilenia: %s not found\n\n", name);
 	return (EXIT_FAILURE);
 }

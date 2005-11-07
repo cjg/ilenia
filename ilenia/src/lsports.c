@@ -260,21 +260,21 @@ struct repolist *parse_cvsup(char *path, struct repolist *r)
 struct deplist *deplist_from_deprow(char *deprow)
 {
 	struct deplist *d = NULL;
-	
+
 	if (strlen(deprow) <= 0)
 		return (NULL);
 
 	int n, i;
 
 	deprow = sedchr(deprow, ',', ' ');
-		
+
 	while (strstr(deprow, "  "))
 		deprow = sed(deprow, "  ", " ");
 	n = count(deprow, ' ');
 
 	char *deps[n];
 	split(deprow, " ", deps);
-	
+
 	for (i = 0; i < n; i++) {
 		trim(deps[i]);
 		d = deplist_add(deps[i], d);
@@ -302,19 +302,19 @@ int parse_pkgfile(char *filename, char *repo)
 		if (line[0] == '#') {
 			line = mid(line, 1, END);
 			trim(line);
-			
+
 			if (strstr(line, "Depends") == NULL)
 				continue;
 			if (strstr(line, ":") == NULL)
 				continue;
-			
+
 			line = strstr(line, ":");
-			
+
 			line = mid(line, 1, END);
 			trim(line);
 			d = deplist_from_deprow(line);
 			line = NULL;
-			
+
 		} else if (strncmp(line, "name", 4) == 0)
 			name = get_value(line, "name");
 		else if (strncmp(line, "version", 7) == 0)

@@ -22,11 +22,10 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct deplist
-{
-  char name[255];
-  struct deplist *next;
+struct deplist {
+	char name[255];
+	struct deplist *next;
 };
 
-struct deplist *deplist_add (char *name, struct deplist *d);
-int deplist_exists (char *param, struct deplist *d);
+struct deplist *deplist_add(char *name, struct deplist *d);
+int deplist_exists(char *param, struct deplist *d);

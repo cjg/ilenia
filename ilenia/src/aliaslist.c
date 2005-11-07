@@ -100,8 +100,7 @@ struct aliaseslist *aliaseslist_build()
 				for (i = 0; i < num_alias; i++) {
 					trim(alias[i]);
 
-					a = aliaslist_add(alias[i],
-							  a);
+					a = aliaslist_add(alias[i], a);
 				}
 				s = aliaseslist_add(a, s);
 			}

@@ -43,16 +43,16 @@ struct pkglist *lspkgs()
 
 	while (((nread = getline(&line, &n, file)) != -1)) {
 		line[strlen(line) - 1] = '\0';
-		
-		if (line[0] == '\0'){
+
+		if (line[0] == '\0') {
 			newrecord = 1;
 			continue;
 		}
-	
+
 		if (!newrecord)
 			continue;
-		
-		if (name == NULL) 
+
+		if (name == NULL)
 			name = strdup(line);
 		else {
 			p = pkglist_add_ordered(name, line, NULL, NULL, p);
@@ -63,9 +63,9 @@ struct pkglist *lspkgs()
 
 	if (line)
 		free(line);
-	
+
 	fclose(file);
-	
+
 	return (p);
 }
 
@@ -100,7 +100,7 @@ struct pkglist *get_favorite(int favorite)
 			sed(line, "  ", " ");
 
 		split(line, " ", favoriterow);
-			trim(favoriterow[1]);
+		trim(favoriterow[1]);
 		p = pkglist_add_ordered(favoriterow[0],
 					favoriterow[1],
 					favoriterow[1], NULL, p);

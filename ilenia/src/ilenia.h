@@ -35,6 +35,6 @@ int ask_for_update;
 #define CACHE "/var/cache/ilenia"
 #define ALIAS_FILE "/etc/ports/alias"
 
-char *get_value (char s[], char *var);
-int parse_ileniarc ();
-int ask (char *question, ...);
+char *get_value(char s[], char *var);
+int parse_ileniarc();
+int ask(char *question, ...);

@@ -24,12 +24,12 @@
 
 #define END -1
 
-void ltrim (char *s);
-void rtrim (char *s);
-void trim (char *s);
-char *mid (char *s, int start, int length);
-char *spaces (int n);
-char *sed (char *s, char *find, char *replace);
-char *sedchr (char *s, int find, int replace);
-int count (char *s, int delim);
-int split (char *s, char *delim, char *splitted[]);
+void ltrim(char *s);
+void rtrim(char *s);
+void trim(char *s);
+char *mid(char *s, int start, int length);
+char *spaces(int n);
+char *sed(char *s, char *find, char *replace);
+char *sedchr(char *s, int find, int replace);
+int count(char *s, int delim);
+int split(char *s, char *delim, char *splitted[]);

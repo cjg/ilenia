@@ -29,7 +29,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
- 
+
 int exec(char *wdir, char *command, char *args[])
 {
 	int status;
@@ -53,7 +53,7 @@ int is_file(char *filepath)
 	int file = 0;
 	file = open(filepath, O_RDONLY);
 	if (file == -1)
-		return(EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	close(file);
-	return(EXIT_SUCCESS);
+	return (EXIT_SUCCESS);
 }
