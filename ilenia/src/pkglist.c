@@ -28,180 +28,155 @@
 #include "pkglist.h"
 #include "deplist.h"
 
-struct pkglist *
-pkglist_add (char *name, char *version, char *repo,
-	     struct deplist *d, struct pkglist *p)
+struct pkglist *pkglist_add(char *name, char *version, char *repo,
+			    struct deplist *d, struct pkglist *p)
 {
-  struct pkglist *paus = NULL;
-  paus = (struct pkglist *) malloc (sizeof (struct pkglist));
-  strcpy (paus->name, name);
-  if (version)
-    strcpy (paus->version, version);
-  if (repo)
-    strcpy (paus->repo, repo);
-  paus->depends = d;
-  if (p == NULL)
-    {
-      p = paus;
-      p->next = NULL;
-    }
-  else
-    {
-      paus->next = p;
-      p = paus;
-    }
-  return (p);
-}
-
-struct pkglist *
-pkglist_add_ordered (char *name, char *version, char *repo,
-		     struct deplist *d, struct pkglist *p)
-{
-  struct pkglist *paus1 = NULL;
-  struct pkglist *paus2 = NULL;
-  int pos;
-  paus1 = (struct pkglist *) malloc (sizeof (struct pkglist));
-  strcpy (paus1->name, name);
-  if (version)
-    strcpy (paus1->version, version);
-  if (repo)
-    strcpy (paus1->repo, repo);
-  paus1->depends = d;
-  if (p == NULL)
-    {
-      p = paus1;
-      p->next = NULL;
-    }
-  else
-    {
-      if (strcmp (p->name, paus1->name) > 0)
-	{
-	  paus1->next = p;
-	  p = paus1;
+	struct pkglist *paus = NULL;
+	paus = (struct pkglist *) malloc(sizeof(struct pkglist));
+	strcpy(paus->name, name);
+	if (version)
+		strcpy(paus->version, version);
+	if (repo)
+		strcpy(paus->repo, repo);
+	paus->depends = d;
+	if (p == NULL) {
+		p = paus;
+		p->next = NULL;
+	} else {
+		paus->next = p;
+		p = paus;
 	}
-      else
-	{
-	  paus2 = p;
-	  pos = 0;
-	  while (paus2->next != NULL && pos != 1)
-	    {
-	      if (strcmp (paus2->next->name, paus1->name) < 0)
-		paus2 = paus2->next;
-	      else
-		pos = 1;
-	    }
-	  paus1->next = paus2->next;
-	  paus2->next = paus1;
+	return (p);
+}
+
+struct pkglist *pkglist_add_ordered(char *name, char *version, char *repo,
+				    struct deplist *d, struct pkglist *p)
+{
+	struct pkglist *paus1 = NULL;
+	struct pkglist *paus2 = NULL;
+	int pos;
+	paus1 = (struct pkglist *) malloc(sizeof(struct pkglist));
+	strcpy(paus1->name, name);
+	if (version)
+		strcpy(paus1->version, version);
+	if (repo)
+		strcpy(paus1->repo, repo);
+	paus1->depends = d;
+	if (p == NULL) {
+		p = paus1;
+		p->next = NULL;
+	} else {
+		if (strcmp(p->name, paus1->name) > 0) {
+			paus1->next = p;
+			p = paus1;
+		} else {
+			paus2 = p;
+			pos = 0;
+			while (paus2->next != NULL && pos != 1) {
+				if (strcmp(paus2->next->name, paus1->name)
+				    < 0)
+					paus2 = paus2->next;
+				else
+					pos = 1;
+			}
+			paus1->next = paus2->next;
+			paus2->next = paus1;
+		}
 	}
-    }
-  return (p);
+	return (p);
 }
 
-struct pkglist *
-pkglist_add_reversed (char *name, char *version,
-		      char *repo, struct deplist *d, struct pkglist *p)
+struct pkglist *pkglist_add_reversed(char *name, char *version,
+				     char *repo, struct deplist *d,
+				     struct pkglist *p)
 {
-  struct pkglist *paus1 = NULL;
-  paus1 = (struct pkglist *) malloc (sizeof (struct pkglist));
-  strcpy (paus1->name, name);
-  if (version)
-    strcpy (paus1->version, version);
-  if (repo)
-    strcpy (paus1->repo, repo);
-  paus1->depends = d;
-  if (p == NULL)
-    {
-      p = paus1;
-      p->next = NULL;
-    }
-  else
-    {
-      struct pkglist *paus2 = NULL;
-      paus2 = p;
-      while (paus2->next != NULL)
-	paus2 = paus2->next;
-      paus1->next = NULL;
-      paus2->next = paus1;
-    }
-  return (p);
-}
-
-struct pkglist *
-pkglist_add_deplist (struct deplist *d, struct pkglist *p)
-{
-  p->depends = d;
-  return (p);
-}
-
-struct pkglist *
-pkglist_find (char *param, struct pkglist *p)
-{
-  struct pkglist *paus = NULL;
-  while (p != NULL)
-    {
-      if ((strcmp (p->name, param) == 0)
-	  || (strcmp (p->repo, param) == 0)
-	  || (strcmp (p->version, param) == 0))
-	{
-	  paus =
-	    pkglist_add_ordered (p->name, p->version,
-				 p->repo, p->depends, paus);
+	struct pkglist *paus1 = NULL;
+	paus1 = (struct pkglist *) malloc(sizeof(struct pkglist));
+	strcpy(paus1->name, name);
+	if(version)
+		strcpy(paus1->version, version);
+	if(repo)
+		strcpy(paus1->repo, repo);
+	paus1->depends = d;
+	if (p == NULL) {
+		p = paus1;
+		p->next = NULL;
+	} else {
+		struct pkglist *paus2 = NULL;
+		paus2 = p;
+		while (paus2->next != NULL)
+			paus2 = paus2->next;
+		paus1->next = NULL;
+		paus2->next = paus1;
 	}
-      p = p->next;
-    }
-  return (paus);
+	return (p);
 }
 
-struct pkglist *
-pkglist_find_like (char *param, struct pkglist *p)
+struct pkglist *pkglist_add_deplist(struct deplist *d, struct pkglist *p)
 {
-  struct pkglist *paus = NULL;
-  while (p != NULL)
-    {
-      if (strstr (p->name, param))
-	{
-	  paus =
-	    pkglist_add_ordered (p->name, p->version,
-				 p->repo, p->depends, paus);
+	p->depends = d;
+	return (p);
+}
+
+struct pkglist *pkglist_find(char *param, struct pkglist *p)
+{
+	struct pkglist *paus = NULL;
+	while (p != NULL) {
+		if ((strcmp(p->name, param) == 0)
+		    || (strcmp(p->repo, param) == 0)
+		    || (strcmp(p->version, param) == 0)) {
+			paus =
+			    pkglist_add_ordered(p->name, p->version,
+						p->repo, p->depends, paus);
+		}
+		p = p->next;
 	}
-      p = p->next;
-    }
-  return (paus);
+	return (paus);
 }
 
-struct pkglist *
-pkglist_select_from_repo (char *repo, struct pkglist *p)
+struct pkglist *pkglist_find_like(char *param, struct pkglist *p)
 {
-  struct pkglist *paus = NULL;
-  while (p != NULL)
-    {
-      if (strcmp (p->repo, repo) == 0)
-	paus =
-	  pkglist_add_ordered (p->name, p->version,
-			       p->repo, p->depends, paus);
-      p = p->next;
-    }
-  return (paus);
+	struct pkglist *paus = NULL;
+	while (p != NULL) {
+		if (strstr(p->name, param)) {
+			paus =
+			    pkglist_add_ordered(p->name, p->version,
+						p->repo, p->depends, paus);
+		}
+		p = p->next;
+	}
+	return (paus);
 }
 
-int
-pkglist_len (struct pkglist *p)
+struct pkglist *pkglist_select_from_repo(char *repo, struct pkglist *p)
 {
-  int i;
-  struct pkglist *paus;
-  for (paus = p, i = 0; paus; paus = paus->next, i++);
-  return (i);
+	struct pkglist *paus = NULL;
+	while (p != NULL) {
+		if (strcmp(p->repo, repo) == 0)
+			paus =
+			    pkglist_add_ordered(p->name, p->version,
+						p->repo, p->depends, paus);
+		p = p->next;
+	}
+	return (paus);
 }
 
-int
-pkglist_exists (char *param, struct pkglist *p)
+int pkglist_len(struct pkglist *p)
 {
-  while (p != NULL)
-    {
-      if (strcmp (p->name, param) == 0
-	  || strcmp (p->version, param) == 0 || strcmp (p->repo, param) == 0)
-	return (0);
-      p = p->next;
-    }
-  return (-1);
+	int i;
+	struct pkglist *paus;
+	for (paus = p, i = 0; paus; paus = paus->next, i++);
+	return (i);
+}
+
+int pkglist_exists(char *param, struct pkglist *p)
+{
+	while (p != NULL) {
+		if (strcmp(p->name, param) == 0
+		    || strcmp(p->version, param) == 0
+		    || strcmp(p->repo, param) == 0)
+			return (0);
+		p = p->next;
+	}
+	return (-1);
 }

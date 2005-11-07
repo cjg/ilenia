@@ -30,84 +30,77 @@
 #include "manipulator.h"
 #include "ilenia.h"
 
-char *
-get_value (char s[], char *var)
+char *get_value(char s[], char *var)
 {
-  char *tmp = "";
-  if (strncmp (s, var, strlen (var)) == 0)
-    {
-      char *splitted_s[2];
-      split (s, "=", splitted_s);
-      trim (splitted_s[0]);
-      if (strcmp (splitted_s[0], var) == 0)
-	{
-	  trim (splitted_s[1]);
-	  splitted_s[1] = mid (splitted_s[1], 1, END);
-	  trim (splitted_s[1]);
-	  if (splitted_s[1][0] == '\"' || splitted_s[1][0] == '\"')
-	    {
-	      splitted_s[1] =
-		mid (splitted_s[1], 1, strlen (splitted_s[1]) - 2);
-	      trim (splitted_s[1]);
-	    }
-	  tmp = strdup (splitted_s[1]);
-	}
-    }
-  return (tmp);
-}
-
-int
-parse_ileniarc ()
-{
-  FILE *rc;
-  ask_for_update = 1;
-  post_pkgadd = strdup ("");
-  if ((rc = fopen ("/etc/ilenia.rc", "r")))
-    {
-      size_t n = 0;
-      char *line = NULL;
-      int nread = getline (&line, &n, rc);
-      while (nread > 0)
-	{
-	  trim (line);
-	  if (line[0] != '#')
-	    {
-	      if (strstr (line, "POST_PKGADD"))
-		post_pkgadd = get_value (line, "POST_PKGADD");
-	      if (strstr (line, "ASK_FOR_UPDATE"))
-		{
-		  if (strcasecmp
-		      (get_value (line, "ASK_FOR_UPDATE"), "No") == 0)
-		    ask_for_update = 0;
+	char *tmp = "";
+	if (strncmp(s, var, strlen(var)) == 0) {
+		char *splitted_s[2];
+		split(s, "=", splitted_s);
+		trim(splitted_s[0]);
+		if (strcmp(splitted_s[0], var) == 0) {
+			trim(splitted_s[1]);
+			splitted_s[1] = mid(splitted_s[1], 1, END);
+			trim(splitted_s[1]);
+			if (splitted_s[1][0] == '\"'
+			    || splitted_s[1][0] == '\"') {
+				splitted_s[1] =
+				    mid(splitted_s[1], 1,
+					strlen(splitted_s[1]) - 2);
+				trim(splitted_s[1]);
+			}
+			tmp = strdup(splitted_s[1]);
 		}
-	    }
-	  nread = getline (&line, &n, rc);
 	}
-      line = NULL;
-      free (line);
-    }
-  else
-    printf ("Warning you don't have a ilenia.rc file.\n");
-  return (0);
+	return (tmp);
 }
 
-int
-ask (char *question, ...)
+int parse_ileniarc()
 {
-  va_list args;
+	FILE *rc;
+	ask_for_update = 1;
+	post_pkgadd = strdup("");
+	if ((rc = fopen("/etc/ilenia.rc", "r"))) {
+		size_t n = 0;
+		char *line = NULL;
+		int nread = getline(&line, &n, rc);
+		while (nread > 0) {
+			trim(line);
+			if (line[0] != '#') {
+				if (strstr(line, "POST_PKGADD"))
+					post_pkgadd =
+					    get_value(line, "POST_PKGADD");
+				if (strstr(line, "ASK_FOR_UPDATE")) {
+					if (strcasecmp
+					    (get_value
+					     (line, "ASK_FOR_UPDATE"),
+					     "No") == 0)
+						ask_for_update = 0;
+				}
+			}
+			nread = getline(&line, &n, rc);
+		}
+		line = NULL;
+		free(line);
+	} else
+		printf("Warning you don't have a ilenia.rc file.\n");
+	return (0);
+}
 
-  va_start (args, question);
-  vprintf (question, args);
-  va_end (args);
+int ask(char *question, ...)
+{
+	va_list args;
 
-  size_t n = 0;
-  char *line = NULL;
+	va_start(args, question);
+	vprintf(question, args);
+	va_end(args);
 
-  if (getline (&line, &n, stdin))
-    {
-      trim (line);
-      if (!strcasecmp (line, "Y") || !strlen (line))
-	return (1);
-    }
-  return (0);
+	size_t n = 0;
+	char *line = NULL;
+
+	if (getline(&line, &n, stdin)) {
+		trim(line);
+		if (!strcasecmp(line, "Y") || !strlen(line))
+			return (1);
+	}
+	return (0);
 }

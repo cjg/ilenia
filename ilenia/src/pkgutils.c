@@ -40,236 +40,218 @@
 #include "output.h"
 #include "utils.h"
 
-int
-do_post_pkgadd (char *path)
+int do_post_pkgadd(char *path)
 {
-  if (post_pkgadd == NULL)
-    return (EXIT_SUCCESS);
+	if (post_pkgadd == NULL)
+		return (EXIT_SUCCESS);
 
-  FILE *file;
-  file = fopen ("/tmp/post_pkgadd.sh", "w");
-  if (file == NULL)
-    return (EXIT_FAILURE);
+	FILE *file;
+	file = fopen("/tmp/post_pkgadd.sh", "w");
+	if (file == NULL)
+		return (EXIT_FAILURE);
 
-  fprintf (file, "#!/bin/sh\n\n%s\n\n# End of file", post_pkgadd);
-  fclose (file);
+	fprintf(file, "#!/bin/sh\n\n%s\n\n# End of file", post_pkgadd);
+	fclose(file);
 
-  char *args[2];
-  args[0] = NULL;
-  args[1] = strdup ("/tmp/post_pkgadd.sh");
+	char *args[2];
+	args[0] = NULL;
+	args[1] = strdup("/tmp/post_pkgadd.sh");
 
-  return (exec (path, "/bin/sh", args));
+	return (exec(path, "/bin/sh", args));
 }
 
-void
-installscript (char *path, char *script)
+void installscript(char *path, char *script)
 {
-  /*
-     int file = 0;
-     char filename[strlen(path) + strlen(script) + 10];
-     sprintf(filename, "%s/%s", path, script);
-     file = open(filename, O_RDONLY);
-     if (file == 0)
-     return;
-     close(file);
-   */
-  char *filepath = strdup (path);
-  strcat (filepath, "/");
-  strcat (filepath, script);
-  if (is_file (filepath) == EXIT_SUCCESS)
-    exec (path, script, NULL);
+	/*
+	int file = 0;
+	char filename[strlen(path) + strlen(script) + 10];
+	sprintf(filename, "%s/%s", path, script);
+	file = open(filename, O_RDONLY);
+	if (file == 0)
+		return;
+	close(file);
+	*/
+	char *filepath=strdup(path);
+	strcat(filepath, "/");
+	strcat(filepath, script);
+	if(is_file(filepath)==EXIT_SUCCESS)
+		exec(path, script, NULL);
 }
 
-int
-build_install_pkg (int option, char *name)
+int build_install_pkg(int option, char *name)
 {
-  struct repolist *r;
-  char *path;
-  char *install_action;
-  char *repo = pkglist_get_newer_favorite (name, option);
+	struct repolist *r;
+	char *path;
+	char *install_action;
+	char *repo = pkglist_get_newer_favorite(name, option);
 
-  if (repo == NULL)
-    {
-      printf ("Error: %s not found or locked!\n", name);
-      return (EXIT_FAILURE);
-    }
-
-  r = repolist_find (repo, ilenia_repos);
-
-  if (pkglist_find (name, ilenia_pkgs))
-    install_action = strdup ("-u");
-  else
-    install_action = strdup ("-i");
-
-  path = strdup (r->path);
-  if (path[strlen (path) - 1] != '/')
-    strcat (path, "/");
-
-  if (strstr (r->name, "local") == NULL)
-    {
-      strcat (path, r->name);
-      strcat (path, "/");
-    }
-
-  strcat (path, name);
-
-  installscript (path, "pre-install");
-
-  char *args[] = { "", "-d", install_action, NULL };
-
-  if (exec (path, "/usr/bin/pkgmk", args) != EXIT_SUCCESS)
-    return (EXIT_FAILURE);
-
-  installscript (path, "post-install");
-
-  do_post_pkgadd (path);
-
-  return (EXIT_SUCCESS);
-}
-
-int
-update_pkg (int option, char *name)
-{
-  if (getuid () != 0)
-    {
-      printf ("ilenia: only root can update or install packages\n\n");
-      return (-1);
-    }
-
-  struct pkglist *d = NULL;
-  if (option >= 0)
-    d = get_dependencies (name);
-
-  while (d != NULL)
-    {
-      printf ("%s [", d->name);
-      if (strcmp (d->repo, "not found") == 0)
-	{
-	  printf ("not found]\n");
-	  d = d->next;
-	  continue;
+	if (repo == NULL) {
+		printf("Error: %s not found or locked!\n", name);
+		return (EXIT_FAILURE);
 	}
 
-      if (pkglist_exists (d->name, ilenia_pkgs) == 0)
-	{
-	  printf ("installed]\n");
-	  d = d->next;
-	  continue;
+	r = repolist_find(repo, ilenia_repos);
+
+	if (pkglist_find(name, ilenia_pkgs))
+		install_action = strdup("-u");
+	else
+		install_action = strdup("-i");
+
+	path = strdup(r->path);
+	if (path[strlen(path) - 1] != '/')
+		strcat(path, "/");
+
+	if (strstr(r->name, "local") == NULL) {
+		strcat(path, r->name);
+		strcat(path, "/");
 	}
 
-      printf ("install now]\n");
-      if (build_install_pkg (option, d->name) != 0)
-	return (EXIT_FAILURE);
-      d = d->next;
-    }
+	strcat(path, name);
 
-  if (pkglist_exists (name, ilenia_ports) != 0)
-    {
-      printf ("%s [not found]\n", name);
-      return (EXIT_FAILURE);
-    }
+	installscript(path, "pre-install");
 
-  printf ("%s [install now]\n", name);
+	char *args[] = { "", "-d", install_action, NULL };
 
-  if (build_install_pkg (option, name) != 0)
-    return (EXIT_FAILURE);
+	if (exec(path, "/usr/bin/pkgmk", args) != EXIT_SUCCESS)
+		return (EXIT_FAILURE);
 
-  return (EXIT_SUCCESS);
-}
+	installscript(path, "post-install");
 
-int
-update_system (int options)
-{
-  if (getuid () != 0)
-    {
-      printf ("ilenia: only root can update or install packages\n\n");
-      return (-1);
-    }
+	do_post_pkgadd(path);
 
-  struct pkglist *p = NULL;
-  struct pkglist *q = NULL;
-
-  p = pkglist_confront (UPDATED, options, 0);
-
-  if (pkglist_len (p) < 1)
-    {
-      printf ("All packages are up-to-date\n");
-      return (EXIT_SUCCESS);
-    }
-
-  while (p != NULL)
-    {
-      if (pkglist_exists (p->name, q) == 0)
-	continue;
-
-      char *repo = pkglist_get_newer (p->name, ilenia_ports);
-      char *version = pkglist_get_from_repo (p->name, repo,
-					     ilenia_ports);
-
-      q = pkglist_add_ordered (p->name, version, repo, NULL, q);
-      p = p->next;
-    }
-
-  /*
-   * someone wants that ilenia ask them if they're sure to update all 
-   * packages, I hate this feature, then I've to add another feature 
-   * that bypass this feature
-   */
-  if (ask_for_update)
-    {
-      pkglist_print (q);
-      if (!ask ("Are you sure to update the above packages? [Y/n] "))
 	return (EXIT_SUCCESS);
-    }
+}
 
-  while (q != NULL)
-    {
-      if (build_install_pkg (options, q->name) != EXIT_SUCCESS)
-	return (EXIT_FAILURE);
-      q = q->next;
-    }
+int update_pkg(int option, char *name)
+{
+	if (getuid() != 0) {
+		printf
+		    ("ilenia: only root can update or install packages\n\n");
+		return (-1);
+	}
 
-  return (EXIT_SUCCESS);
+	struct pkglist *d = NULL;
+	if (option >= 0)
+		d = get_dependencies(name);
+
+	while (d != NULL) {
+		printf("%s [", d->name);
+		if (strcmp(d->repo, "not found") == 0) {
+			printf("not found]\n");
+			d = d->next;
+			continue;
+		}
+
+		if (pkglist_exists(d->name, ilenia_pkgs) == 0) {
+			printf("installed]\n");
+			d = d->next;
+			continue;
+		}
+
+		printf("install now]\n");
+		if (build_install_pkg(option, d->name) != 0)
+			return (EXIT_FAILURE);
+		d = d->next;
+	}
+
+	if (pkglist_exists(name, ilenia_ports) != 0) {
+		printf("%s [not found]\n", name);
+		return (EXIT_FAILURE);
+	}
+
+	printf("%s [install now]\n", name);
+
+	if (build_install_pkg(option, name) != 0)
+		return (EXIT_FAILURE);
+
+	return (EXIT_SUCCESS);
+}
+
+int update_system(int options)
+{
+	if (getuid() != 0) {
+		printf
+		    ("ilenia: only root can update or install packages\n\n");
+		return (-1);
+	}
+
+	struct pkglist *p = NULL;
+	struct pkglist *q = NULL;
+
+	p = pkglist_confront(UPDATED, options, 0);
+
+	if (pkglist_len(p) < 1) {
+		printf("All packages are up-to-date\n");
+		return (EXIT_SUCCESS);
+	}
+
+	while (p != NULL) {
+		if (pkglist_exists(p->name, q) == 0)
+			continue;
+
+		char *repo = pkglist_get_newer(p->name, ilenia_ports);
+		char *version = pkglist_get_from_repo(p->name, repo,
+						      ilenia_ports);
+
+		q = pkglist_add_ordered(p->name, version, repo, NULL, q);
+		p = p->next;
+	}
+
+	/*
+	 * someone wants that ilenia ask them if they're sure to update all 
+	 * packages, I hate this feature, then I've to add another feature 
+	 * that bypass this feature
+	 */
+	if (ask_for_update) {
+		pkglist_print(q);
+		if (!ask
+		    ("Are you sure to update the above packages? [Y/n] "))
+			return (EXIT_SUCCESS);
+	}
+
+	while (q != NULL) {
+		if (build_install_pkg(options, q->name) != EXIT_SUCCESS)
+			return (EXIT_FAILURE);
+		q = q->next;
+	}
+
+	return (EXIT_SUCCESS);
 }
 
 
-int
-remove_pkg (char *name, int checkdeps, int all)
+int remove_pkg(char *name, int checkdeps, int all)
 {
-  if (getuid () != 0)
-    {
-      printf ("ilenia: only root can remove packages\n\n");
-      return (-1);
-    }
+	if (getuid() != 0) {
+		printf("ilenia: only root can remove packages\n\n");
+		return (-1);
+	}
 
-  struct pkglist *p = NULL;
+	struct pkglist *p = NULL;
 
-  p = get_dependents (name, 0);
+	p = get_dependents(name, 0);
 
 
-  if (pkglist_len (p) > 1 && checkdeps && !all)
-    {
-      printf
-	("ilenia: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T --all%s to see a list of the packages that need %s.\n",
-	 name, name, name, name);
-      return (EXIT_FAILURE);
-    }
+	if (pkglist_len(p) > 1 && checkdeps && !all) {
+		printf
+		    ("ilenia: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T --all%s to see a list of the packages that need %s.\n",
+		     name, name, name, name);
+		return (EXIT_FAILURE);
+	}
 
-  p = NULL;
+	p = NULL;
 
-  if (all)
-    p = get_dependents (name, 1);
-  else
-    p = pkglist_add_reversed (name, NULL, NULL, NULL, p);
+	if (all)
+		p = get_dependents(name, 1);
+	else
+		p = pkglist_add_reversed(name, NULL, NULL, NULL, p);
 
-  while (p)
-    {
-      printf ("Removing %s ...\n", p->name);
-      char *args[] = { "pkgrm", p->name, NULL };
-      if (exec (NULL, "/usr/bin/pkgrm", args) != EXIT_SUCCESS)
-	return (EXIT_FAILURE);
-      p = p->next;
-    }
+	while (p) {
+		printf("Removing %s ...\n", p->name);
+		char *args[] = { "pkgrm", p->name, NULL };
+		if (exec(NULL, "/usr/bin/pkgrm", args) != EXIT_SUCCESS)
+			return (EXIT_FAILURE);
+		p = p->next;
+	}
 
-  return (EXIT_SUCCESS);
+	return (EXIT_SUCCESS);
 }

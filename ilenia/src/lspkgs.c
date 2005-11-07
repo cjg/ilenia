@@ -31,91 +31,86 @@
 #include "aliaslist.h"
 #include "ilenia.h"
 
-struct pkglist *
-lspkgs ()
+struct pkglist *lspkgs()
 {
-  FILE *file = fopen (DB_FILE, "r");
-  struct pkglist *p = NULL;
-  char *line = NULL;
-  char *name = NULL;
-  size_t n = 0;
-  ssize_t nread;
-  int newrecord = 1;
+	FILE *file = fopen(DB_FILE, "r");
+	struct pkglist *p = NULL;
+	char *line = NULL;
+	char *name = NULL;
+	size_t n = 0;
+	ssize_t nread;
+	int newrecord = 1;
 
-  while (((nread = getline (&line, &n, file)) != -1))
-    {
-      line[strlen (line) - 1] = '\0';
-
-      if (line[0] == '\0')
-	{
-	  newrecord = 1;
-	  continue;
+	while (((nread = getline(&line, &n, file)) != -1)) {
+		line[strlen(line) - 1] = '\0';
+		
+		if (line[0] == '\0'){
+			newrecord = 1;
+			continue;
+		}
+	
+		if (!newrecord)
+			continue;
+		
+		if (name == NULL) 
+			name = strdup(line);
+		else {
+			p = pkglist_add_ordered(name, line, NULL, NULL, p);
+			name = NULL;
+			newrecord = 0;
+		}
 	}
 
-      if (!newrecord)
-	continue;
-
-      if (name == NULL)
-	name = strdup (line);
-      else
-	{
-	  p = pkglist_add_ordered (name, line, NULL, NULL, p);
-	  name = NULL;
-	  newrecord = 0;
-	}
-    }
-
-  if (line)
-    free (line);
-
-  fclose (file);
-
-  return (p);
+	if (line)
+		free(line);
+	
+	fclose(file);
+	
+	return (p);
 }
 
 
-struct pkglist *
-get_favorite (int favorite)
+struct pkglist *get_favorite(int favorite)
 {
-  FILE *file;
-  char *filename = "";
-  struct pkglist *p = NULL;
+	FILE *file;
+	char *filename = "";
+	struct pkglist *p = NULL;
 
-  if (favorite == REPO)
-    filename = strdup ("/etc/ports/favoriterepo");
-  else
-    filename = strdup ("/etc/ports/favoriteversion");
-  file = fopen (filename, "r");
-  if (file == NULL)
-    return (NULL);
+	if (favorite == FAVORITE_REPO)
+		filename = strdup("/etc/ports/favoriterepo");
+	else
+		filename = strdup("/etc/ports/favoriteversion");
+	file = fopen(filename, "r");
+	if (file == NULL)
+		return (NULL);
 
-  size_t n = 0;
-  char *line = NULL;
-  int nread;
-  char *favoriterow[2];
+	size_t n = 0;
+	char *line = NULL;
+	int nread;
+	char *favoriterow[2];
 
-  while ((nread = getline (&line, &n, file)) > 0)
-    {
-      trim (line);
-      if ((strcmp (line, "") == 0) || (line[0] == '#'))
-	continue;
+	while ((nread = getline(&line, &n, file)) > 0) {
+		trim(line);
+		if ((strcmp(line, "") == 0) || (line[0] == '#'))
+			continue;
 
-      sedchr (line, '\t', ' ');
+		sedchr(line, '\t', ' ');
 
-      while (strstr (line, "  "))
-	sed (line, "  ", " ");
+		while (strstr(line, "  "))
+			sed(line, "  ", " ");
 
-      split (line, " ", favoriterow);
-      trim (favoriterow[1]);
-      p = pkglist_add_ordered (favoriterow[0],
-			       favoriterow[1], favoriterow[1], NULL, p);
-    }
+		split(line, " ", favoriterow);
+			trim(favoriterow[1]);
+		p = pkglist_add_ordered(favoriterow[0],
+					favoriterow[1],
+					favoriterow[1], NULL, p);
+	}
 
-  if (line)
-    free (line);
+	if (line)
+		free(line);
 
-  if (filename)
-    free (filename);
+	if (filename)
+		free(filename);
 
-  return (p);
+	return (p);
 }
