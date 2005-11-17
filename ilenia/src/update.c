@@ -106,27 +106,27 @@ int update_repo(char *name)
 	if ((file = fopen(CACHE, "w"))) {
 		fclose(file);
 	}
+	/*
+	   sprintf(filename, "/etc/ports/%s.local", name);
+	   if (is_file(filename) == EXIT_SUCCESS)
+	   return (EXIT_SUCCESS);
 
-	sprintf(filename, "/etc/ports/%s.local", name);
-	if (is_file(filename) == EXIT_SUCCESS)
-		return (EXIT_SUCCESS);
+	   sprintf(filename, "/etc/ports/%s.cvsup", name);
+	   if (is_file(filename) == EXIT_SUCCESS)
+	   return (cvsup(filename));
 
-	sprintf(filename, "/etc/ports/%s.cvsup", name);
-	if (is_file(filename) == EXIT_SUCCESS)
-		return (cvsup(filename));
+	   sprintf(filename, "/etc/ports/%s.httpup", name);
+	   if (is_file(filename) == EXIT_SUCCESS)
+	   return (httpup(filename));
 
-	sprintf(filename, "/etc/ports/%s.httpup", name);
-	if (is_file(filename) == EXIT_SUCCESS)
-		return (httpup(filename));
+	   sprintf(filename, "/etc/ports/%s.cvs", name);
+	   if (is_file(filename) == EXIT_SUCCESS)
+	   return (cvs(filename));
 
-	sprintf(filename, "/etc/ports/%s.cvs", name);
-	if (is_file(filename) == EXIT_SUCCESS)
-		return (cvs(filename));
-
-	sprintf(filename, "/etc/ports/%s.rsync", name);
-	if (is_file(filename) == EXIT_SUCCESS)
-		return (rsync(filename));
-
+	   sprintf(filename, "/etc/ports/%s.rsync", name);
+	   if (is_file(filename) == EXIT_SUCCESS)
+	   return (rsync(filename));
+	 */
 	printf("ilenia: %s not found\n\n", name);
 	return (EXIT_FAILURE);
 }

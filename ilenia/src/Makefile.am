@@ -40,7 +40,9 @@ ilenia_SOURCES = \
 	aliaslist.h\
 	aliaslist.c\
 	utils.h\
-	utils.c
+	utils.c\
+	list.h\
+	list.c
 
 ilenia_LDFLAGS = 
 

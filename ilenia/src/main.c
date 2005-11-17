@@ -36,6 +36,7 @@
 #include "confront.h"
 #include "dependencies.h"
 #include "pkgutils.h"
+#include "list.h"
 
 const char *argp_program_version = VERSION;
 const char *argp_program_bug_address = "<immigrant@email.it>";
@@ -49,20 +50,29 @@ static char args_doc[] = "ARG1";
 #define OPT_NO_DEPS 5
 #define OPT_ALL 6
 
+#define ACT_UPDATE 10
+#define ACT_LIST 11
+#define ACT_SEARCH 12
+#define ACT_DIFF 13
+#define ACT_UPDATED 14
+#define ACT_DEPENDENCIES 15
+#define ACT_UPDATE_PKG 16
+#define ACT_DEPENDENTS 17
+#define ACT_REMOVE 18
+#define ACT_CACHE 19
+#define ACT_REPOSITORY_LIST 20
+
 static struct argp_option options[] = {
-	{"update", 'u', "REPO", OPTION_ARG_OPTIONAL, "Update ports tree"},
-	{"list", 'l', "REPO", OPTION_ARG_OPTIONAL, "List ports"},
-	{"search", 's', "PACKAGE", 0, "Search for ports"},
+	{"update", 'u', 0, 0, "Update ports tree"},
+	{"list", 'l', 0, 0, "List ports"},
+	{"search", 's', 0, 0, "Search for ports"},
 	{"diff", 'd', 0, 0, "List version differences"},
 	{"updated", 'p', 0, 0, "List ports with newer version"},
-	{"depedencies", 'D', "PACKAGE", 0,
-	 "List dependencies of a package"},
-	{"update-pkg", 'U', "PACKAGE", OPTION_ARG_OPTIONAL,
+	{"depedencies", 'D', 0, 0, "List dependencies of a package"},
+	{"update-pkg", 'U', 0, 0,
 	 "Update or install a package with dependencies"},
-	{"dependents", 'T', "PACKAGE", 0,
-	 "List dependents of a package\n"},
-	{"remove", 'R', "PACKAGE", 0,
-	 "Remove a package checking dependencies"},
+	{"dependents", 'T', 0, 0, "List dependents of a package\n"},
+	{"remove", 'R', 0, 0, "Remove a package checking dependencies"},
 	{"cache", OPT_CACHE, 0, 0, "Rebuild the cache"},
 	{"repository-list", OPT_REPOSITORY_LIST, 0, 0,
 	 "List repository that ilenia are using"},
@@ -76,6 +86,8 @@ static struct argp_option options[] = {
 };
 
 struct arguments {
+	int action;
+/*
 	int update;
 	char *update_repo;
 	int list;
@@ -90,10 +102,12 @@ struct arguments {
 	char *remove_package;
 	int cache;
 	int repository_list;
+*/
 	int no_favorite_repo;
 	int no_favorite_version;
 	int no_deps;
 	int all;
+	struct list *args;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state)
@@ -102,40 +116,37 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 
 	switch (key) {
 	case 'u':
-		arguments->update = 1;
-		arguments->update_repo = arg;
+		arguments->action += ACT_UPDATE;
 		break;
 	case 'l':
-		arguments->list = 1;
-		arguments->list_repo = arg;
+		arguments->action += ACT_LIST;
 		break;
 	case 's':
-		arguments->search_package = arg;
+		arguments->action += ACT_SEARCH;
 		break;
 	case 'd':
-		arguments->diff = 1;
+		arguments->action += ACT_DIFF;
 		break;
 	case 'p':
-		arguments->updated = 1;
+		arguments->action += ACT_UPDATED;
 		break;
 	case 'D':
-		arguments->dependencies_package = arg;
+		arguments->action += ACT_DEPENDENCIES;
 		break;
 	case 'U':
-		arguments->update_pkg = 1;
-		arguments->update_pkg_package = arg;
+		arguments->action += ACT_UPDATE_PKG;
 		break;
 	case 'T':
-		arguments->dependents_package = arg;
+		arguments->action += ACT_DEPENDENTS;
 		break;
 	case 'R':
-		arguments->remove_package = arg;
+		arguments->action += ACT_REMOVE;
 		break;
 	case OPT_CACHE:
-		arguments->cache = 1;
+		arguments->action += ACT_CACHE;
 		break;
 	case OPT_REPOSITORY_LIST:
-		arguments->repository_list = 1;
+		arguments->action += ACT_REPOSITORY_LIST;
 		break;
 	case OPT_NO_FAVORITE_REPO:
 		arguments->no_favorite_repo = NO_FAVORITE_REPO;
@@ -149,6 +160,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 	case OPT_ALL:
 		arguments->all = 1;
 		break;
+	case ARGP_KEY_ARG:
+		arguments->args = list_add(arg, arguments->args);
+		break;
 	default:
 		return ARGP_ERR_UNKNOWN;
 	}
@@ -160,25 +174,28 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 int main(int argc, char **argv)
 {
 	struct arguments arguments;
-
-	arguments.update = 0;
-	arguments.update_repo = NULL;
-	arguments.list = 0;
-	arguments.list_repo = NULL;
-	arguments.search_package = NULL;
-	arguments.diff = 0;
-	arguments.updated = 0;
-	arguments.dependencies_package = NULL;
-	arguments.update_pkg = 0;
-	arguments.update_pkg_package = NULL;
-	arguments.dependents_package = NULL;
-	arguments.remove_package = NULL;
-	arguments.cache = 0;
-	arguments.repository_list = 0;
+	/*
+	   arguments.update = 0;
+	   arguments.update_repo = NULL;
+	   arguments.list = 0;
+	   arguments.list_repo = NULL;
+	   arguments.search_package = NULL;
+	   arguments.diff = 0;
+	   arguments.updated = 0;
+	   arguments.dependencies_package = NULL;
+	   arguments.update_pkg = 0;
+	   arguments.update_pkg_package = NULL;
+	   arguments.dependents_package = NULL;
+	   arguments.remove_package = NULL;
+	   arguments.cache = 0;
+	   arguments.repository_list = 0;
+	 */
+	arguments.action = 0;
 	arguments.no_favorite_repo = 0;
 	arguments.no_favorite_version = 0;
 	arguments.no_deps = 1;
 	arguments.all = 0;
+	arguments.args = NULL;
 
 	if (argc < 2) {
 		char *fake_arg[2];
@@ -194,7 +211,7 @@ int main(int argc, char **argv)
 
 	ilenia_repos = build_repolist();
 
-	if (arguments.cache) {
+	if (arguments.action == ACT_CACHE) {
 		FILE *file;
 		if ((file = fopen(CACHE, "w")))
 			fclose(file);
@@ -206,27 +223,10 @@ int main(int argc, char **argv)
 	ilenia_ports = lsports();
 	ilenia_pkgs = lspkgs();
 
-	if (arguments.update_repo != NULL) {
-		update_repo(arguments.update_repo);
-		arguments.update = 0;
+	if (arguments.action > 20 || arguments.action == 0) {
+		printf("Error: please perform an action at a time!\n");
+		return (EXIT_FAILURE);
 	}
-
-	if (arguments.update)
-		update_all_repos();
-
-	if (arguments.list_repo != NULL) {
-		if (repolist_exists(arguments.list_repo, ilenia_repos))
-			pkglist_print(pkglist_select_from_repo
-				      (arguments.list_repo, ilenia_ports));
-		arguments.list = 0;
-	}
-
-	if (arguments.list)
-		pkglist_print(ilenia_ports);
-
-	if (arguments.search_package != NULL)
-		pkglist_print(pkglist_find_like(arguments.search_package,
-						ilenia_ports));
 
 	int confront_options =
 	    arguments.no_favorite_repo + arguments.no_favorite_version;
@@ -235,32 +235,101 @@ int main(int argc, char **argv)
 	if (confront_options)
 		update_options = confront_options * update_options;
 
-	if (arguments.diff)
-		pkglist_confront(DIFF, confront_options, 1);
-
-	if (arguments.updated)
-		pkglist_confront(UPDATED, confront_options, 1);
-
-	if (arguments.dependencies_package != NULL)
-		print_dependencies(arguments.dependencies_package);
-
-	if (arguments.update_pkg_package != NULL) {
-		update_pkg(update_options, arguments.update_pkg_package);
-		arguments.update_pkg = 0;
+	if (arguments.action == ACT_UPDATE) {
+		if (arguments.args == NULL) {
+			update_all_repos();
+			return (EXIT_SUCCESS);
+		}
+		while (arguments.args) {
+			update_repo(arguments.args->data);
+			arguments.args = arguments.args->next;
+		}
 	}
 
-	if (arguments.update_pkg)
-		update_system(update_options);
+	if (arguments.action == ACT_LIST) {
+		if (arguments.args == NULL) {
+			pkglist_print(ilenia_ports);
+			return (EXIT_SUCCESS);
+		}
+		while (arguments.args) {
+			pkglist_print(pkglist_select_from_repo
+				      (arguments.args->data,
+				       ilenia_ports));
+			arguments.args = arguments.args->next;
+		}
+	}
 
-	if (arguments.dependents_package != NULL)
-		print_dependents(arguments.dependents_package,
-				 arguments.all);
+	if (arguments.action == ACT_SEARCH) {
+		if (arguments.args == NULL) {
+			printf
+			    ("Error: action search requires an argument!\n");
+			return (EXIT_FAILURE);
+		}
+		while (arguments.args) {
+			pkglist_print(pkglist_find_like
+				      (arguments.args->data,
+				       ilenia_ports));
+			arguments.args = arguments.args->next;
+		}
+	}
 
-	if (arguments.remove_package != NULL)
-		remove_pkg(arguments.dependents_package, arguments.no_deps,
-			   arguments.all);
+	if (arguments.action == ACT_DIFF)
+		pkglist_confront(DIFF, confront_options, 1);
 
-	if (arguments.repository_list) {
+	if (arguments.action == ACT_UPDATED)
+		pkglist_confront(UPDATED, confront_options, 1);
+
+	if (arguments.action == ACT_DEPENDENCIES) {
+		if (arguments.args == NULL) {
+			printf
+			    ("Error: action dependencies requires an argument!\n");
+			return (EXIT_FAILURE);
+		}
+		while (arguments.args) {
+			print_dependencies(arguments.args->data);
+			arguments.args = arguments.args->next;
+		}
+	}
+
+	if (arguments.action == ACT_UPDATE_PKG) {
+		if (arguments.args == NULL) {
+			update_system(update_options);
+			return (EXIT_SUCCESS);
+		}
+		while (arguments.args) {
+			update_pkg(update_options, arguments.args->data);
+			arguments.args = arguments.args->next;
+		}
+	}
+
+	if (arguments.action == ACT_DEPENDENTS) {
+		if (arguments.args == NULL) {
+			printf
+			    ("Error: action dependents requires an argument!\n");
+			return (EXIT_FAILURE);
+		}
+		while (arguments.args) {
+			print_dependents(arguments.args->data,
+					 arguments.all);
+			arguments.args = arguments.args->next;
+		}
+	}
+
+	if (arguments.action == ACT_REMOVE) {
+		if (arguments.args == NULL) {
+			printf
+			    ("Error: action remove requires an argument!\n");
+			return (EXIT_FAILURE);
+		}
+		while (arguments.args) {
+			remove_pkg(arguments.args->data, arguments.no_deps,
+				   arguments.all);
+			arguments.args = arguments.args->next;
+		}
+	}
+
+
+	if (arguments.action == ACT_REPOSITORY_LIST) {
 		while (ilenia_repos != NULL) {
 			printf("name %s path %s\n", ilenia_repos->name,
 			       ilenia_repos->path);

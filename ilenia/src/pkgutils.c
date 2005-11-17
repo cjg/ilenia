@@ -60,21 +60,9 @@ int do_post_pkgadd(char *path)
 	return (exec(path, "/bin/sh", args));
 }
 
-void installscript(char *path, char *script)
+void installscript(char path[], char *script)
 {
-	/*
-	   int file = 0;
-	   char filename[strlen(path) + strlen(script) + 10];
-	   sprintf(filename, "%s/%s", path, script);
-	   file = open(filename, O_RDONLY);
-	   if (file == 0)
-	   return;
-	   close(file);
-	 */
-	char *filepath = strdup(path);
-	strcat(filepath, "/");
-	strcat(filepath, script);
-	if (is_file(filepath) == EXIT_SUCCESS)
+	if (is_file(path, script) == EXIT_SUCCESS)
 		exec(path, script, NULL);
 }
 
@@ -107,7 +95,6 @@ int build_install_pkg(int option, char *name)
 	}
 
 	strcat(path, name);
-
 	installscript(path, "pre-install");
 
 	char *args[] = { "", "-d", install_action, NULL };

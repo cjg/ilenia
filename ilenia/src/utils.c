@@ -23,10 +23,11 @@
  */
 
 #include <fcntl.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 
@@ -48,9 +49,13 @@ int exec(char *wdir, char *command, char *args[])
 	return (status);
 }
 
-int is_file(char *filepath)
+int is_file(char *path, char *name)
 {
 	int file = 0;
+	char filepath[strlen(path) + strlen(name) + 1];
+	strcpy(filepath, path);
+	strcat(filepath, "/");
+	strcat(filepath, name);
 	file = open(filepath, O_RDONLY);
 	if (file == -1)
 		return (EXIT_FAILURE);
