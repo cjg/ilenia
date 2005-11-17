@@ -26,6 +26,6 @@
 #define _UTILS_H
 
 int exec(char *wdir, char *command, char *args[]);
-int is_file(char *filepath);
+int is_file(char *path, char *name);
 
 #endif				/* _UTILS_H */
