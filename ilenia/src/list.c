@@ -28,15 +28,19 @@
 
 struct list *list_add(char *data, struct list *l)
 {
-	struct list *laus = NULL;
-	laus = (struct list *) malloc(sizeof(struct list));
-	strcpy(laus->data, data);
+	struct list *laus1 = NULL;
+	laus1 = (struct list *) malloc(sizeof(struct list));
+	strcpy(laus1->data, data);
 	if (l == NULL) {
-		l = laus;
+		l = laus1;
 		l->next = NULL;
 	} else {
-		laus->next = l;
-		l = laus;
+		struct list *laus2 = NULL;
+		laus2 = l;
+		while (laus2->next != NULL)
+			laus2 = laus2->next;
+		laus1->next = NULL;
+		laus2->next = laus1;
 	}
 	return (l);
 }

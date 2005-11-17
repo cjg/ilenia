@@ -87,22 +87,6 @@ static struct argp_option options[] = {
 
 struct arguments {
 	int action;
-/*
-	int update;
-	char *update_repo;
-	int list;
-	char *list_repo;
-	char *search_package;
-	int diff;
-	int updated;
-	char *dependencies_package;
-	int update_pkg;
-	char *update_pkg_package;
-	char *dependents_package;
-	char *remove_package;
-	int cache;
-	int repository_list;
-*/
 	int no_favorite_repo;
 	int no_favorite_version;
 	int no_deps;
@@ -174,22 +158,7 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 int main(int argc, char **argv)
 {
 	struct arguments arguments;
-	/*
-	   arguments.update = 0;
-	   arguments.update_repo = NULL;
-	   arguments.list = 0;
-	   arguments.list_repo = NULL;
-	   arguments.search_package = NULL;
-	   arguments.diff = 0;
-	   arguments.updated = 0;
-	   arguments.dependencies_package = NULL;
-	   arguments.update_pkg = 0;
-	   arguments.update_pkg_package = NULL;
-	   arguments.dependents_package = NULL;
-	   arguments.remove_package = NULL;
-	   arguments.cache = 0;
-	   arguments.repository_list = 0;
-	 */
+
 	arguments.action = 0;
 	arguments.no_favorite_repo = 0;
 	arguments.no_favorite_version = 0;
