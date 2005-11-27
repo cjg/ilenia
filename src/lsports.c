@@ -325,7 +325,7 @@ struct deplist *deplist_from_deprow(char *deprow)
 	char *deps[n];
 	split(deprow, " ", deps);
 
-	for (i = 0; i < n; i++) {
+	for (i = 0; i <= n; i++) {
 		trim(deps[i]);
 		d = deplist_add(deps[i], d);
 	}
