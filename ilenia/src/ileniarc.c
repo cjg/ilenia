@@ -56,33 +56,43 @@ char *get_value(char s[], char *var)
 
 int parse_ileniarc()
 {
-	FILE *rc;
+	FILE *file;
 	ask_for_update = 1;
 	post_pkgadd = strdup("");
-	if ((rc = fopen("/etc/ilenia.rc", "r"))) {
-		size_t n = 0;
-		char *line = NULL;
-		int nread = getline(&line, &n, rc);
-		while (nread > 0) {
-			trim(line);
-			if (line[0] != '#') {
-				if (strstr(line, "POST_PKGADD"))
-					post_pkgadd =
-					    get_value(line, "POST_PKGADD");
-				if (strstr(line, "ASK_FOR_UPDATE")) {
-					if (strcasecmp
-					    (get_value
-					     (line, "ASK_FOR_UPDATE"),
-					     "No") == 0)
-						ask_for_update = 0;
-				}
-			}
-			nread = getline(&line, &n, rc);
-		}
-		line = NULL;
-		free(line);
-	} else
+	not_found_policy = ASK_POLICY;
+	file = fopen("/etc/ilenia.rc", "r");
+	if (file == NULL) {
 		printf("Warning you don't have a ilenia.rc file.\n");
+		return (0);
+	}
+	size_t n = 0;
+	char *line = NULL;
+	int nread;
+	while ((nread = getline(&line, &n, file)) > 0) {
+		trim(line);
+		if (line[0] == '#')
+			continue;
+		if (strstr(line, "POST_PKGADD"))
+			post_pkgadd = get_value(line, "POST_PKGADD");
+		if (strstr(line, "ASK_FOR_UPDATE")) {
+			if (strcasecmp
+			    (get_value(line, "ASK_FOR_UPDATE"), "No") == 0)
+				ask_for_update = 0;
+
+		}
+		if (strstr(line, "NOT_FOUND_POLICY")) {
+			char *tmp = get_value(line, "NOT_FOUND_POLICY");
+			if (strcasecmp(tmp, "ask") == 0)
+				not_found_policy = ASK_POLICY;
+			else if (strcasecmp(tmp, "stop") == 0)
+				not_found_policy = STOP_POLICY;
+			else if (strcasecmp(tmp, "nevermind") == 0)
+				not_found_policy = NEVERMIND_POLICY;
+		}
+
+	}
+	if (line)
+		free(line);
 	return (0);
 }
 

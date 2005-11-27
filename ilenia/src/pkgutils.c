@@ -109,6 +109,16 @@ int build_install_pkg(int option, char *name)
 	return (EXIT_SUCCESS);
 }
 
+void not_found_helper()
+{
+	if (not_found_policy == STOP_POLICY)
+		exit(EXIT_FAILURE);
+	if (not_found_policy == NEVERMIND_POLICY)
+		return;
+	if (!ask("Can I ignore above package and continue? [Y/n] "))
+		exit(EXIT_FAILURE);
+}
+
 int update_pkg(int option, char *name)
 {
 	if (getuid() != 0) {
@@ -125,6 +135,7 @@ int update_pkg(int option, char *name)
 		printf("%s [", d->name);
 		if (strcmp(d->repo, "not found") == 0) {
 			printf("not found]\n");
+			not_found_helper();
 			d = d->next;
 			continue;
 		}

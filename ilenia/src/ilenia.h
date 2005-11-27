@@ -30,10 +30,14 @@ struct pkglist *ilenia_favoriteversion;
 struct aliaseslist *ilenia_aliases;
 
 char *post_pkgadd;
+int not_found_policy;
 int ask_for_update;
 
 #define CACHE "/var/cache/ilenia"
 #define ALIAS_FILE "/etc/ports/alias"
+#define ASK_POLICY 0
+#define STOP_POLICY 1
+#define NEVERMIND_POLICY 2
 
 char *get_value(char s[], char *var);
 int parse_ileniarc();
