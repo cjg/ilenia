@@ -46,50 +46,23 @@ int cvsup(char *filename)
 
 int httpup(char *filename)
 {
-	FILE *file;
-	if (!(file = fopen(filename, "r")))
-		return (EXIT_FAILURE);
-	size_t n = 0;
-	char *line = NULL;
-	int nread;
-	char *root_dir = NULL;
-	char *url = NULL;
-	while ((nread = getline(&line, &n, file)) > 0) {
-		trim(line);
-		if (strncmp(line, "ROOT_DIR", 8) == 0)
-			root_dir = get_value(line, "ROOT_DIR");
-		else if (strncmp(line, "URL", 3) == 0)
-			url = get_value(line, "URL");
-	}
-
-	if (!(strlen(root_dir) && strlen(url)))
-		return (EXIT_FAILURE);
-
 	char *args[] = {
-		"", "sync", url, root_dir, NULL
+		"", filename, NULL
 	};
-
-	int status = exec("/etc/ports", "/usr/bin/httpup", args);
-
-	if (root_dir)
-		free(root_dir);
-	if (url)
-		free(url);
-
-	return (status);
+	return (exec("/etc/ports", "/etc/ports/drivers/httpup", args));
 }
 
-int cvs(char *path)
+int cvs(char *filename)
 {
 	char *args[] = {
-		"", path, NULL
+		"", filename, NULL
 	};
 	return (exec("/etc/ports", "/etc/ports/drivers/cvs", args));
 }
 
-int rsync(char *path)
+int rsync(char *filename)
 {
-	char *args[] = { "", path, NULL };
+	char *args[] = { "", filename, NULL };
 	return (exec("/etc/ports", "/etc/ports/drivers/rsync", args));
 }
 
