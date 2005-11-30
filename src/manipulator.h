@@ -22,6 +22,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include "list.h"
+
 #define END -1
 
 void ltrim(char *s);
@@ -33,3 +35,4 @@ char *sed(char *s, char *find, char *replace);
 char *sedchr(char *s, int find, int replace);
 int count(char *s, int delim);
 int split(char *s, char *delim, char *splitted[]);
+struct list *list_split(char *s, char *delim);

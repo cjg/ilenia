@@ -39,6 +39,7 @@
 #include "repolist.h"
 #include "output.h"
 #include "utils.h"
+#include "favoritepkgmk.h"
 
 int do_post_pkgadd(char *path)
 {
@@ -69,7 +70,13 @@ void installscript(char path[], char *script)
 int build_install_pkg(int option, char *name)
 {
 	struct repolist *r;
-	char *path;
+	char *pkgmk_conf = NULL;
+
+	pkgmk_conf = pkgmklist_get_pkgmk_conf(name, ilenia_favoritepkgmk);
+	if (pkgmk_conf == NULL)
+		pkgmk_conf = strdup("/etc/pkgmk.conf");
+
+	char *path = NULL;
 	char *install_action;
 	char *repo = pkglist_get_newer_favorite(name, option);
 
@@ -97,7 +104,8 @@ int build_install_pkg(int option, char *name)
 	strcat(path, name);
 	installscript(path, "pre-install");
 
-	char *args[] = { "", "-d", install_action, NULL };
+	char *args[] =
+	    { "", "-d", "-cf", pkgmk_conf, install_action, NULL };
 
 	if (exec(path, "/usr/bin/pkgmk", args) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);

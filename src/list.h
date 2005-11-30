@@ -32,7 +32,7 @@ struct list {
 
 struct list *list_add(char *data, struct list *l);
 struct list *list_find(char *param, struct list *l);
-int list_exists(char *param, struct list *r);
+int list_exists(char *param, struct list *l);
 
 
 #endif				/* _LIST_H */
