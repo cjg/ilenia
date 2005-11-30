@@ -36,7 +36,7 @@
 #include "confront.h"
 #include "dependencies.h"
 #include "pkgutils.h"
-#include "list.h"
+#include "favoritepkgmk.h"
 
 const char *argp_program_version = VERSION;
 const char *argp_program_bug_address = "<immigrant@email.it>";
@@ -191,6 +191,7 @@ int main(int argc, char **argv)
 	ilenia_aliases = aliaseslist_build();
 	ilenia_ports = lsports();
 	ilenia_pkgs = lspkgs();
+	ilenia_favoritepkgmk = pkgmklist_build();
 
 	if (arguments.action > 20 || arguments.action == 0) {
 		printf("Error: please perform an action at a time!\n");

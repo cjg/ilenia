@@ -158,3 +158,19 @@ int split(char *s, char *delim, char *splitted[])
 	}
 	return (i);
 }
+
+struct list *list_split(char *s, char *delim)
+{
+	struct list *l = NULL;
+	while (strlen(s) > 0) {
+		char *tmp;
+		tmp = strdup(s);
+		strtok(tmp, delim);
+		s = mid(s, strlen(tmp), END);
+		trim(tmp);
+		l = list_add(tmp, l);
+		if (tmp)
+			free(tmp);
+	}
+	return (l);
+}
