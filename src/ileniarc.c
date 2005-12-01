@@ -63,7 +63,7 @@ int parse_ileniarc()
 	file = fopen("/etc/ilenia.rc", "r");
 	if (file == NULL) {
 		printf("Warning: you don't have a ilenia.rc file.\n");
-		return (0);
+		return (EXIT_SUCCESS);
 	}
 	size_t n = 0;
 	char *line = NULL;
@@ -93,7 +93,7 @@ int parse_ileniarc()
 	}
 	if (line)
 		free(line);
-	return (0);
+	return (EXIT_SUCCESS);
 }
 
 int ask(char *question, ...)
@@ -110,7 +110,7 @@ int ask(char *question, ...)
 	if (getline(&line, &n, stdin)) {
 		trim(line);
 		if (!strcasecmp(line, "Y") || !strlen(line))
-			return (1);
+			return (EXIT_FAILURE);
 	}
-	return (0);
+	return (EXIT_SUCCESS);
 }

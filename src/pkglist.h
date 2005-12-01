@@ -42,3 +42,5 @@ struct pkglist *pkglist_find_like(char *param, struct pkglist *p);
 struct pkglist *pkglist_select_from_repo(char *repo, struct pkglist *p);
 int pkglist_len(struct pkglist *p);
 int pkglist_exists(char *param, struct pkglist *p);
+struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
+			    int duplicates);

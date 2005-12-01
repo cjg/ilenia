@@ -148,9 +148,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 		arguments->args = list_add(arg, arguments->args);
 		break;
 	default:
-		return ARGP_ERR_UNKNOWN;
+		return (ARGP_ERR_UNKNOWN);
 	}
-	return 0;
+	return (EXIT_SUCCESS);
 }
 
 static struct argp argp = { options, parse_opt, args_doc, doc };

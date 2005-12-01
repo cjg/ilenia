@@ -175,8 +175,23 @@ int pkglist_exists(char *param, struct pkglist *p)
 		if (strcmp(p->name, param) == 0
 		    || strcmp(p->version, param) == 0
 		    || strcmp(p->repo, param) == 0)
-			return (0);
+			return (EXIT_SUCCESS);
 		p = p->next;
 	}
-	return (-1);
+	return (EXIT_FAILURE);
+}
+
+struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
+			    int duplicates)
+{
+	while (src != NULL) {
+		if (duplicates == 1
+		    || pkglist_exists(src->name, dest) == 0)
+			dest =
+			    pkglist_add_reversed(src->name, src->version,
+						 src->repo, src->depends,
+						 dest);
+		src = src->next;
+	}
+	return (dest);
 }

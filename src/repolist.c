@@ -58,8 +58,8 @@ int repolist_exists(char *param, struct repolist *r)
 {
 	while (r != NULL) {
 		if (strcmp(r->name, param) == 0)
-			return (1);
+			return (EXIT_SUCCESS);
 		r = r->next;
 	}
-	return (0);
+	return (EXIT_FAILURE);
 }
