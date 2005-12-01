@@ -131,8 +131,8 @@ int update_pkg(int option, char *name)
 {
 	if (getuid() != 0) {
 		printf
-		    ("ilenia: only root can update or install packages\n\n");
-		return (-1);
+		    ("Error: only root can update or install packages\n");
+		return (EXIT_FAILURE);
 	}
 
 	struct pkglist *d = NULL;
@@ -177,7 +177,7 @@ int update_system(int options)
 {
 	if (getuid() != 0) {
 		printf
-		    ("ilenia: only root can update or install packages\n\n");
+		    ("Error: only root can update or install packages\n");
 		return (-1);
 	}
 
@@ -228,7 +228,7 @@ int update_system(int options)
 int remove_pkg(char *name, int checkdeps, int all)
 {
 	if (getuid() != 0) {
-		printf("ilenia: only root can remove packages\n\n");
+		printf("Error: only root can remove packages\n");
 		return (-1);
 	}
 
@@ -239,7 +239,7 @@ int remove_pkg(char *name, int checkdeps, int all)
 
 	if (pkglist_len(p) > 1 && checkdeps && !all) {
 		printf
-		    ("ilenia: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T --all%s to see a list of the packages that need %s.\n",
+		    ("Warning: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T --all%s to see a list of the packages that need %s.\n",
 		     name, name, name, name);
 		return (EXIT_FAILURE);
 	}

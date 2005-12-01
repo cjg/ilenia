@@ -62,7 +62,7 @@ int parse_ileniarc()
 	not_found_policy = ASK_POLICY;
 	file = fopen("/etc/ilenia.rc", "r");
 	if (file == NULL) {
-		printf("Warning you don't have a ilenia.rc file.\n");
+		printf("Warning: you don't have a ilenia.rc file.\n");
 		return (0);
 	}
 	size_t n = 0;

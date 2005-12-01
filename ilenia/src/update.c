@@ -70,8 +70,8 @@ int rsync(char *filename)
 int update_repo(char *name)
 {
 	if (getuid() != 0) {
-		printf("ilenia: only root can update the ports tree\n\n");
-		return (-1);
+		printf("Error: only root can update the ports tree\n");
+		return (EXIT_FAILURE);
 	}
 
 	FILE *file;
@@ -100,14 +100,14 @@ int update_repo(char *name)
 	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
 		return (rsync(filename));
 
-	printf("ilenia: %s not found\n", name);
+	printf("Error: %s not found\n", name);
 	return (EXIT_FAILURE);
 }
 
 int update_all_repos()
 {
 	if (getuid() != 0) {
-		printf("ilenia: only root can update the ports tree\n\n");
+		printf("Error: only root can update the ports tree\n");
 		return (EXIT_FAILURE);
 	}
 

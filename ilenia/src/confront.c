@@ -144,7 +144,7 @@ char *pkglist_get_newer_favorite(char *name, int option)
 		if (strcmp
 		    (pkglist_get_from_repo(name, repo, ilenia_ports),
 		     version)) {
-			printf("Fix your favorite!\n");
+			printf("Error: fix your favorite!\n");
 			exit(EXIT_FAILURE);
 		}
 	}

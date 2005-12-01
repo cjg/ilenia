@@ -42,7 +42,9 @@ ilenia_SOURCES = \
 	utils.h\
 	utils.c\
 	list.h\
-	list.c
+	list.c\
+	favoritepkgmk.h\
+	favoritepkgmk.c
 
 ilenia_LDFLAGS = 
 
