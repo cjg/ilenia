@@ -73,7 +73,7 @@ char *mid(char s[], int start, int length)
 	strncpy(s, s + start, length);
 	s[length] = '\0';
 
-	return s;
+	return (s);
 }
 
 char *spaces(int n)
@@ -130,7 +130,7 @@ char *sedchr(char s[], int find, int replace)
 	s[i] = '\0';
 	if (s_copy)
 		free(s_copy);
-	return s;
+	return (s);
 }
 
 int count(char *s, int delim)

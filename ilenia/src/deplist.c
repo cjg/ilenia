@@ -45,8 +45,8 @@ int deplist_exists(char *param, struct deplist *d)
 {
 	while (d != NULL) {
 		if (strcmp(d->name, param) == 0)
-			return (1);
+			return (EXIT_SUCCESS);
 		d = d->next;
 	}
-	return (0);
+	return (EXIT_FAILURE);
 }

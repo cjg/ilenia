@@ -61,8 +61,8 @@ int list_exists(char *param, struct list *l)
 {
 	while (l != NULL) {
 		if (strcmp(l->data, param) == 0)
-			return (1);
+			return (EXIT_SUCCESS);
 		l = l->next;
 	}
-	return (0);
+	return (EXIT_FAILURE);
 }

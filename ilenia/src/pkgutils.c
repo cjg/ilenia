@@ -123,7 +123,8 @@ void not_found_helper()
 		exit(EXIT_FAILURE);
 	if (not_found_policy == NEVERMIND_POLICY)
 		return;
-	if (!ask("Can I ignore above package and continue? [Y/n] "))
+	if (ask("Can I ignore above package and continue? [Y/n] ") ==
+	    EXIT_FAILURE)
 		exit(EXIT_FAILURE);
 }
 
@@ -178,7 +179,7 @@ int update_system(int options)
 	if (getuid() != 0) {
 		printf
 		    ("Error: only root can update or install packages\n");
-		return (-1);
+		return (EXIT_FAILURE);
 	}
 
 	struct pkglist *p = NULL;
@@ -210,8 +211,9 @@ int update_system(int options)
 	 */
 	if (ask_for_update) {
 		pkglist_print(q);
-		if (!ask
-		    ("Are you sure to update the above packages? [Y/n] "))
+		if (ask
+		    ("Are you sure to update the above packages? [Y/n] ")
+		    == EXIT_FAILURE)
 			return (EXIT_SUCCESS);
 	}
 
@@ -229,7 +231,7 @@ int remove_pkg(char *name, int checkdeps, int all)
 {
 	if (getuid() != 0) {
 		printf("Error: only root can remove packages\n");
-		return (-1);
+		return (EXIT_FAILURE);
 	}
 
 	struct pkglist *p = NULL;

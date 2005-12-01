@@ -23,6 +23,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "pkglist.h"
 #include "deplist.h"
@@ -56,27 +57,30 @@ struct pkglist *get_package_dependencies(char *name, char *repo)
 	return (dependencies);
 }
 
+struct pkglist *pkglist_remove_duplicates(struct pkglist *p)
+{
+	struct pkglist *paus = NULL;
+	while (p != NULL) {
+		if (pkglist_exists(p->name, paus) != 0)
+			paus = pkglist_add_reversed(p->name, "", p->repo,
+						    NULL, paus);
+		p = p->next;
+	}
+	return (paus);
+}
+
 struct pkglist *find_dependencies(struct pkglist *p)
 {
 	struct pkglist *dependencies = NULL;
 	while (p != NULL) {
-		if (strcmp(p->repo, "not found") != 0) {
-			struct pkglist *d = NULL;
-			d = get_package_dependencies(p->name, p->repo);
-			d = pkglist_add_reversed(p->name, "", p->repo,
-						 NULL, d);
-			while (d != NULL) {
-				if (pkglist_exists(d->name, dependencies)
-				    != 0)
-					dependencies =
-					    pkglist_add_reversed(d->name,
-								 "",
-								 d->repo,
-								 NULL,
-								 dependencies);
-				d = d->next;
-			}
+		if (strcmp(p->repo, "not found") == 0) {
+			p = p->next;
+			continue;
 		}
+		struct pkglist *d = NULL;
+		d = get_package_dependencies(p->name, p->repo);
+		d = pkglist_add_reversed(p->name, "", p->repo, NULL, d);
+		dependencies = pkglist_cat(dependencies, d, 0);
 		p = p->next;
 	}
 	return (dependencies);
@@ -97,7 +101,8 @@ struct pkglist *find_dependents(struct pkglist *p)
 			     pkglist_find(repo,
 					  pkglist_find(pkgs->name,
 						       ilenia_ports)))) {
-				if (deplist_exists(p->name, tmp->depends)) {
+				if (deplist_exists(p->name, tmp->depends)
+				    == EXIT_SUCCESS) {
 					if (pkglist_find
 					    (pkgs->name,
 					     dependents) == NULL)
@@ -157,23 +162,28 @@ void print_dependencies(char *name)
 	struct pkglist *p = NULL;
 	p = get_dependencies(name);
 	while (p != NULL) {
-		if (strcmp(p->repo, "not found") != 0) {
-			printf("%s [", p->name);
-			if (pkglist_exists(p->name, ilenia_pkgs) == 0) {
-				printf("installed]");
-
-				struct pkglist *paus = NULL;
-				paus = pkglist_find(p->name, ilenia_pkgs);
-
-				if (strcmp(paus->version, "alias") == 0)
-					printf(" (%s)\n", paus->repo);
-				else
-					printf("\n");
-			} else
-				printf(" ]\n");
-		} else {
+		if (strcmp(p->repo, "not found") == 0) {
 			printf("%s [not found]\n", p->name);
+			p = p->next;
+			continue;
 		}
+
+		printf("%s [", p->name);
+
+		if (pkglist_exists(p->name, ilenia_pkgs) != 0) {
+			printf(" ]\n");
+			p = p->next;
+			continue;
+		}
+		printf("installed]");
+
+		struct pkglist *paus = NULL;
+		paus = pkglist_find(p->name, ilenia_pkgs);
+
+		if (strcmp(paus->version, "alias") == 0)
+			printf(" (%s)\n", paus->repo);
+		else
+			printf("\n");
 		p = p->next;
 	}
 }

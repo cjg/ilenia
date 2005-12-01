@@ -389,7 +389,7 @@ int parse_pkgfile(char *filename, char *repo)
 	if (line)
 		free(line);
 	fclose(file);
-	return EXIT_SUCCESS;
+	return (EXIT_SUCCESS);
 }
 
 int read_from_dir(char *repo_name, char *prefix)
@@ -429,7 +429,7 @@ int build_cache(struct repolist *r)
 {
 	printf("Building cache!\n");
 	if (!(cachefile = fopen(CACHE, "w"))) {
-		return (-1);
+		return (EXIT_FAILURE);
 	}
 	while (r != NULL) {
 		read_from_dir(r->name, r->path);
