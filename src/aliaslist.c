@@ -106,8 +106,8 @@ struct aliaseslist *aliaseslist_build()
 			}
 			nread = getline(&line, &n, aliasfile);
 		}
-		line = NULL;
-		free(line);
+		if (line)
+			free(line);
 	}
 	return (s);
 }

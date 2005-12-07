@@ -91,34 +91,42 @@ struct repolist *parse_rsync(char *path, struct repolist *r)
 
 struct repolist *parse_local(char *path, struct repolist *r)
 {
-	FILE *file;
-
-	file = fopen(path, "r");
-	if (file == NULL)
-		return (r);
-
-	char *line = NULL;
-	char *repo;
-	char *prefix = NULL;
-	char *mad_prefix;
-	size_t n = 0;
-	ssize_t nread;
-
-	while ((nread = getline(&line, &n, file)) != -1) {
-		line[strlen(line) - 1] = '\0';
-		trim(line);
-		if (line[0] == '#')
-			continue;
-		if (strstr(line, "PATH"))
-			prefix = get_value(line, "PATH");
-	}
-	repo = rindex(path, '/');
-	repo = mid(repo, 1, strlen(repo) - strlen(index(repo, '.')) - 1);
-	mad_prefix = strdup("local/");
-	repo = strcat(mad_prefix, repo);
-	r = repolist_add(repo, prefix, r);
-
+	r = repolist_add("local/slash", "/home/slash/ports", r);
 	return (r);
+	/*
+	   FILE *file;
+
+	   file = fopen(path, "r");
+	   if (file == NULL)
+	   return (r);
+
+	   char *line = NULL;
+	   char *repo;
+	   char *prefix = NULL;
+	   char *mad_prefix;
+	   char *c_path = NULL;
+	   c_path=strdup(path);
+	   size_t n = 0;
+	   ssize_t nread;
+
+	   while ((nread = getline(&line, &n, file)) != -1) {
+	   line[strlen(line) - 1] = '\0';
+	   trim(line);
+	   if (line[0] == '#')
+	   continue;
+	   if (strstr(line, "PATH"))
+	   prefix = get_value(line, "PATH");
+	   }
+	   if(line)
+	   free(line);
+	   repo = rindex(c_path, '/');
+	   repo = mid(repo, 1, strlen(repo) - strlen(index(repo, '.')) - 1);
+	   mad_prefix = strdup("local/");
+	   repo = strcat(mad_prefix, repo);
+	   r = repolist_add(repo, prefix, r);
+	   fclose(file);
+	   return (r);
+	 */
 }
 
 // not changed yet
@@ -405,10 +413,14 @@ int read_from_dir(char *repo_name, char *prefix)
 		strcat(path, repo_name);
 	}
 
-	dir = opendir(path);
-	if (dir == NULL)
-		return (EXIT_FAILURE);
+	if ((dir = opendir(path)) == NULL) {
+		return EXIT_FAILURE;
+	}
 
+	/*
+	   if (dir == NULL)
+	   return (EXIT_FAILURE);
+	 */
 	while ((info_file = readdir(dir))) {
 		char filename[strlen(path) + strlen(info_file->d_name) +
 			      9];
@@ -476,6 +488,7 @@ struct pkglist *lsports()
 		trim(splitted_line[0]);
 		trim(splitted_line[1]);
 		trim(splitted_line[2]);
+
 		p = pkglist_add_ordered(splitted_line[0],
 					splitted_line[1],
 					splitted_line[2], d, p);
@@ -516,8 +529,10 @@ struct repolist *build_repolist()
 			r = parse_cvs(filename, r);
 		else if (strcmp(extension, ".local") == 0)
 			r = parse_local(filename, r);
-		else if (strcmp(extension, ".rsync") == 0)
-			r = parse_rsync(filename, r);
+		/*
+		   else if (strcmp(extension, ".rsync") == 0)
+		   r = parse_rsync(filename, r);
+		 */
 	}
 
 	closedir(dir);
