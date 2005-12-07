@@ -37,6 +37,9 @@
 #include "dependencies.h"
 #include "pkgutils.h"
 #include "favoritepkgmk.h"
+#ifdef DMALLOC
+#include "dmalloc.h"
+#endif
 
 const char *argp_program_version = VERSION;
 const char *argp_program_bug_address = "<immigrant@email.it>";
@@ -63,6 +66,7 @@ static char args_doc[] = "ARG1";
 #define ACT_REPOSITORY_LIST 20
 
 static struct argp_option options[] = {
+
 	{"update", 'u', 0, 0, "Update ports tree"},
 	{"list", 'l', 0, 0, "List ports"},
 	{"search", 's', 0, 0, "Search for ports"},
@@ -191,7 +195,7 @@ int main(int argc, char **argv)
 	ilenia_aliases = aliaseslist_build();
 	ilenia_ports = lsports();
 	ilenia_pkgs = lspkgs();
-	ilenia_favoritepkgmk = pkgmklist_build();
+	ilenia_favoritepkgmk = NULL;	//pkgmklist_build();
 
 	if (arguments.action > 20 || arguments.action == 0) {
 		printf("Error: please perform an action at a time!\n");

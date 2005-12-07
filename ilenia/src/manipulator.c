@@ -72,12 +72,13 @@ char *mid(char s[], int start, int length)
 
 	strncpy(s, s + start, length);
 	s[length] = '\0';
-
 	return (s);
 }
 
 char *spaces(int n)
 {
+	if (n < 0)
+		return ("");
 	char s[n];
 	memset(s, ' ', n);
 	s[n] = '\0';
@@ -111,8 +112,8 @@ char *sed(char *s, char *find, char *replace)
 	}
 
 	s[i] = '\0';
-	tmp = NULL;
-	free(tmp);
+	if (tmp)
+		free(tmp);
 	return (s);
 }
 
