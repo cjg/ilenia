@@ -21,33 +21,38 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
+#include <stdlib.h>
 #include <string.h>
 #include "manipola.h"
 
-char *
-sed (char *s, char *trova, char *sostituisci)
+char *sed(char *s, char *find, char *replace)
 {
-  int i, j = 0;
-  static char local_s[MASSIMO] = "";
-  for (i = 0; i <= MASSIMO; i++)
-    local_s[i] = '\0';
-  for (i = 0; i <= (strlen (s) - strlen (trova)); i++)
-    {
-      if (strcmp (mid (s, i, strlen (trova)), trova) == 0)
-	{
-	  strcat (local_s, sostituisci);
-	  j += strlen (sostituisci);
-	  i += strlen (sostituisci) - 1;
+	char *tmp = strdup(s);
+	s = (char *) malloc(strlen(tmp));
+	int i = 0;
+	while (*tmp) {
+		if (strncmp(tmp, find, strlen(find)) != 0) {
+			s[i++] = *tmp;
+			tmp++;
+			continue;
+		}
+		if (strlen(replace) > 1)
+			s = (char *) realloc(s,
+					     strlen(s) + strlen(tmp) +
+					     strlen(replace));
+		int z;
+		for (z = 0; z < strlen(replace); z++)
+			s[i++] = replace[z];
+
+		tmp += strlen(find);
+
+		s[i++] = *tmp;
+		tmp++;
 	}
-      else
-	{
-	  local_s[i] = s[i];
-	  j++;
-	}
-    }
-  local_s[j] = '\0';
-  return ((char *) local_s);
+	tmp = NULL;
+	free(tmp);
+	s[i] = '\0';
+	return (s);
 }
 
 char *
@@ -91,27 +96,14 @@ tab2spazi (char *s)
   return ((char *) saus);
 }
 
-char *
-mid (char *s, int inizio, int lunghezza)
+char *mid(char s[], int start, int length)
 {
-  static char local_s[MASSIMO] = "";
-  strcpy (local_s, s);
-  int x, z = 0;
-  if (lunghezza == FINE)
-    lunghezza = strlen (local_s) - inizio;
-  if ((inizio + lunghezza) <= strlen (local_s))
-    {
-      for (x = 0; x <= strlen (local_s); x++)
-	{
-	  if ((x >= inizio))
-	    {
-	      local_s[z] = local_s[x];
-	      z++;
-	    }
-	}
-    }
-  local_s[lunghezza] = '\0';
-  return ((char *) local_s);
+	if (length == -1)
+		length = strlen(s) - start;
+
+	strncpy(s, s + start, length);
+	s[length] = '\0';
+	return (s);
 }
 
 char *

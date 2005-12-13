@@ -22,6 +22,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
@@ -106,7 +107,7 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    }
 	  if (strlen (nome) && strlen (versione) && release)
 	    {
-	      strcpy(versione, sed(versione, " ", "_"));
+		    strcpy(versione, sed(versione, " ", "_"));
 	      p = inserisci_elemento_ordinato (nome, versione, collezione,
 					       d, p);
 	      char dependencies[MASSIMO] = "";
@@ -318,6 +319,54 @@ parse_local (char *path, struct repolist *p)
   return (p);
 }
 
+struct repolist *parse_rsync(char *path, struct repolist *r)
+{
+	FILE *file;
+	file = fopen(path, "r");
+	if (file == NULL)
+		return (r);
+	char *line = NULL;
+	size_t n = 0;
+	ssize_t nread;
+
+	while ((nread = getline(&line, &n, file)) != -1) {
+		char *prefix;
+		char *mad_prefix = NULL;
+		char *repo;
+		line[strlen(line) - 1] = '\0';
+		trim(line);
+
+		if (line[0] == '#' || strlen(line) == 0)
+			continue;
+
+		if (strstr(line, "destination") == NULL)
+			continue;
+
+		repo = get_value(line, "destination");
+		prefix = strdup(repo);
+
+		repo = rindex(repo, '/');
+		repo = mid(repo, 1, FINE);
+		prefix = mid(prefix, 0, strlen(prefix) - strlen(repo));
+		if (strncmp
+		    (prefix, PORTS_LOCATION,
+		     strlen(PORTS_LOCATION)) == 0
+		    && strlen(prefix) > strlen(PORTS_LOCATION) + 1) {
+			mad_prefix =
+			    mid(prefix, strlen(PORTS_LOCATION) + 1, FINE);
+			strcat(mad_prefix, "/");
+			prefix = strdup(PORTS_LOCATION);
+			repo = strcat(mad_prefix, repo);
+			sed(repo, "//", "/");
+		}
+		r = repolist_add(repo, prefix, r);
+		fclose(file);
+		return (r);
+	}
+	fclose(file);
+	return (r);
+}
+
 
 struct db *
 leggi_dir (char *collezione, char *prefix, struct db *p)
@@ -376,6 +425,8 @@ build_repolist ()
 	    p = parse_cvs (filename, p);
 	  else if (strcmp (extension, "local") == 0)
 	    p = parse_local (filename, p);
+	  else if(!strcmp(extension, "rsync"))
+		  p = parse_rsync(filename, p);
 	}
     }
   return (p);

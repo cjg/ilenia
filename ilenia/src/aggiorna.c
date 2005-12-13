@@ -124,6 +124,26 @@ cvs (char *filepath)
   return (state);
 }
 
+int rsync (char *filepath)
+{
+  int state;
+  pid_t pid = fork ();
+  if (pid == 0)
+    {
+      execl ("/etc/ports/drivers/rsync", "", filepath, 0);
+    }
+  else if (pid < 0)
+    {
+      state = -1;
+    }
+  else
+    {
+      while ((waitpid (pid, &state, 0) == 0))
+	{
+	}
+    }
+  return (state);
+}
 
 int
 aggiorna_collezione (char *collezione)
@@ -168,6 +188,14 @@ aggiorna_collezione (char *collezione)
       httpup (nome_file);
       return (0);
     }
+  strcpy (nome_file, "/etc/ports/");
+  strcat (nome_file, collezione);
+  strcat (nome_file, ".rsync");
+  if ((file = fopen (nome_file, "r"))){
+	  fclose(file);
+	  rsync(nome_file);
+	  return(0);
+  }
   printf ("ilenia: %s not found\n\n", collezione);
   return (-1);
 }
@@ -212,6 +240,8 @@ aggiorna_ports ()
 	    {
 	      cvs (nome_file);
 	    }
+	  else if(!strcmp(estensione, "rsync"))
+		  rsync(nome_file);
 	}
     }
   return (0);

@@ -95,7 +95,7 @@ dipendenze (char *pacchetto)
     {
       strcpy (collezione, il_piu_aggiornato (pacchetto, ports));
       d = inserisci_elemento_inverso (pacchetto, "", collezione, NULL, d);
-
+      //printf("%s\n", pacchetto);
       while (i != conta (d))
 	{
 	  i = conta (d);

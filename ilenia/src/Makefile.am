@@ -8,7 +8,8 @@ INCLUDES =
 
 AM_CFLAGS =\
 	 -Wall\
-	 -g
+	 -g\
+	-D_GNU_SOURCE
 
 bin_PROGRAMS = ilenia
 
