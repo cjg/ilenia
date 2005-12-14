@@ -22,7 +22,6 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
@@ -60,6 +59,12 @@ struct db *
 parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 {
   FILE *pkgfile;
+  char pdir[strlen(percorso)];
+  strcpy(pdir, percorso);
+  strcpy(pdir, sed(pdir, "//", "/"));
+  mid(pdir, 0, strlen(pdir)-7);
+  strcpy(pdir, rindex(pdir, '/'));
+  mid(pdir, 1, FINE);
   if ((pkgfile = fopen (percorso, "r")))
     {
       char riga[255] = "";
@@ -88,8 +93,11 @@ parsa_pkgfile (char *percorso, char *collezione, struct db *p)
 	    }
 	  else if (strncmp (riga, "name", 4) == 0)
 	    {
-	      if (strlen (value = get_value (riga, "name")))
-		nome = strdup (value);
+		    if (strlen (value = get_value (riga, "name"))){
+			    nome = strdup (value);
+			    if(strcmp(nome, pdir))
+				    return(p);
+		    }
 	    }
 	  else if (strncmp (riga, "version", 7) == 0)
 	    {
