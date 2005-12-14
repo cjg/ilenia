@@ -56,8 +56,10 @@ prendi_favorite (int quale)
 	    {
 	      strcpy (riga, tab2spazi (riga));
 	      strcpy (favorite_opzioni, index (riga, ' '));
+	      char tmp[strlen(riga)];
+	      strcpy(tmp, riga);
 	      strcpy (nome,
-		      mid (riga, 0,
+		      mid(tmp, 0,
 			   strlen (riga) - strlen (favorite_opzioni)));
 	      strcpy (favorite_opzioni, trim (favorite_opzioni));
 	      p = inserisci_elemento_ordinato (nome, favorite_opzioni,

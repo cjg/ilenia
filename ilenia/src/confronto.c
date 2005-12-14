@@ -76,18 +76,20 @@ confronta (struct db *pacchetti_db, struct db *ports_db,
 	      if ((pacchetti_db->collezione[0] == 'R')
 		  && (opzioni != NO_REPO && opzioni != NO_FAVORITE))
 		{
-		  if (strcmp
-		      (mid (pacchetti_db->collezione, 2, FINE),
-		       p->collezione) != 0)
-		    skip = 1;
+			char tmp[strlen(pacchetti_db->collezione)];
+			strcpy(tmp, pacchetti_db->collezione);
+			mid (tmp, 2, FINE);
+			if (strcmp (tmp, p->collezione))
+				skip = 1;
 		}
 	      if ((pacchetti_db->collezione[0] == 'V')
 		  && (opzioni != NO_VERSION && opzioni != NO_FAVORITE))
 		{
-		  if (strcmp
-		      (mid (pacchetti_db->collezione, 2, FINE),
-		       pacchetti_db->versione) == 0)
-		    skip = 1;
+			char tmp[strlen(pacchetti_db->collezione)];
+			strcpy(tmp, pacchetti_db->collezione);
+			mid (tmp, 2, FINE);
+			if (!strcmp (tmp,pacchetti_db->versione))
+				skip = 1;
 		}
 	      if (test != 0 && skip != 1)
 		{
