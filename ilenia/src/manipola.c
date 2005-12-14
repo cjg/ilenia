@@ -25,7 +25,34 @@
 #include <string.h>
 #include "manipola.h"
 
-char *sed(char *s, char *find, char *replace)
+char *
+sed (char *s, char *trova, char *sostituisci)
+{
+  int i, j = 0;
+  static char local_s[MASSIMO] = "";
+  char tmp[strlen(s)];
+  for (i = 0; i <= MASSIMO; i++)
+    local_s[i] = '\0';
+  for (i = 0; i <= (strlen (s) - strlen (trova)); i++)
+    {
+	    strcpy(tmp, s);
+      if (strcmp (mid (tmp, i, strlen (trova)), trova) == 0)
+	{
+	  strcat (local_s, sostituisci);
+	  j += strlen (sostituisci);
+	  i += strlen (sostituisci) - 1;
+	}
+      else
+	{
+	  local_s[i] = s[i];
+	  j++;
+	}
+    }
+  local_s[j] = '\0';
+  return ((char *) local_s);
+}
+
+char *sedng(char *s, char *find, char *replace)
 {
 	char *tmp = strdup(s);
 	s = (char *) malloc(strlen(tmp));

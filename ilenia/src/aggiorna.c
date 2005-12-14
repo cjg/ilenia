@@ -56,50 +56,19 @@ cvsup (char *nome_file)
 }
 
 int
-httpup (char *nome_file)
+httpup (char *filepath)
 {
-  FILE *file;
-  if ((file = fopen (nome_file, "r")))
-    {
-      char riga[255];
-      static char root_dir[255];
-      static char url[255];
-      while (fgets (riga, 255, file))
-	{
-	  strcpy (riga, trim (riga));
-	  if (strcmp (mid (riga, 0, 8), "ROOT_DIR") == 0)
-	    {
-	      strcpy (root_dir, mid (riga, 9, FINE));
-	    }
-	  if (strcmp (mid (riga, 0, 3), "URL") == 0)
-	    {
-	      strcpy (url, mid (riga, 4, FINE));
-	    }
-	  if (strlen (root_dir) && strlen (url))
-	    {
-	      int stato;
-	      pid_t pid = fork ();
-	      if (pid == 0)
-		{
-		  execl ("/usr/bin/httpup", "", "sync", url, root_dir, 0);
-		}
-	      else if (pid < 0)
-		{
-		  stato = -1;
-		}
-	      else
-		{
-		  while ((waitpid (pid, &stato, 0) == 0))
-		    {
-		    }
-		}
-	      root_dir[0] = '\0';
-	      url[0] = '\0';
-	      return (stato);
-	    }
-	}
-    }
-  return (-1);
+	int state;
+	pid_t pid = fork ();
+	if (pid == 0)
+		execl ("/etc/ports/drivers/httpup", "", filepath, 0);
+	else if (pid < 0)
+		state = -1;
+	else
+		while ((waitpid (pid, &state, 0) == 0))
+			{
+			}
+	return (state);
 }
 
 int

@@ -1,3 +1,5 @@
+1.5:	
+	- feature: support for rsync repo
 1.4:
 	- feature: introduced alias
 	- feature: added a little search function
