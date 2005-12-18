@@ -40,7 +40,9 @@ struct pkglist *get_package_dependencies(char *name, char *repo)
 	pkg = pkglist_select_from_repo(repo, pkg);
 	while (pkg->depends != NULL) {
 		char *repo = NULL;
-		repo = pkglist_get_newer(pkg->depends->name, ilenia_ports);
+		repo =
+		    pkglist_get_newer_favorite(pkg->depends->name,
+					       REGULAR);
 		if (repo != NULL)
 			dependencies =
 			    pkglist_add_reversed(pkg->depends->name, "",
@@ -93,7 +95,9 @@ struct pkglist *find_dependents(struct pkglist *p)
 		pkgs = ilenia_pkgs;
 		while (pkgs != NULL) {
 			char *repo;
-			repo = pkglist_get_newer(pkgs->name, ilenia_ports);
+			repo =
+			    pkglist_get_newer_favorite(pkgs->name,
+						       REGULAR);
 			struct pkglist *tmp = NULL;
 			if ((tmp =
 			     pkglist_select_from_repo(repo,
@@ -127,7 +131,7 @@ struct pkglist *get_dependencies(char *name)
 	int i = -10;
 
 	if (pkglist_exists(name, ilenia_ports) == 0) {
-		repo = pkglist_get_newer(name, ilenia_ports);
+		repo = pkglist_get_newer_favorite(name, REGULAR);
 		p = pkglist_add_reversed(name, "", repo, NULL, p);
 		while (i != pkglist_len(p)) {
 			i = pkglist_len(p);
@@ -145,7 +149,7 @@ struct pkglist *get_dependents(char *name, int all)
 	char *repo;
 	int i = -10;
 
-	repo = pkglist_get_newer(name, ilenia_ports);
+	repo = pkglist_get_newer_favorite(name, REGULAR);
 	p = pkglist_add(name, "", repo, NULL, p);
 
 	while (i != pkglist_len(p)) {
