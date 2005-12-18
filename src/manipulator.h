@@ -34,5 +34,5 @@ char *spaces(int n);
 char *sed(char *s, char *find, char *replace);
 char *sedchr(char *s, int find, int replace);
 int count(char *s, int delim);
-int split(char *s, char *delim, char *splitted[]);
-struct list *list_split(char *s, char *delim);
+int old_splitsplit(char *s, char *delim, char *splitted[]);
+struct list *split(char *s, char *delim);

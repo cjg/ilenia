@@ -318,21 +318,20 @@ struct deplist *deplist_from_deprow(char *deprow)
 	if (strlen(deprow) <= 0)
 		return (NULL);
 
-	int n, i;
-
 	deprow = sedchr(deprow, ',', ' ');
 
 	while (strstr(deprow, "  "))
 		deprow = sed(deprow, "  ", " ");
-	n = count(deprow, ' ');
 
-	char *deps[n];
-	split(deprow, " ", deps);
+	struct list *deps = NULL;
+	deps = split(deprow, " ");
 
-	for (i = 0; i <= n; i++) {
-		trim(deps[i]);
-		d = deplist_add(deps[i], d);
+	while (deps != NULL) {
+		trim(deps->data);
+		d = deplist_add(deps->data, d);
+		deps = deps->next;
 	}
+
 	return (d);
 }
 
@@ -465,24 +464,33 @@ struct pkglist *lsports()
 	}
 
 	while (nread > 0) {
-		int i, num = count(line, ' ');
-		char *splitted_line[num];
-
-		split(line, " ", splitted_line);
+		//int i, num = count(line, ' ');
+		struct list *splitted_line;
+		char *name, *version, *repo;
 		struct deplist *d = NULL;
 
-		for (i = 3; i <= num; i++) {
-			trim(splitted_line[i]);
-			if (strlen(splitted_line[i]) > 0)
-				d = deplist_add(splitted_line[i], d);
-		}
-		trim(splitted_line[0]);
-		trim(splitted_line[1]);
-		trim(splitted_line[2]);
+		splitted_line = split(line, " ");
+		name = splitted_line->data;
+		splitted_line = splitted_line->next;
+		version = splitted_line->data;
+		splitted_line = splitted_line->next;
+		repo = splitted_line->data;
+		splitted_line = splitted_line->next;
 
-		p = pkglist_add_ordered(splitted_line[0],
-					splitted_line[1],
-					splitted_line[2], d, p);
+		while (splitted_line != NULL) {
+			trim(splitted_line->data);
+			d = deplist_add(splitted_line->data, d);
+			splitted_line = splitted_line->next;
+		}
+
+		trim(name);
+		trim(version);
+		trim(repo);
+
+		p = pkglist_add_ordered(name, version, repo, d, p);
+		free(name);
+		free(version);
+		free(repo);
 		nread = getline(&line, &n, file);
 	}
 

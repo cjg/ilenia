@@ -84,30 +84,31 @@ struct aliaseslist *aliaseslist_build()
 {
 	struct aliaseslist *s = NULL;
 	FILE *aliasfile;
+	aliasfile = fopen(ALIAS_FILE, "r");
+	if (aliasfile == NULL)
+		return (NULL);
+	size_t n = 0;
+	char *line = NULL;
+	int nread;
 
-	if ((aliasfile = fopen(ALIAS_FILE, "r"))) {
-		size_t n = 0;
-		char *line = NULL;
-		int nread = getline(&line, &n, aliasfile);
-		while (nread > 0) {
-			trim(line);
-			if (strlen(line) > 0 && line[0] != '#') {
-				int i, num_alias;
-				struct aliaslist *a = NULL;
-				num_alias = count(line, ' ');
-				char *alias[num_alias];
-				split(line, " ", alias);
-				for (i = 0; i < num_alias; i++) {
-					trim(alias[i]);
+	while ((nread = getline(&line, &n, aliasfile)) > 0) {
+		trim(line);
+		if (!(strlen(line) > 0 && line[0] != '#'))
+			continue;
 
-					a = aliaslist_add(alias[i], a);
-				}
-				s = aliaseslist_add(a, s);
-			}
-			nread = getline(&line, &n, aliasfile);
+		struct aliaslist *alias = NULL;
+		struct list *tmp = NULL;
+		tmp = split(line, " ");
+
+		while (tmp != NULL) {
+			alias = aliaslist_add(tmp->data, alias);
+			tmp = tmp->next;
 		}
-		if (line)
-			free(line);
+		s = aliaseslist_add(alias, s);
 	}
+
+	if (line)
+		free(line);
+
 	return (s);
 }

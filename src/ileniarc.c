@@ -34,21 +34,23 @@ char *get_value(char s[], char *var)
 {
 	char *tmp = "";
 	if (strncmp(s, var, strlen(var)) == 0) {
-		char *splitted_s[2];
-		split(s, "=", splitted_s);
-		trim(splitted_s[0]);
-		if (strcmp(splitted_s[0], var) == 0) {
-			trim(splitted_s[1]);
-			splitted_s[1] = mid(splitted_s[1], 1, END);
-			trim(splitted_s[1]);
-			if (splitted_s[1][0] == '\"'
-			    || splitted_s[1][0] == '\"') {
-				splitted_s[1] =
-				    mid(splitted_s[1], 1,
-					strlen(splitted_s[1]) - 2);
-				trim(splitted_s[1]);
+		struct list *splitted_s = NULL;
+		splitted_s = split(s, "=");
+		trim(splitted_s->data);
+		if (strcmp(splitted_s->data, var) == 0) {
+			trim(splitted_s->next->data);
+			strcpy(splitted_s->next->data,
+			       mid(splitted_s->next->data, 1, END));
+			trim(splitted_s->next->data);
+			if (splitted_s->next->data[0] == '\"'
+			    || splitted_s->next->data[0] == '\"') {
+				strcpy(splitted_s->next->data,
+				       mid(splitted_s->next->data, 1,
+					   strlen(splitted_s->next->data) -
+					   2));
+				trim(splitted_s->next->data);
 			}
-			tmp = strdup(splitted_s[1]);
+			tmp = strdup(splitted_s->next->data);
 		}
 	}
 	return (tmp);

@@ -122,13 +122,10 @@ struct pkglist *pkglist_find(char *param, struct pkglist *p)
 {
 	struct pkglist *paus = NULL;
 	while (p != NULL) {
-		if ((strcmp(p->name, param) == 0)
-		    || (strcmp(p->repo, param) == 0)
-		    || (strcmp(p->version, param) == 0)) {
+		if (!strcmp(p->name, param))
 			paus =
 			    pkglist_add_ordered(p->name, p->version,
 						p->repo, p->depends, paus);
-		}
 		p = p->next;
 	}
 	return (paus);
@@ -172,9 +169,7 @@ int pkglist_len(struct pkglist *p)
 int pkglist_exists(char *param, struct pkglist *p)
 {
 	while (p != NULL) {
-		if (strcmp(p->name, param) == 0
-		    || strcmp(p->version, param) == 0
-		    || strcmp(p->repo, param) == 0)
+		if (!strcmp(p->name, param))
 			return (EXIT_SUCCESS);
 		p = p->next;
 	}
@@ -186,7 +181,7 @@ struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
 {
 	while (src != NULL) {
 		if (duplicates == 1
-		    || pkglist_exists(src->name, dest) == 0)
+		    || pkglist_exists(src->name, dest) != 0)
 			dest =
 			    pkglist_add_reversed(src->name, src->version,
 						 src->repo, src->depends,

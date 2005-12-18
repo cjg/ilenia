@@ -63,6 +63,8 @@ struct pkglist *lspkgs()
 
 	if (line)
 		free(line);
+	if (name)
+		free(name);
 
 	fclose(file);
 
@@ -87,7 +89,7 @@ struct pkglist *get_favorite(int favorite)
 	size_t n = 0;
 	char *line = NULL;
 	int nread;
-	char *favoriterow[2];
+	struct list *favoriterow = NULL;
 
 	while ((nread = getline(&line, &n, file)) > 0) {
 		trim(line);
@@ -99,11 +101,14 @@ struct pkglist *get_favorite(int favorite)
 		while (strstr(line, "  "))
 			sed(line, "  ", " ");
 
-		split(line, " ", favoriterow);
-		trim(favoriterow[1]);
-		p = pkglist_add_ordered(favoriterow[0],
-					favoriterow[1],
-					favoriterow[1], NULL, p);
+		favoriterow = split(line, " ");
+		trim(favoriterow->next->data);
+		p = pkglist_add_ordered(favoriterow->data,
+					favoriterow->next->data,
+					favoriterow->next->data, NULL, p);
+		/*for(i=0;i<3;i++)
+		   if(favoriterow[i])
+		   free(favoriterow[i]); */
 	}
 
 	if (line)
