@@ -195,7 +195,7 @@ int main(int argc, char **argv)
 	ilenia_aliases = aliaseslist_build();
 	ilenia_ports = lsports();
 	ilenia_pkgs = lspkgs();
-	ilenia_favoritepkgmk = NULL;	//pkgmklist_build();
+	ilenia_favoritepkgmk = pkgmklist_build();
 
 	if (arguments.action > 20 || arguments.action == 0) {
 		printf("Error: please perform an action at a time!\n");

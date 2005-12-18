@@ -54,9 +54,7 @@ int do_post_pkgadd(char *path)
 	fprintf(file, "#!/bin/sh\n\n%s\n\n# End of file", post_pkgadd);
 	fclose(file);
 
-	char *args[2];
-	args[0] = NULL;
-	args[1] = strdup("/tmp/post_pkgadd.sh");
+	char *args[] = { "", "/tmp/post_pkgadd.sh", NULL };
 
 	return (exec(path, "/bin/sh", args));
 }
@@ -76,8 +74,7 @@ int build_install_pkg(int option, char *name)
 	if (pkgmk_conf == NULL)
 		pkgmk_conf = strdup("/etc/pkgmk.conf");
 
-	char *path = NULL;
-	char *install_action;
+	char *path;
 	char *repo = pkglist_get_newer_favorite(name, option);
 
 	if (repo == NULL) {
@@ -87,12 +84,8 @@ int build_install_pkg(int option, char *name)
 
 	r = repolist_find(repo, ilenia_repos);
 
-	if (pkglist_find(name, ilenia_pkgs))
-		install_action = strdup("-u");
-	else
-		install_action = strdup("-i");
-
 	path = strdup(r->path);
+
 	if (path[strlen(path) - 1] != '/')
 		strcat(path, "/");
 
@@ -103,6 +96,13 @@ int build_install_pkg(int option, char *name)
 
 	strcat(path, name);
 	installscript(path, "pre-install");
+
+	char *install_action;
+
+	if (pkglist_find(name, ilenia_pkgs))
+		install_action = strdup("-u");
+	else
+		install_action = strdup("-i");
 
 	char *args[] =
 	    { "", "-d", "-cf", pkgmk_conf, install_action, NULL };
@@ -130,12 +130,13 @@ void not_found_helper()
 
 int update_pkg(int option, char *name)
 {
-	if (getuid() != 0) {
-		printf
-		    ("Error: only root can update or install packages\n");
-		return (EXIT_FAILURE);
-	}
-
+	/*
+	   if (getuid() != 0) {
+	   printf
+	   ("Error: only root can update or install packages\n");
+	   return (EXIT_FAILURE);
+	   }
+	 */
 	struct pkglist *d = NULL;
 	if (option >= 0)
 		d = get_dependencies(name);
