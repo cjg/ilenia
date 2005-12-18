@@ -130,13 +130,12 @@ void not_found_helper()
 
 int update_pkg(int option, char *name)
 {
-	/*
-	   if (getuid() != 0) {
-	   printf
-	   ("Error: only root can update or install packages\n");
-	   return (EXIT_FAILURE);
-	   }
-	 */
+	if (getuid() != 0) {
+		printf
+		    ("Error: only root can update or install packages\n");
+		return (EXIT_FAILURE);
+	}
+
 	struct pkglist *d = NULL;
 	if (option >= 0)
 		d = get_dependencies(name);
