@@ -53,9 +53,10 @@ struct pkglist *pkglist_confront(int type, int options, int print)
 	if (print)
 		printf
 		    ("Name                       Installed Version  Repository     Port Version \n");
-
+	char *repo = NULL;
+	char *version = NULL;
 	while (ilenia_pkgs) {
-		char *repo =
+		repo =
 		    pkglist_get_newer_favorite(ilenia_pkgs->name, options);
 
 		if (repo == NULL) {
@@ -63,7 +64,7 @@ struct pkglist *pkglist_confront(int type, int options, int print)
 			continue;
 		}
 
-		char *version =
+		version =
 		    pkglist_get_from_repo(ilenia_pkgs->name, repo,
 					  ilenia_ports);
 		int test;
@@ -86,6 +87,11 @@ struct pkglist *pkglist_confront(int type, int options, int print)
 
 		ilenia_pkgs = ilenia_pkgs->next;
 	}
+
+	if (repo)
+		free(repo);
+	if (version)
+		free(version);
 
 	return (p);
 }
@@ -113,6 +119,9 @@ char *pkglist_get_newer(char *name, struct pkglist *p)
 		}
 		p = p->next;
 	}
+
+	if (version)
+		free(version);
 
 	if (repo)
 		return (strdup(repo));
@@ -158,6 +167,7 @@ char *pkglist_get_newer_favorite(char *name, int option)
 		if (repo == NULL)
 			printf("Warning: %s with version %s not found!\n",
 			       name, version);
+		free(version);
 	}
 
 	if (repo) {

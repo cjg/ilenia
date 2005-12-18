@@ -37,16 +37,14 @@ struct pkglist *get_package_dependencies(char *name, char *repo)
 	struct pkglist *pkg = NULL;
 	struct pkglist *dependencies = NULL;
 	pkg = pkglist_find(name, ilenia_ports);
-	pkg = pkglist_find(repo, pkg);
+	pkg = pkglist_select_from_repo(repo, pkg);
 	while (pkg->depends != NULL) {
-		if (pkglist_exists(pkg->depends->name, ilenia_ports) == 0)
+		char *repo = NULL;
+		repo = pkglist_get_newer(pkg->depends->name, ilenia_ports);
+		if (repo != NULL)
 			dependencies =
 			    pkglist_add_reversed(pkg->depends->name, "",
-						 pkglist_get_newer(pkg->
-								   depends->
-								   name,
-								   ilenia_ports),
-						 NULL, dependencies);
+						 repo, NULL, dependencies);
 		else
 			dependencies =
 			    pkglist_add_reversed(pkg->depends->name, "",
@@ -98,9 +96,11 @@ struct pkglist *find_dependents(struct pkglist *p)
 			repo = pkglist_get_newer(pkgs->name, ilenia_ports);
 			struct pkglist *tmp = NULL;
 			if ((tmp =
-			     pkglist_find(repo,
-					  pkglist_find(pkgs->name,
-						       ilenia_ports)))) {
+			     pkglist_select_from_repo(repo,
+						      pkglist_find(pkgs->
+								   name,
+								   ilenia_ports))))
+			{
 				if (deplist_exists(p->name, tmp->depends)
 				    == EXIT_SUCCESS) {
 					if (pkglist_find

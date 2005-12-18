@@ -38,28 +38,27 @@ char *trim(char s[])
 	return s;
 }*/
 
-void ltrim(char *s)
+void ltrim(char s[])
 {
-	char *str = s;
+	int n;
 
-	while (isspace(*str))
-		str++;
-
-	while ((*s++ = *str++));
+	for (n = 0; n < strlen(s); n++)
+		if (s[n] != ' ' && s[n] != '\t' && s[n] != '\n')
+			break;
+	strcpy(s, s + n);
 }
 
-void rtrim(char *s)
+void rtrim(char s[])
 {
-	char *str = s;
-	register int i;
+	int n;
 
-	for (i = strlen(str) - 1; isspace(*(str + i)); i--)
-		*(str + i) = '\0';
-
-	while ((*s++ = *str++));
+	for (n = strlen(s) - 1; n >= 0; n--)
+		if (s[n] != ' ' && s[n] != '\t' && s[n] != '\n')
+			break;
+	s[n + 1] = '\0';
 }
 
-void trim(char *s)
+void trim(char s[])
 {
 	ltrim(s);
 	rtrim(s);
@@ -144,23 +143,25 @@ int count(char *s, int delim)
 	return (c);
 }
 
-int split(char *s, char *delim, char *splitted[])
+int old_split(char *s, char *delim, char *splitted[])
 {
 	int i = 0;
+	char *tmp = NULL;
 	while (strlen(s) > 0) {
-		char *tmp;
+		tmp = NULL;
 		tmp = strdup(s);
 		strtok(tmp, delim);
 		splitted[i] = strdup(tmp);
 		s = mid(s, strlen(tmp), END);
 		i++;
-		if (tmp)
-			free(tmp);
 	}
+	if (tmp)
+		free(tmp);
 	return (i);
 }
 
-struct list *list_split(char *s, char *delim)
+
+struct list *split(char *s, char *delim)
 {
 	struct list *l = NULL;
 	while (strlen(s) > 0) {
