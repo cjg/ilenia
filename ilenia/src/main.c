@@ -75,7 +75,7 @@ static struct argp_option options[] = {
 	{"depedencies", 'D', 0, 0, "List dependencies of a package"},
 	{"update-pkg", 'U', 0, 0,
 	 "Update or install a package with dependencies"},
-	{"dependents", 'T', 0, 0, "List dependents of a package\n"},
+	{"dependents", 'T', 0, 0, "List dependents of a package"},
 	{"remove", 'R', 0, 0, "Remove a package checking dependencies"},
 	{"cache", OPT_CACHE, 0, 0, "Rebuild the cache"},
 	{"repository-list", OPT_REPOSITORY_LIST, 0, 0,
