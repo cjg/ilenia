@@ -44,7 +44,7 @@
 const char *argp_program_version = VERSION;
 const char *argp_program_bug_address = "<immigrant@email.it>";
 static char doc[] = "Package manager for CRUX";
-static char args_doc[] = "ARG1";
+static char args_doc[] = "ACT ARG1...";
 
 #define OPT_CACHE 1
 #define OPT_REPOSITORY_LIST 2
@@ -209,13 +209,15 @@ int main(int argc, char **argv)
 	if (confront_options)
 		update_options = confront_options * update_options;
 
+	int status = EXIT_SUCCESS;
+
 	if (arguments.action == ACT_UPDATE) {
 		if (arguments.args == NULL) {
-			update_all_repos();
+			status = update_all_repos();
 			return (EXIT_SUCCESS);
 		}
 		while (arguments.args) {
-			update_repo(arguments.args->data);
+			status = update_repo(arguments.args->data);
 			arguments.args = arguments.args->next;
 		}
 	}
@@ -267,11 +269,13 @@ int main(int argc, char **argv)
 
 	if (arguments.action == ACT_UPDATE_PKG) {
 		if (arguments.args == NULL) {
-			update_system(update_options);
+			status = update_system(update_options);
 			return (EXIT_SUCCESS);
 		}
 		while (arguments.args) {
-			update_pkg(update_options, arguments.args->data);
+			status =
+			    update_pkg(update_options,
+				       arguments.args->data);
 			arguments.args = arguments.args->next;
 		}
 	}
@@ -296,8 +300,9 @@ int main(int argc, char **argv)
 			return (EXIT_FAILURE);
 		}
 		while (arguments.args) {
-			remove_pkg(arguments.args->data, arguments.no_deps,
-				   arguments.all);
+			status =
+			    remove_pkg(arguments.args->data,
+				       arguments.no_deps, arguments.all);
 			arguments.args = arguments.args->next;
 		}
 	}
@@ -311,5 +316,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	exit(EXIT_SUCCESS);
+	return (status);
 }
