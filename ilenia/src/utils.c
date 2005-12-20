@@ -38,7 +38,7 @@ int exec(char *wdir, char *command, char *args[])
 	if (pid == 0) {
 		if (wdir)
 			chdir(wdir);
-		execv(command, args);
+		execvp(command, args);
 		exit(EXIT_FAILURE);
 	} else if (pid < 0) {
 		status = EXIT_FAILURE;

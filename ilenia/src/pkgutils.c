@@ -68,14 +68,16 @@ void installscript(char path[], char *script)
 int build_install_pkg(int option, char *name)
 {
 	struct repolist *r;
-	char *pkgmk_conf = NULL;
+	char *pkgmk_conf;
+	char *path;
+	char *repo;
+	char *install_action;
 
 	pkgmk_conf = pkgmklist_get_pkgmk_conf(name, ilenia_favoritepkgmk);
 	if (pkgmk_conf == NULL)
 		pkgmk_conf = strdup("/etc/pkgmk.conf");
 
-	char *path;
-	char *repo = pkglist_get_newer_favorite(name, option);
+	repo = pkglist_get_newer_favorite(name, option);
 
 	if (repo == NULL) {
 		printf("Error: %s not found or locked!\n", name);
@@ -95,9 +97,8 @@ int build_install_pkg(int option, char *name)
 	}
 
 	strcat(path, name);
-	installscript(path, "pre-install");
 
-	char *install_action;
+	installscript(path, "pre-install");
 
 	if (pkglist_find(name, ilenia_pkgs))
 		install_action = strdup("-u");
@@ -107,7 +108,7 @@ int build_install_pkg(int option, char *name)
 	char *args[] =
 	    { "", "-d", "-cf", pkgmk_conf, install_action, NULL };
 
-	if (exec(path, "/usr/bin/pkgmk", args) != EXIT_SUCCESS)
+	if (exec(path, "pkgmk", args) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
 
 	installscript(path, "post-install");
@@ -129,12 +130,12 @@ void not_found_helper()
 }
 
 int update_pkg(int option, char *name)
-{
-	if (getuid() != 0) {
-		printf
-		    ("Error: only root can update or install packages\n");
-		return (EXIT_FAILURE);
-	}
+{				/*
+				   if (getuid() != 0) {
+				   printf
+				   ("Error: only root can update or install packages\n");
+				   return (EXIT_FAILURE);
+				   } */
 
 	struct pkglist *d = NULL;
 	if (option >= 0)
