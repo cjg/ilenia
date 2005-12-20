@@ -33,6 +33,6 @@ struct list {
 struct list *list_add(char *data, struct list *l);
 struct list *list_find(char *param, struct list *l);
 int list_exists(char *param, struct list *l);
-
+struct list *list_remove(char *param, struct list *l);
 
 #endif				/* _LIST_H */
