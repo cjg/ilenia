@@ -30,6 +30,7 @@ struct deplist *deplist_add(char *name, struct deplist *d)
 {
 	struct deplist *daus = NULL;
 	daus = (struct deplist *) malloc(sizeof(struct deplist));
+	daus->name = (char *) malloc(strlen(name));
 	strcpy(daus->name, name);
 	if (d == NULL) {
 		d = daus;

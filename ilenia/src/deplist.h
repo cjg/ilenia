@@ -23,7 +23,7 @@
  */
 
 struct deplist {
-	char name[255];
+	char *name;
 	struct deplist *next;
 };
 

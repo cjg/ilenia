@@ -75,28 +75,28 @@ int update_repo(char *name)
 	}
 
 	FILE *file;
-	char filename[20 + strlen(name)];
+	char *filename = NULL;
 	if ((file = fopen(CACHE, "w"))) {
 		fclose(file);
 	}
 
-	sprintf(filename, "%s.local", name);
+	strprintf(&filename, "%s.local", name);
 	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
 		return (EXIT_SUCCESS);
 
-	sprintf(filename, "%s.cvsup", name);
+	strprintf(&filename, "%s.cvsup", name);
 	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
 		return (cvsup(filename));
 
-	sprintf(filename, "%s.httpup", name);
+	strprintf(&filename, "%s.httpup", name);
 	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
 		return (httpup(filename));
 
-	sprintf(filename, "%s.cvs", name);
+	strprintf(&filename, "%s.cvs", name);
 	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
 		return (cvs(filename));
 
-	sprintf(filename, "%s.rsync", name);
+	strprintf(&filename, "%s.rsync", name);
 	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
 		return (rsync(filename));
 

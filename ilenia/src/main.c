@@ -37,7 +37,7 @@
 #include "dependencies.h"
 #include "pkgutils.h"
 #include "favoritepkgmk.h"
-#ifdef DMALLOC
+#ifdef DMALLOCO
 #include "dmalloc.h"
 #endif
 
@@ -56,20 +56,22 @@ static char args_doc[] = "ACT ARG1...";
 #define ACT_UPDATE 10
 #define ACT_LIST 11
 #define ACT_SEARCH 12
-#define ACT_DIFF 13
-#define ACT_UPDATED 14
-#define ACT_DEPENDENCIES 15
-#define ACT_UPDATE_PKG 16
-#define ACT_DEPENDENTS 17
-#define ACT_REMOVE 18
-#define ACT_CACHE 19
-#define ACT_REPOSITORY_LIST 20
+#define ACT_INFO 13
+#define ACT_DIFF 14
+#define ACT_UPDATED 15
+#define ACT_DEPENDENCIES 16
+#define ACT_UPDATE_PKG 17
+#define ACT_DEPENDENTS 18
+#define ACT_REMOVE 19
+#define ACT_CACHE 20
+#define ACT_REPOSITORY_LIST 21
 
 static struct argp_option options[] = {
 
 	{"update", 'u', 0, 0, "Update ports tree"},
 	{"list", 'l', 0, 0, "List ports"},
 	{"search", 's', 0, 0, "Search for ports"},
+	{"info", 'i', 0, 0, "Get info on a port"},
 	{"diff", 'd', 0, 0, "List version differences"},
 	{"updated", 'p', 0, 0, "List ports with newer version"},
 	{"depedencies", 'D', 0, 0, "List dependencies of a package"},
@@ -111,6 +113,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 		break;
 	case 's':
 		arguments->action += ACT_SEARCH;
+		break;
+	case 'i':
+		arguments->action += ACT_INFO;
 		break;
 	case 'd':
 		arguments->action += ACT_DIFF;
@@ -197,7 +202,7 @@ int main(int argc, char **argv)
 	ilenia_pkgs = lspkgs();
 	ilenia_favoritepkgmk = pkgmklist_build();
 
-	if (arguments.action > 20 || arguments.action == 0) {
+	if (arguments.action > 21 || arguments.action == 0) {
 		printf("Error: please perform an action at a time!\n");
 		return (EXIT_FAILURE);
 	}
@@ -245,6 +250,18 @@ int main(int argc, char **argv)
 			pkglist_print(pkglist_find_like
 				      (arguments.args->data,
 				       ilenia_ports));
+			arguments.args = arguments.args->next;
+		}
+	}
+
+	if (arguments.action == ACT_INFO) {
+		if (arguments.args == NULL) {
+			printf
+			    ("Error: action info requires an argument!\n");
+			return EXIT_FAILURE;
+		}
+		while (arguments.args) {
+			info(arguments.args->data, confront_options);
 			arguments.args = arguments.args->next;
 		}
 	}
