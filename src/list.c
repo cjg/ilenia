@@ -30,6 +30,7 @@ struct list *list_add(char *data, struct list *l)
 {
 	struct list *laus1 = NULL;
 	laus1 = (struct list *) malloc(sizeof(struct list));
+	//laus1->data = (char *) malloc(strlen(data));
 	strcpy(laus1->data, data);
 	if (l == NULL) {
 		l = laus1;

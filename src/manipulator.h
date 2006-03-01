@@ -36,3 +36,4 @@ char *sedchr(char *s, int find, int replace);
 int count(char *s, int delim);
 int old_splitsplit(char *s, char *delim, char *splitted[]);
 struct list *split(char *s, char *delim);
+void strprintf(char **dest, char *fmt, ...);

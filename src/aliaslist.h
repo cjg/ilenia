@@ -23,7 +23,7 @@
  */
 
 struct aliaslist {
-	char name[255];
+	char *name;
 	struct aliaslist *next;
 };
 

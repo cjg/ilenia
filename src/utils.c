@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
+#include "manipulator.h"
 
 int exec(char *wdir, char *command, char *args[])
 {
@@ -52,10 +52,9 @@ int exec(char *wdir, char *command, char *args[])
 int is_file(char *path, char *name)
 {
 	int file = 0;
-	char filepath[strlen(path) + strlen(name) + 1];
-	strcpy(filepath, path);
-	strcat(filepath, "/");
-	strcat(filepath, name);
+	char *filepath;
+	strprintf(&filepath, "%s/%s", path, name);
+	printf("%s\n", filepath);
 	file = open(filepath, O_RDONLY);
 	if (file == -1)
 		return (EXIT_FAILURE);

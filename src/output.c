@@ -24,9 +24,26 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "confront.h"
+#include "ilenia.h"
 #include "manipulator.h"
 #include "pkglist.h"
+#include "repolist.h"
 #include "../config.h"
+
+void info(char *name, int options)
+{
+	char *reponame;
+	struct repolist *repo;
+	reponame = pkglist_get_newer_favorite(name, options);
+	if (reponame == NULL) {
+		printf("Error: %s not found!\n", name);
+		return;
+	}
+	repo = repolist_find(reponame, ilenia_repos);
+	printf("%s%s/%s\n", repo->path, repo->name, name);
+}
+
 
 void pkglist_print(struct pkglist *p)
 {

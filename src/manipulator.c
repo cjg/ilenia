@@ -23,6 +23,7 @@
  */
 
 #include <ctype.h>
+#include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
 #include "manipulator.h"
@@ -175,4 +176,76 @@ struct list *split(char *s, char *delim)
 			free(tmp);
 	}
 	return (l);
+}
+
+void reverse(char s[])
+{
+	int c, i, j;
+
+	for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+
+char *itoa(int n)
+{
+	int i = 0, sign;
+	char *s;
+	s = (char *) malloc(sizeof(char));
+	if ((sign = n) < 0)
+		n = -n;
+	do {
+		s = (char *) realloc(s, i + 1);
+		s[i++] = n % 10 + '0';
+	} while ((n /= 10) > 0);
+
+	if (sign < 0) {
+		s = (char *) realloc(s, i + 1);
+		s[i++] = '-';
+	}
+
+	s[i] = '\0';
+	reverse(s);
+	return strdup(s);
+}
+
+void strprintf(char **dest, char *fmt, ...)
+{
+	va_list ap;
+	char *p, *d, *sval = NULL;
+	int ival;
+	va_start(ap, fmt);
+	d = (char *) malloc(sizeof(char));
+	for (p = fmt; *p; p++) {
+		if (*p != '%') {
+			d = (char *) realloc(d, strlen(d) + 2);
+			d[strlen(d)] = *p;
+			continue;
+		}
+		switch (*++p) {
+		case 'd':
+			ival = va_arg(ap, int);
+			char *tmp = itoa(ival);
+			d = (char *) realloc(d,
+					     strlen(d) + strlen(tmp) + 1);
+			strcat(d, tmp);
+			free(tmp);
+			break;
+		case 's':
+			sval = va_arg(ap, char *);
+			d = (char *) realloc(d,
+					     strlen(d) + strlen(sval) + 1);
+			strcat(d, sval);
+			break;
+		default:
+			d = (char *) realloc(d, strlen(d) + 2);
+			d[strlen(d)] = *p;
+		}
+	}
+
+	d[strlen(d)] = '\0';
+	*dest = d;
+	va_end(ap);
 }
