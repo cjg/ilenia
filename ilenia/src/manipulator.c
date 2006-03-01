@@ -89,7 +89,7 @@ char *spaces(int n)
 char *sed(char *s, char *find, char *replace)
 {
 	char *tmp = strdup(s);
-	s = (char *) malloc(strlen(tmp));
+	s = (char *) malloc(strlen(tmp) + 1);
 	int i = 0;
 	while (*tmp) {
 		if (strncmp(tmp, find, strlen(find)) != 0) {
@@ -112,8 +112,9 @@ char *sed(char *s, char *find, char *replace)
 	}
 
 	s[i] = '\0';
-	if (tmp)
-		free(tmp);
+	/*if (tmp)
+	   free(tmp);
+	 */
 	return (s);
 }
 
@@ -219,6 +220,7 @@ void strprintf(char **dest, char *fmt, ...)
 	va_start(ap, fmt);
 	d = (char *) malloc(sizeof(char));
 	for (p = fmt; *p; p++) {
+		printf("%d\n", strlen(d));
 		if (*p != '%') {
 			d = (char *) realloc(d, strlen(d) + 2);
 			d[strlen(d)] = *p;

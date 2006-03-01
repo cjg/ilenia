@@ -33,7 +33,7 @@ struct aliaslist *aliaslist_add(char *name, struct aliaslist *a)
 {
 	struct aliaslist *aaus = NULL;
 	aaus = (struct aliaslist *) malloc(sizeof(struct aliaslist));
-	aaus->name = (char *) malloc(strlen(name));
+	aaus->name = (char *) malloc(strlen(name) + 1);
 	strcpy(aaus->name, name);
 	if (a == NULL) {
 		a = aaus;

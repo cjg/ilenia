@@ -33,17 +33,7 @@
 
 void prettyprint(char *str1, char *str2, char *str3, char *str4)
 {
-	str1 = mid(str1, 0, 26);
-	str2 = mid(str2, 0, 16);
-	str3 = mid(str3, 0, 28);
-	str4 = mid(str4, 0, 16);
-
-	strcat(str1, spaces(26 - strlen(str1)));
-	strcat(str2, spaces(18 - strlen(str2)));
-	strcat(str3, spaces(14 - strlen(str3)));
-	strcat(str4, spaces(18 - strlen(str4)));
-
-	printf("%s %s %s %s\n", str1, str2, str3, str4);
+	printf("%-26s %18s %-14s %-18s\n", str1, str2, str3, str4);
 }
 
 struct pkglist *pkglist_confront(int type, int options, int print)
@@ -90,8 +80,8 @@ struct pkglist *pkglist_confront(int type, int options, int print)
 
 	if (repo)
 		free(repo);
-	if (version)
-		free(version);
+
+	version = NULL;
 
 	return (p);
 }
@@ -100,18 +90,20 @@ char *pkglist_get_newer(char *name, struct pkglist *p)
 {
 	char *version = NULL;
 	char *repo = NULL;
+
 	while (p != NULL) {
 		if (strcmp(name, p->name) != 0) {
 			p = p->next;
 			continue;
 		}
 
-		if (version == NULL) {
+		if (repo == NULL) {
 			version = strdup(p->version);
 			repo = strdup(p->repo);
 			p = p->next;
 			continue;
 		}
+
 
 		if (vercmp(version, p->version)) {
 			version = strdup(p->version);
@@ -159,7 +151,8 @@ char *pkglist_get_newer_favorite(char *name, int option)
 	}
 
 	if (repo == NULL && version == NULL)
-		repo = pkglist_get_newer(name, ilenia_ports);
+		repo = pkglist_get_newer(name, pkglist_find(name,
+							    ilenia_ports));
 
 	if (version) {
 		repo =

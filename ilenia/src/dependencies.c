@@ -98,6 +98,12 @@ struct pkglist *find_dependents(struct pkglist *p)
 			repo =
 			    pkglist_get_newer_favorite(pkgs->name,
 						       REGULAR);
+
+			if (repo == NULL) {
+				pkgs = pkgs->next;
+				continue;
+			}
+
 			struct pkglist *tmp = NULL;
 			if ((tmp =
 			     pkglist_select_from_repo(repo,

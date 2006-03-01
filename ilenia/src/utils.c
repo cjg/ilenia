@@ -54,7 +54,7 @@ int is_file(char *path, char *name)
 	int file = 0;
 	char *filepath;
 	strprintf(&filepath, "%s/%s", path, name);
-	printf("%s\n", filepath);
+	printf("\n%s %s\n", path, filepath);
 	file = open(filepath, O_RDONLY);
 	if (file == -1)
 		return (EXIT_FAILURE);

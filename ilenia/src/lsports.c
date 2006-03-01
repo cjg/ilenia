@@ -320,6 +320,9 @@ struct deplist *deplist_from_deprow(char *deprow)
 
 	deprow = sedchr(deprow, ',', ' ');
 
+	if (!strlen(deprow) > 0)
+		return d;
+
 	while (strstr(deprow, "  "))
 		deprow = sed(deprow, "  ", " ");
 
