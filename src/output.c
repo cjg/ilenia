@@ -51,12 +51,16 @@ void pkglist_print(struct pkglist *p)
 	printf
 	    ("Package                           Version              Repository\n");
 	while (p != NULL) {
-		printf("%s%s %s%s %s%s\n", mid(p->name, 0, 33),
-		       spaces(33 - strlen(mid(p->name, 0, 33))),
-		       mid(p->version, 0, 20),
-		       spaces(20 - strlen(mid(p->version, 0, 20))),
-		       mid(p->repo, 0, 20),
-		       spaces(20 - strlen(mid(p->repo, 0, 20))));
+		printf("%-33s %-20s %-20s\n", p->name, p->version,
+		       p->repo);
+		/*
+		   printf("%s%s %s%s %s%s\n", mid(p->name, 0, 33),
+		   spaces(33 - strlen(mid(p->name, 0, 33))),
+		   mid(p->version, 0, 20),
+		   spaces(20 - strlen(mid(p->version, 0, 20))),
+		   mid(p->repo, 0, 20),
+		   spaces(20 - strlen(mid(p->repo, 0, 20))));
+		 */
 		p = p->next;
 	}
 	printf("\n");
