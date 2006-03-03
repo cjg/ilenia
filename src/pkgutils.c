@@ -69,7 +69,7 @@ int build_install_pkg(int option, char *name)
 {
 	struct repolist *r;
 	char *pkgmk_conf;
-	char *path;
+	char path[PATH_MAX];
 	char *repo;
 	char *install_action;
 
@@ -86,7 +86,8 @@ int build_install_pkg(int option, char *name)
 
 	r = repolist_find(repo, ilenia_repos);
 
-	path = strdup(r->path);
+	//path = strdup(r->path);
+	strcpy(path, r->path);
 
 	if (path[strlen(path) - 1] != '/')
 		strcat(path, "/");
@@ -142,6 +143,8 @@ int update_pkg(int option, char *name)
 		d = get_dependencies(name);
 
 	while (d != NULL) {
+		if (!strcmp(name, d->name))
+			break;
 		printf("%s [", d->name);
 		if (strcmp(d->repo, "not found") == 0) {
 			printf("not found]\n");
