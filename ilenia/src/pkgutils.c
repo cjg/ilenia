@@ -86,7 +86,6 @@ int build_install_pkg(int option, char *name)
 
 	r = repolist_find(repo, ilenia_repos);
 
-	//path = strdup(r->path);
 	strcpy(path, r->path);
 
 	if (path[strlen(path) - 1] != '/')
@@ -130,13 +129,33 @@ void not_found_helper()
 		exit(EXIT_FAILURE);
 }
 
+struct pkglist *skim_dependencies(struct pkglist *d,
+				  struct pkglist *outdated)
+{
+	struct pkglist *p = NULL;
+	while (d != NULL) {
+		if (strcmp(d->repo, "not found") == 0) {
+			printf("%s [not found]\n", d->name);
+			not_found_helper();
+			d = d->next;
+			continue;
+		}
+		if (pkglist_exists(d->name, ilenia_pkgs) != 1
+		    || pkglist_exists(d->name, outdated) == 0)
+			p = pkglist_add_reversed(d->name, d->version,
+						 d->repo, NULL, p);
+		d = d->next;
+	}
+	return p;
+}
+
 int update_pkg(int option, char *name)
-{				/*
-				   if (getuid() != 0) {
-				   printf
-				   ("Error: only root can update or install packages\n");
-				   return (EXIT_FAILURE);
-				   } */
+{
+	if (getuid() != 0) {
+		printf
+		    ("Error: only root can update or install packages\n");
+		return (EXIT_FAILURE);
+	}
 
 	struct pkglist *d = NULL;
 	if (option >= 0)
@@ -208,6 +227,21 @@ int update_system(int options)
 		p = p->next;
 	}
 
+#ifdef _SYSUPNG
+	/*
+	   system update with dependency check
+	 */
+	struct pkglist *d = NULL;
+	p = NULL;
+	while (q != NULL) {
+		d = get_dependencies(q->name);
+		d = skim_dependencies(d, q);
+		p = pkglist_cat(p, d, 0);
+		q = q->next;
+	}
+	q = p;
+#endif
+
 	/*
 	 * someone wants that ilenia ask them if they're sure to update all 
 	 * packages, I hate this feature, then I've to add another feature 
@@ -217,7 +251,7 @@ int update_system(int options)
 		pkglist_print(q);
 		if (ask
 		    ("Are you sure to update the above packages? [Y/n] ")
-		    == EXIT_FAILURE)
+		    == EXIT_SUCCESS)
 			return (EXIT_SUCCESS);
 	}
 
