@@ -220,7 +220,6 @@ void strprintf(char **dest, char *fmt, ...)
 	va_start(ap, fmt);
 	d = (char *) malloc(sizeof(char));
 	for (p = fmt; *p; p++) {
-		printf("%d\n", strlen(d));
 		if (*p != '%') {
 			d = (char *) realloc(d, strlen(d) + 2);
 			d[strlen(d)] = *p;
