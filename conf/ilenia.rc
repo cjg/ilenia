@@ -1,0 +1,8 @@
+#
+# /etc/ilenia.rc: ilenia (8) configuration 
+#
+
+# POST_PKGADD=""
+# ASK_FOR_UPDATE="Yes" or "No"
+
+# End of file

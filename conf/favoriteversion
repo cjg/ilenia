@@ -1,0 +1,11 @@
+#
+# /etc/ports/favoriteversion: ilenia (8) configuration for CRUX ports system
+#
+# Use:
+# port	version
+#
+# like:
+# x11	6.7.0-2
+
+
+# End of file

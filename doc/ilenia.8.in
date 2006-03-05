@@ -1,0 +1,111 @@
+.TH ilenia 8 "" "ilenia #VERSION#" ""
+.SH NAME
+ilenia \- update/list ports collection and compile-install/update packages with dependencies
+.SH SYNOPSIS
+\fBilenia [options] [collection] [packages]\fP
+.SH DESCRIPTION
+\fBilenia\fP was a replacement of the standard CRUX ports tool.
+\fBilenia\fP connects to one or more master repositories and updates the local copy of a
+ports collection. If no collections are specified then all collections will be updated.
+\fBilenia\fP, now can also update, install and remove a packages with relatives 
+dependencies; \fBilenia\fP chooses which port (with same name) to 
+compile and install in the "ilenia --updated" way: if there is the same port in 
+different repos, and if the port/package isn't controlled by favoriterepo or 
+favoriteversion, che compiles and installs the one with newer version.
+A \fIport\fP is a directory containing all necessary files for building a software package using pkgmk(8).
+.SH OPTIONS
+.TP
+.B "\-u, \-\-update"
+Update ports.
+.TP
+.B "\-l, \-\-list"
+List ports. When specified lists ports of the specified collection(s).
+.TP
+.B "\-s, \-\-search"
+Search for ports.
+.TP
+.B "\-d, \-\-diff"
+List version differences between local ports and installed packages.
+.TP
+.B "\-p, \-\-updated"
+Show the ports that are newer than installed packages.
+.TP 
+.B "\-U"
+Update or install the specified package with relativese dependencies, if no package is
+specified, ilenia updates all packages.
+.TP
+.B "\-D"
+Show ths dependencies of the specified package.
+.TP
+.B "\-T"
+Show the dependents packages of the specified package.
+.TP
+.B "\-R"
+Remove the specified package checking if there is installed any didepent package.
+.TP
+.B "\-\-no\-favorite\-repo"
+Used with \-d \-p and \-U options. Ignore the user's favorite repository for ports listed in /etc/ports/favoriterepo
+.TP
+.B "\-\-no\-favorite\-version"
+Used with \-d \-p and \-U options. Ignore the user's favorite version for ports listed in /etc/ports/favoriteversion
+.TP
+.B "\-\-no--deps"
+Used with \-U and \-R options, do not check dependencies
+.TP
+.B "\-\-all"
+Used with \-T and \-R options, shows or removes all dependents packages
+.TP
+.B "\-\-cache"
+Forces ilenia to rebuild her cachefile, useful when you modify ports in a local repository 
+.TP
+.B "\-v, \-\-version"
+Print version and exit.
+.TP
+.B "\-h, \-\-help"
+Print help and exit.
+.SH LOCAL REPOSITORY
+.TP
+You can use local repository on your machine. To let ilenia recognize them you have to create a file in "/etc/ports/" with ".local" extension (for example: my.local); this file must be a single row, where there is specified the fullpath of the local repository.
+For example:
+
+# my.local
+
+PATH="/home/ports"
+
+# End of file
+.SH FILES
+.TP
+.B "/usr/ports/"  
+Root of local ports collection.
+.TP
+.B "/etc/ports/"
+Directory for port collection configuration.
+.TP
+.B "/etc/ports/favoriterepo"
+File where the informations about the favorite repository are stored.
+.TP
+.B "/etc/ports/favoriteversion"
+File where the informations about the favorite version are stored.
+.TP
+.B "/etc/ports/alias"
+File where the informations about the alias are stored.
+In each row could be a list of equivalent packages (such as: sendmail exim postfix). Ilenia don't install a package as dependencies if you have an equivalent ones installed.
+.TP
+.B "/etc/ilenia.rc"
+File contening optional features like "POST_PKGADD"
+.SH POST_PKGADD
+.TP
+In your ilenia.rc you can specify a command, or some commands, to be executed after each installation of packages; the commands are executed in the, just compiled and installed, ports dir. 
+For example, I use:
+
+POST_PKGADD  = "pkgmk \-c; aplay /home/slash/sounds/grolsch_plop.wav"
+.SH ASK_FOR_UPDATE
+.TP
+Now ilenia, when you are trying to update all packages, asks you if you're sure to do that. If you like, the old way: without any question; you can set the ASK_FOR_UPDATE variable to "No" (I use this).
+.SH SEE ALSO
+pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1), httpup(8)
+.SH AUTHOR
+.nf
+Coviello Giuseppe <immigrant@email.it>
+http://ilenia.berlios.de http://coviello.altervista.org
+.fi

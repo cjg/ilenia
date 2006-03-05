@@ -1,0 +1,11 @@
+#
+# /etc/ports/alias: ilenia (8) configuration for CRUX ports system
+#
+# Use:
+# pkg pkg pkg
+#
+# like:
+# sendmail exim postfix
+
+
+# End of file
