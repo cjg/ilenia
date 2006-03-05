@@ -37,9 +37,6 @@
 #include "dependencies.h"
 #include "pkgutils.h"
 #include "favoritepkgmk.h"
-#ifdef DMALLOCO
-#include "dmalloc.h"
-#endif
 
 const char *argp_program_version = VERSION;
 const char *argp_program_bug_address = "<immigrant@email.it>";
@@ -233,6 +230,13 @@ int main(int argc, char **argv)
 			return (EXIT_SUCCESS);
 		}
 		while (arguments.args) {
+			if (repolist_exists(arguments.args->data,
+					    ilenia_repos)) {
+				printf("Error: repository %s not found!\n",
+				       arguments.args->data);
+				arguments.args = arguments.args->next;
+				continue;
+			}
 			pkglist_print(pkglist_select_from_repo
 				      (arguments.args->data,
 				       ilenia_ports));
