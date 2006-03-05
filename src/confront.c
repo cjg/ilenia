@@ -33,7 +33,7 @@
 
 void prettyprint(char *str1, char *str2, char *str3, char *str4)
 {
-	printf("%-26s %18s %-14s %-18s\n", str1, str2, str3, str4);
+	printf("%-26s %18s %-14s %18s\n", str1, str2, str3, str4);
 }
 
 struct pkglist *pkglist_confront(int type, int options, int print)
@@ -41,8 +41,8 @@ struct pkglist *pkglist_confront(int type, int options, int print)
 	struct pkglist *p = NULL;
 
 	if (print)
-		printf
-		    ("Name                       Installed Version  Repository     Port Version \n");
+		prettyprint("Name", "Installed Version", "Repository",
+			    "Port Version");
 	char *repo = NULL;
 	char *version = NULL;
 	while (ilenia_pkgs) {
