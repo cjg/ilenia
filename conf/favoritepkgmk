@@ -1,0 +1,11 @@
+#
+# /etc/ports/favoritepkgmk.conf: ilenia(8) configuration for CRUX ports system
+#
+# Use:
+# /path/to/pkgmk.conf  port(s)
+#
+# like:
+# /etc/pkgmk.conf.standard wine ruby
+
+
+# End Of File

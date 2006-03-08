@@ -2,7 +2,7 @@
  *            update.c
  *
  *  Thu Jul 15 16:27:56 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -34,6 +34,7 @@
 #include "manipulator.h"
 #include "repolist.h"
 #include "ilenia.h"
+#include "output.h"
 
 int cvsup(char *filename)
 {
@@ -69,10 +70,8 @@ int rsync(char *filename)
 
 int update_repo(char *name)
 {
-	if (getuid() != 0) {
-		printf("Error: only root can update the ports tree\n");
-		return (EXIT_FAILURE);
-	}
+	if (getuid() != 0)
+		error("only root can update the ports tree");
 
 	FILE *file;
 	char *filename = NULL;
@@ -100,16 +99,14 @@ int update_repo(char *name)
 	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
 		return (rsync(filename));
 
-	printf("Error: %s not found\n", name);
-	return (EXIT_FAILURE);
+	error("%s not found!", name);
+	return EXIT_FAILURE;
 }
 
 int update_all_repos()
 {
-	if (getuid() != 0) {
-		printf("Error: only root can update the ports tree\n");
-		return (EXIT_FAILURE);
-	}
+	if (getuid() != 0)
+		error("only root can update the ports tree!");
 
 	int status = 0;
 	DIR *dir;

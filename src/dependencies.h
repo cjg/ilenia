@@ -2,7 +2,7 @@
  *            dependencies.h
  *
  *  Sat Sep 11 18:04:47 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,7 +22,12 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _DEPENDENCIES_H
+#define _DEPENDENCIES_H
+
 struct pkglist *get_dependencies(char *name);
 struct pkglist *get_dependents(char *name, int all);
 void print_dependencies(char *name);
 void print_dependents(char *name, int all);
+
+#endif				/* _DEPENDENCIES_H */

@@ -2,7 +2,7 @@
  *            pkgutils.c
  *
  *  Wed Sep  1 18:55:42 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -79,10 +79,8 @@ int build_install_pkg(int option, char *name)
 
 	repo = pkglist_get_newer_favorite(name, option);
 
-	if (repo == NULL) {
-		printf("Error: %s not found or locked!\n", name);
-		return (EXIT_FAILURE);
-	}
+	if (repo == NULL)
+		error("%s not found or locked!", name);
 
 	r = repolist_find(repo, ilenia_repos);
 
@@ -135,8 +133,10 @@ struct pkglist *skim_dependencies(struct pkglist *d,
 	struct pkglist *p = NULL;
 	while (d != NULL) {
 		if (strcmp(d->repo, "not found") == 0) {
-			printf("%s [not found]\n", d->name);
-			not_found_helper();
+			if (pkglist_exists(d->name, ilenia_pkgs) == 0) {
+				printf("%s [not found]\n", d->name);
+				not_found_helper();
+			}
 			d = d->next;
 			continue;
 		}
@@ -151,11 +151,8 @@ struct pkglist *skim_dependencies(struct pkglist *d,
 
 int update_pkg(int option, char *name)
 {
-	if (getuid() != 0) {
-		printf
-		    ("Error: only root can update or install packages\n");
-		return (EXIT_FAILURE);
-	}
+	if (getuid() != 0)
+		error("only root can update or install packages");
 
 	struct pkglist *d = NULL;
 	if (option >= 0)
@@ -199,11 +196,8 @@ int update_pkg(int option, char *name)
 
 int update_system(int options)
 {
-	if (getuid() != 0) {
-		printf
-		    ("Error: only root can update or install packages\n");
-		return (EXIT_FAILURE);
-	}
+	if (getuid() != 0)
+		error("only root can update or install packages");
 
 	struct pkglist *p = NULL;
 	struct pkglist *q = NULL;
@@ -267,10 +261,8 @@ int update_system(int options)
 
 int remove_pkg(char *name, int checkdeps, int all)
 {
-	if (getuid() != 0) {
-		printf("Error: only root can remove packages\n");
-		return (EXIT_FAILURE);
-	}
+	if (getuid() != 0)
+		error("only root can remove packages");
 
 	struct pkglist *p = NULL;
 
@@ -278,8 +270,8 @@ int remove_pkg(char *name, int checkdeps, int all)
 
 
 	if (pkglist_len(p) > 1 && checkdeps && !all) {
-		printf
-		    ("Warning: there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T --all%s to see a list of the packages that need %s.\n",
+		warning
+		    ("there are some packages that depends from %s, use --all or --no-deps, to remove all packages that depends from %s or to not check dependencies (use at your risk)\nYou can use ilenia -T --all%s to see a list of the packages that need %s!",
 		     name, name, name, name);
 		return (EXIT_FAILURE);
 	}

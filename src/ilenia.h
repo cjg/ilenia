@@ -2,7 +2,7 @@
  *            ilenia.h
  *
  *  Tue Sep 28 11:06:51 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -21,6 +21,9 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#ifndef _ILENIA_H
+#define _ILENIA_H
 
 struct pkglist *ilenia_ports;
 struct pkglist *ilenia_pkgs;
@@ -44,3 +47,5 @@ int ask_for_update;
 char *get_value(char s[], char *var);
 int parse_ileniarc();
 int ask(char *question, ...);
+
+#endif				/* _ILENIA_H */

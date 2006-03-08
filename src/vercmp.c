@@ -2,7 +2,7 @@
  *            vercmp.c
  *
  *  Sat Jul 10 13:22:49 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 

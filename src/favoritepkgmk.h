@@ -1,7 +1,7 @@
 /***************************************************************************
- *            list.h
+ *            favoritepkgmk.h
  *
- *  Thu Nov 17 13:37:34 2005
+ *  Wed Nov 30 16:11:10 2005
  *  Copyright  2005 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
@@ -22,17 +22,19 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _LIST_H
-#define _LIST_H
+#ifndef _FAVORITEPKGMK_H
+#define _FAVORITEPKGMK_H
+#include "list.h"
 
-struct list {
-	char data[255];
-	struct list *next;
+struct pkgmklist {
+	char *pkgmk_conf;
+	struct list *pkgs;
+	struct pkgmklist *next;
 };
 
-struct list *list_add(char *data, struct list *l);
-struct list *list_find(char *param, struct list *l);
-int list_exists(char *param, struct list *l);
-struct list *list_remove(char *param, struct list *l);
+struct pkgmklist *pkgmklist_add(char *pkgmk_conf, struct list *pkgs,
+				struct pkgmklist *m);
+char *pkgmklist_get_pkgmk_conf(char *pkg, struct pkgmklist *m);
+struct pkgmklist *pkgmklist_build();
 
-#endif				/* _LIST_H */
+#endif				/* _FAVORITEPKGMK_H */

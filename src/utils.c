@@ -2,7 +2,7 @@
  *            utils.c
  *
  *  Wed Oct 26 12:58:00 2005
- *  Copyright  2005  Coviello Giuseppe
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

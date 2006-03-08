@@ -2,7 +2,7 @@
  *            aggiorna.c
  *
  *  Tue Feb 15 19:02:36 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -29,6 +29,7 @@
 #include <stdarg.h>
 #include "manipulator.h"
 #include "ilenia.h"
+#include "output.h"
 
 char *get_value(char s[], char *var)
 {
@@ -64,7 +65,7 @@ int parse_ileniarc()
 	not_found_policy = ASK_POLICY;
 	file = fopen("/etc/ilenia.rc", "r");
 	if (file == NULL) {
-		printf("Warning: you don't have a ilenia.rc file.\n");
+		warning("you don't have any ilenia.rc file.");
 		return (EXIT_SUCCESS);
 	}
 	size_t n = 0;

@@ -1,3 +1,11 @@
+2.0:
+	- feature: not found policy
+	- feature: favorite pkgmk.conf
+	- feature: sysupng
+	- change: unified error and warning messages system
+	- bugfix: code rewritten to reduce the waste of memory
+1.5:
+	- feature: rsync support
 1.4:
 	- feature: introduced alias
 	- feature: added a little search function
@@ -9,8 +17,10 @@
 	- feature: introduced the POST_PKGADD commands
 	- change:  better way to parse *.{cvsup,cvs,httpup,local} file
 	- change:  more logical way to manage repositories information
-	- bugfix:  reduced CPU usage while compiling packages (thanks to nullpointer)
-	- bugfix:  evited to build two or more times the same package from various repositories during `ilenia -U`
+	- bugfix:  reduced CPU usage while compiling packages (thanks to
+	nullpointer)
+	- bugfix:  evited to build two or more times the same package from
+	various repositories during `ilenia -U`	
 1.2:
 	- feature: support for crux ppc's .cvs supfile
 	- change:  a better support for pre and post install scripts

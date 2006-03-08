@@ -2,7 +2,7 @@
  *            vercmp.h
  *
  *  Sat Jul 10 13:20:31 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,8 +22,13 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _VERCMP_H
+#define _VERCMP_H
+
 #define NO_HIGHER 0
 #define LOCAL_HIGHER 0
 #define PORT_HIGHER 1
 
 int vercmp(char *installato, char *port);
+
+#endif				/* _VERCMP_H */

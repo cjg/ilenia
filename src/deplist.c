@@ -2,7 +2,7 @@
  *            deplist.c
  *
  *  Mon Dec 20 13:58:12 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 

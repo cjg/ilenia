@@ -2,7 +2,7 @@
  *            list.c
  *
  *  Thu Nov 17 13:39:56 2005
- *  Copyright  2005  Coviello Giuseppe
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 

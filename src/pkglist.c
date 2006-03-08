@@ -2,7 +2,7 @@
  *            pkglist.c
  *
  *  Mon Oct 03 12:45:04 2005
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 

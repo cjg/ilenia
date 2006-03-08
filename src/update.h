@@ -2,7 +2,7 @@
  *            update.h
  *
  *  Thu Jul 15 18:17:19 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,5 +22,10 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _UPDATE_H
+#define _UPDATE_H
+
 int update_repo(char *name);
 int update_all_repos();
+
+#endif				/* _LIST_H */

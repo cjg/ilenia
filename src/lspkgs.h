@@ -2,7 +2,7 @@
  *            lspkgs.h
  *
  *  Sat Jul 10 11:44:51 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,9 +22,14 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _LSPKGS_H
+#define _LSPKGS_H
+
 #define DB_FILE "/var/lib/pkg/db"
 #define FAVORITE_VERSION  5
 #define FAVORITE_REPO     2
 
 struct pkglist *lspkgs();
 struct pkglist *get_favorite(int favorite);
+
+#endif				/* _LSPKGS_H */

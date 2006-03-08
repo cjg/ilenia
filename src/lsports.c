@@ -2,7 +2,7 @@
  *            lsports.c
  *
  *  Sat Jul 10 12:57:55 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 

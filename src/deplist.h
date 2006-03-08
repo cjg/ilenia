@@ -2,7 +2,7 @@
  *            deplist.h
  *
  *  Mon Dec 20 13:55:35 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,6 +22,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _DEPLIST_H
+#define _DEPLIST_H
+
 struct deplist {
 	char *name;
 	struct deplist *next;
@@ -29,3 +32,5 @@ struct deplist {
 
 struct deplist *deplist_add(char *name, struct deplist *d);
 int deplist_exists(char *param, struct deplist *d);
+
+#endif				/* _DEPLIST_H */

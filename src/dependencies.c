@@ -2,7 +2,7 @@
  *            dependencies.c
  *
  *  Sat Sep 11 18:04:21 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -38,6 +38,8 @@ struct pkglist *get_package_dependencies(char *name, char *repo)
 	struct pkglist *dependencies = NULL;
 	pkg = pkglist_find(name, ilenia_ports);
 	pkg = pkglist_select_from_repo(repo, pkg);
+	if (!pkg)
+		return NULL;
 	while (pkg->depends != NULL) {
 		char *repo = NULL, *version;
 		repo =

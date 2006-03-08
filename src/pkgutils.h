@@ -2,7 +2,7 @@
  *            pkgutils.h
  *
  *  Wed Sep  1 19:06:24 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,7 +22,12 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _PKGUTILS_H
+#define _PKGUTILS_H
+
 #define NODEPS -1
 int update_pkg(int options, char *name);
 int update_system(int options);
 int remove_pkg(char *name, int checkdeps, int all);
+
+#endif				/* _PKGUTILS_H */

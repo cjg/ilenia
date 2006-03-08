@@ -2,7 +2,7 @@
  *            utils.h
  *
  *  Wed Oct 26 13:00:58 2005
- *  Copyright  2005  Coviello Giuseppe
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 

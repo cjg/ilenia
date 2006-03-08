@@ -2,7 +2,7 @@
  *            main.c
  *
  *  Sun Oct 30 12:33:33 2005
- *  Copyright  2005  Coviello Giuseppe
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -68,7 +68,7 @@ static struct argp_option options[] = {
 	{"update", 'u', 0, 0, "Update ports tree"},
 	{"list", 'l', 0, 0, "List ports"},
 	{"search", 's', 0, 0, "Search for ports"},
-	{"info", 'i', 0, 0, "Get info on a port"},
+	//{"info", 'i', 0, 0, "Get info on a port"},
 	{"diff", 'd', 0, 0, "List version differences"},
 	{"updated", 'p', 0, 0, "List ports with newer version"},
 	{"depedencies", 'D', 0, 0, "List dependencies of a package"},
@@ -77,8 +77,8 @@ static struct argp_option options[] = {
 	{"dependents", 'T', 0, 0, "List dependents of a package"},
 	{"remove", 'R', 0, 0, "Remove a package checking dependencies"},
 	{"cache", OPT_CACHE, 0, 0, "Rebuild the cache"},
-	{"repository-list", OPT_REPOSITORY_LIST, 0, 0,
-	 "List repository that ilenia are using"},
+	/*{"repository-list", OPT_REPOSITORY_LIST, 0, 0,
+	   "List repository that ilenia are using"}, */
 	{"no-favorite-repo", OPT_NO_FAVORITE_REPO, 0, 0,
 	 "Ignore the user's favorite repos"},
 	{"no-favorite-version", OPT_NO_FAVORITE_VERSION, 0, 0,
@@ -199,10 +199,8 @@ int main(int argc, char **argv)
 	ilenia_pkgs = lspkgs();
 	ilenia_favoritepkgmk = pkgmklist_build();
 
-	if (arguments.action > 21 || arguments.action == 0) {
-		printf("Error: please perform an action at a time!\n");
-		return (EXIT_FAILURE);
-	}
+	if (arguments.action > 21 || arguments.action == 0)
+		error("%s", "please perform an action at a time!");
 
 	int confront_options =
 	    arguments.no_favorite_repo + arguments.no_favorite_version;
@@ -232,8 +230,8 @@ int main(int argc, char **argv)
 		while (arguments.args) {
 			if (repolist_exists(arguments.args->data,
 					    ilenia_repos)) {
-				printf("Error: repository %s not found!\n",
-				       arguments.args->data);
+				warning("repository %s not found!\n",
+					arguments.args->data);
 				arguments.args = arguments.args->next;
 				continue;
 			}
@@ -245,11 +243,8 @@ int main(int argc, char **argv)
 	}
 
 	if (arguments.action == ACT_SEARCH) {
-		if (arguments.args == NULL) {
-			printf
-			    ("Error: action search requires an argument!\n");
-			return (EXIT_FAILURE);
-		}
+		if (arguments.args == NULL)
+			error("action search requires an argument!");
 		while (arguments.args) {
 			pkglist_print(pkglist_find_like
 				      (arguments.args->data,
@@ -259,11 +254,8 @@ int main(int argc, char **argv)
 	}
 
 	if (arguments.action == ACT_INFO) {
-		if (arguments.args == NULL) {
-			printf
-			    ("Error: action info requires an argument!\n");
-			return EXIT_FAILURE;
-		}
+		if (arguments.args == NULL)
+			error("action info requires an argument!");
 		while (arguments.args) {
 			info(arguments.args->data, confront_options);
 			arguments.args = arguments.args->next;
@@ -277,11 +269,8 @@ int main(int argc, char **argv)
 		pkglist_confront(UPDATED, confront_options, 1);
 
 	if (arguments.action == ACT_DEPENDENCIES) {
-		if (arguments.args == NULL) {
-			printf
-			    ("Error: action dependencies requires an argument!\n");
-			return (EXIT_FAILURE);
-		}
+		if (arguments.args == NULL)
+			error("action dependencies requires an argument!");
 		while (arguments.args) {
 			print_dependencies(arguments.args->data);
 			arguments.args = arguments.args->next;
@@ -291,7 +280,7 @@ int main(int argc, char **argv)
 	if (arguments.action == ACT_UPDATE_PKG) {
 		if (arguments.args == NULL) {
 			status = update_system(update_options);
-			return (EXIT_SUCCESS);
+			return status;
 		}
 		while (arguments.args) {
 			status =
@@ -302,11 +291,8 @@ int main(int argc, char **argv)
 	}
 
 	if (arguments.action == ACT_DEPENDENTS) {
-		if (arguments.args == NULL) {
-			printf
-			    ("Error: action dependents requires an argument!\n");
-			return (EXIT_FAILURE);
-		}
+		if (arguments.args == NULL)
+			error("action dependents requires an argument!");
 		while (arguments.args) {
 			print_dependents(arguments.args->data,
 					 arguments.all);
@@ -315,11 +301,8 @@ int main(int argc, char **argv)
 	}
 
 	if (arguments.action == ACT_REMOVE) {
-		if (arguments.args == NULL) {
-			printf
-			    ("Error: action remove requires an argument!\n");
-			return (EXIT_FAILURE);
-		}
+		if (arguments.args == NULL)
+			error("action remove requires an argument!");
 		while (arguments.args) {
 			status =
 			    remove_pkg(arguments.args->data,
@@ -337,5 +320,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	return (status);
+	return status;
 }
