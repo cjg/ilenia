@@ -1,4 +1,4 @@
-10/03/2006 - ilenia-2.0 released
+11/03/2006 - ilenia-2.0 released
 There are many new things in this release: beginning from the sourcecode that
 had been rewritten to have a better usage of memory and an "unified error and
 warning message system", all error and warning messages are managed by two
