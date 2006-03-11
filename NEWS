@@ -1,0 +1,67 @@
+11/03/2006 - ilenia-2.0 released
+There are many new things in this release: beginning from the sourcecode that
+had been rewritten to have a better usage of memory and an "unified error and
+warning message system", all error and warning messages are managed by two
+function. 
+The more tangible, for the user, new features are: 
+- the "not found policy", when a dependence isn't found ilenia can act in three
+  ways asking you if she can procede (setting this variable as "Ask", the
+  default), stopping the build and install process (setting this variable as
+  "Stop") or contnuing with next package (setting the value "Nevermind"); 
+- the introduction of "/etc/favoritepkgmk", to use a non default pkgmk.conf for
+  certain packages;
+- the "sysupng", during a system update (`ilenia -U`), the packages won't be
+  updated merely in alphabetic order but with dependencies check; for example if
+  gtk and pango are out of date, ilenia updates pango before of gtk.  
+
+14/12/2005 - ilenia-1.5 released
+This release has a full support for rsync repository.
+
+02/10/2005 - ilenia-1.4 released
+In every new release there are innovations and bugfixes:
+alias list (/etc/ports/alias) and search function (-s)
+are the innovations; fixed segafaults with ports with 
+bad version field and many other things that I don't 
+remember because I've made them many days ago are
+bugfixes.
+
+25/03/2005 - ilenia-1.3 released
+The more obvious innovation in this release are the 
+introduction of local repositories and POST_PKGADD commands
+definables in /etc/ilenia.rc. But the are many innovation's
+in the code that renders ilenia more powerful and secure.
+
+29/01/2005 - ilenia-1.2 released
+A little bugfix release for x86's users, a great release for
+ppc's users: from this release ilenia has the full support
+for .cvs supfiles of crux ppc.
+
+30/12/2004 - ilenia-1.1 released
+Ilenia now with some new features like the secure removing 
+of packages ("secure" means "with dependencies check").
+With ilenia 1.1 you can store your ports tree in more
+floxible way: ilenia knows where you have the ports tree
+reading from .cvsup and .httpup file; for example you can
+store ports from crux (base and opt), crux-it, clc and 
+various people in different directories under /usr/ports, 
+something like:
+
+/usr/ports/clc:
+contrib/  unmaintained/
+
+/usr/ports/crux:
+base/  opt/
+
+/usr/ports/it:
+devel/  games/  gnome/  multimedia/  network/  office/  science/  system/  x11/
+
+/usr/ports/people:
+acrux/  chw/   jaeger/  jolupa/  maol/        ogg/   sten/    tilman/    yankeegohome/
+alan/   dahl/  jdolan/  jue/     mhedenskog/  pazo/  stsp/    vico/      yhafri/
+albe/   han/   jheino/  jw/      noneus/      rrm3/  tbmnet/  wimpress/  zh_current/
+
+The dependencies system of ilenia had been improved very much in this release.
+
+7/11/2004 - ilenia-1.0 released
+Now 'ilenia' can build, install and update packages
+while resolving the dependencies too. 
