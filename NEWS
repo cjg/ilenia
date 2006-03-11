@@ -1,3 +1,22 @@
+10/03/2006 - ilenia-2.0 released
+There are many new things in this release: beginning from the sourcecode that
+had been rewritten to have a better usage of memory and an "unified error and
+warning message system", all error and warning messages are managed by two
+function. 
+The more tangible, for the user, new features are: 
+- the "not found policy", when a dependence isn't found ilenia can act in three
+  ways asking you if she can procede (setting this variable as "Ask", the
+  default), stopping the build and install process (setting this variable as
+  "Stop") or contnuing with next package (setting the value "Nevermind"); 
+- the introduction of "/etc/favoritepkgmk", to use a non default pkgmk.conf for
+  certain packages;
+- the "sysupng", during a system update (`ilenia -U`), the packages won't be
+  updated merely in alphabetic order but with dependencies check; for example if
+  gtk and pango are out of date, ilenia updates pango before of gtk.  
+
+14/12/2005 - ilenia-1.5 released
+This release has a full support for rsync repository.
+
 02/10/2005 - ilenia-1.4 released
 In every new release there are innovations and bugfixes:
 alias list (/etc/ports/alias) and search function (-s)
