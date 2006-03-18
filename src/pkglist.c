@@ -181,8 +181,8 @@ struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
 			    int duplicates)
 {
 	while (src != NULL) {
-		if (duplicates == 1
-		    || pkglist_exists(src->name, dest) != 0)
+		if (duplicates == TRUE
+		    || !pkglist_exists(src->name, dest))
 			dest =
 			    pkglist_add_reversed(src->name, src->version,
 						 src->repo, src->depends,
