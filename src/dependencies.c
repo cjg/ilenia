@@ -67,7 +67,7 @@ struct pkglist *pkglist_remove_duplicates(struct pkglist *p)
 {
 	struct pkglist *paus = NULL;
 	while (p != NULL) {
-		if (pkglist_exists(p->name, paus) != 0)
+		if (!pkglist_exists(p->name, paus))
 			paus = pkglist_add_reversed(p->name, "", p->repo,
 						    NULL, paus);
 		p = p->next;
@@ -118,8 +118,7 @@ struct pkglist *find_dependents(struct pkglist *p)
 								   name,
 								   ilenia_ports))))
 			{
-				if (deplist_exists(p->name, tmp->depends)
-				    == EXIT_SUCCESS) {
+				if (deplist_exists(p->name, tmp->depends)) {
 					if (pkglist_find
 					    (pkgs->name,
 					     dependents) == NULL)
@@ -143,7 +142,7 @@ struct pkglist *get_dependencies(char *name)
 	char *repo, *version;
 	int i = -10;
 
-	if (pkglist_exists(name, ilenia_ports) == 0) {
+	if (pkglist_exists(name, ilenia_ports)) {
 		repo = pkglist_get_newer_favorite(name, REGULAR);
 		version = pkglist_get_from_repo(name, repo, ilenia_ports);
 		p = pkglist_add_reversed(name, version, repo, NULL, p);
@@ -188,7 +187,7 @@ void print_dependencies(char *name)
 
 		printf("%s [", p->name);
 
-		if (pkglist_exists(p->name, ilenia_pkgs) != 0) {
+		if (!pkglist_exists(p->name, ilenia_pkgs)) {
 			printf(" ]\n");
 			p = p->next;
 			continue;
