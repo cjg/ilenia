@@ -43,6 +43,8 @@ int ask_for_update;
 #define STOP_POLICY 1
 #define NEVERMIND_POLICY 2
 #define PATH_MAX 4096
+#define TRUE 1
+#define FALSE 0
 
 char *get_value(char s[], char *var);
 int parse_ileniarc();

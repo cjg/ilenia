@@ -84,19 +84,19 @@ int update_repo(char *name)
 		return (EXIT_SUCCESS);
 
 	strprintf(&filename, "%s.cvsup", name);
-	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
+	if (is_file("/etc/ports/", filename))
 		return (cvsup(filename));
 
 	strprintf(&filename, "%s.httpup", name);
-	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
+	if (is_file("/etc/ports/", filename))
 		return (httpup(filename));
 
 	strprintf(&filename, "%s.cvs", name);
-	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
+	if (is_file("/etc/ports/", filename))
 		return (cvs(filename));
 
 	strprintf(&filename, "%s.rsync", name);
-	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
+	if (is_file("/etc/ports/", filename))
 		return (rsync(filename));
 
 	error("%s not found!", name);
@@ -129,5 +129,5 @@ int update_all_repos()
 			update_repo(name);
 	}
 
-	return (status);
+	return status;
 }

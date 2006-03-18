@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ilenia.h"
 #include "pkglist.h"
 #include "deplist.h"
 
@@ -170,10 +171,10 @@ int pkglist_exists(char *param, struct pkglist *p)
 {
 	while (p != NULL) {
 		if (!strcmp(p->name, param))
-			return (EXIT_SUCCESS);
+			return TRUE;
 		p = p->next;
 	}
-	return (EXIT_FAILURE);
+	return FALSE;
 }
 
 struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,

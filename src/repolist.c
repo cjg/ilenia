@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "ilenia.h"
 #include "repolist.h"
 
 struct repolist *repolist_add(char *name, char *path, struct repolist *r)
@@ -57,9 +58,9 @@ struct repolist *repolist_find(char *param, struct repolist *r)
 int repolist_exists(char *param, struct repolist *r)
 {
 	while (r != NULL) {
-		if (strcmp(r->name, param) == 0)
-			return (EXIT_SUCCESS);
+		if (!strcmp(r->name, param))
+			return TRUE;
 		r = r->next;
 	}
-	return (EXIT_FAILURE);
+	return FALSE;
 }

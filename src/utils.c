@@ -31,6 +31,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "manipulator.h"
+#include "ilenia.h"
 
 int exec(char *wdir, char *command, char *args[])
 {
@@ -58,7 +59,7 @@ int is_file(char *path, char *name)
 	sprintf(filepath, "%s/%s", path, name);
 	file = open(filepath, O_RDONLY);
 	if (file == -1)
-		return (EXIT_FAILURE);
+		return FALSE;
 	close(file);
-	return (EXIT_SUCCESS);
+	return TRUE;
 }
