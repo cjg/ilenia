@@ -2,7 +2,7 @@
  *            lsports.h
  *
  *  Sat Jul 10 12:55:46 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,5 +22,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _LSPORTS_H
+#define _LSPORTS_H
+
 struct pkglist *lsports();
 struct repolist *build_repolist();
+int build_cache(struct repolist *r);
+
+#endif				/* _LSPORTS_H */

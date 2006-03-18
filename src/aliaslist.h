@@ -22,6 +22,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _ALIASLIST_H
+#define _ALIASLIST_H
+
 struct aliaslist {
 	char *name;
 	struct aliaslist *next;
@@ -39,3 +42,5 @@ int aliaslist_exists(char *param, struct aliaslist *a);
 struct aliaseslist *aliaseslist_add(struct aliaslist *a,
 				    struct aliaseslist *s);
 struct aliaseslist *aliaseslist_build();
+
+#endif				/* _ALIASLIST_H */

@@ -2,7 +2,7 @@
  *            manipulator.h
  *
  *  Sat Jul 10 12:49:03 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,6 +22,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _MANIPULATOR_H
+#define _MANIPULATOR_H
+
 #include "list.h"
 
 #define END -1
@@ -37,3 +40,5 @@ int count(char *s, int delim);
 int old_splitsplit(char *s, char *delim, char *splitted[]);
 struct list *split(char *s, char *delim);
 void strprintf(char **dest, char *fmt, ...);
+
+#endif				/* _MANIPULATOR_H */

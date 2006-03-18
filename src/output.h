@@ -2,7 +2,7 @@
  *            output.h
  *
  *  Fri Jul 16 18:51:36 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,7 +22,17 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _OUTPUT_H
+#define _OUTPUT_H
+
+#include <stdarg.h>
+#include "pkglist.h"
+
+void error(char *fmt, ...);
+void warning(char *fmt, ...);
 void info(char *name, int options);
 void pkglist_print(struct pkglist *p);
 void help();
 void version();
+
+#endif				/* _OUTPUT_H */

@@ -2,7 +2,7 @@
  *            lspkgs.c
  *
  *  Sat Jul 10 12:14:11 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 

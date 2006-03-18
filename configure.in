@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(ilenia, 1.99, immigrant@email.it)
-AM_INIT_AUTOMAKE(ilenia, 1.99)
+AC_INIT(ilenia, 2.09, immigrant@email.it)
+AM_INIT_AUTOMAKE(ilenia, 2.09)
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
@@ -16,18 +16,22 @@ AC_PROG_CC
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h db.h stdlib.h string.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_PID_T
+AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_CLOSEDIR_VOID
+AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
 AC_FUNC_MALLOC
+AC_FUNC_REALLOC
 AC_FUNC_STAT
-AC_CHECK_FUNCS([strstr strverscmp])
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([memset strcasecmp strdup strstr strverscmp])
 
 AC_CONFIG_FILES([Makefile
                  conf/Makefile

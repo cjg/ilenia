@@ -2,7 +2,7 @@
  *            pkglist.h
  *
  *  Mon Oct 03 12:19:28 2005
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -21,6 +21,9 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#ifndef _PKGLIST_H
+#define _PKGLIST_H
 
 struct pkglist {
 	char name[255];
@@ -45,3 +48,5 @@ int pkglist_exists(char *param, struct pkglist *p);
 struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
 			    int duplicates);
 struct pkglist *pkglist_remove(char *name, char *repo, struct pkglist *p);
+
+#endif				/* _PKGLIST_H */

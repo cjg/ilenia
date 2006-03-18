@@ -1,8 +1,8 @@
 /***************************************************************************
- *            utils.h
+ *            favoritepkgmk.h
  *
- *  Wed Oct 26 13:00:58 2005
- *  Copyright  2005 - 2006  Coviello Giuseppe
+ *  Wed Nov 30 16:11:10 2005
+ *  Copyright  2005  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,10 +22,19 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _UTILS_H
-#define _UTILS_H
+#ifndef _FAVORITEPKGMK_H
+#define _FAVORITEPKGMK_H
+#include "list.h"
 
-int exec(char *wdir, char *command, char *args[]);
-int is_file(char *path, char *name);
+struct pkgmklist {
+	char *pkgmk_conf;
+	struct list *pkgs;
+	struct pkgmklist *next;
+};
 
-#endif				/* _UTILS_H */
+struct pkgmklist *pkgmklist_add(char *pkgmk_conf, struct list *pkgs,
+				struct pkgmklist *m);
+char *pkgmklist_get_pkgmk_conf(char *pkg, struct pkgmklist *m);
+struct pkgmklist *pkgmklist_build();
+
+#endif				/* _FAVORITEPKGMK_H */

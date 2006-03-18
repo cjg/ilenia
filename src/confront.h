@@ -2,7 +2,7 @@
  *            confront.h
  *
  *  Sat Jul 10 13:27:54 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,6 +22,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _CONFRONT_H
+#define _CONFRONT_H
+
 #define DIFF     3
 #define UPDATED	 4
 
@@ -36,3 +39,5 @@ char *pkglist_get_newer_favorite(char *name, int option);
 char *pkglist_get_from_version(char *nome, char *version,
 			       struct pkglist *p);
 char *pkglist_get_from_repo(char *name, char *repo, struct pkglist *p);
+
+#endif				/* _CONFRONT_H */

@@ -2,7 +2,7 @@
  *            list.h
  *
  *  Thu Nov 17 13:37:34 2005
- *  Copyright  2005  Coviello Giuseppe
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -34,5 +34,7 @@ struct list *list_add(char *data, struct list *l);
 struct list *list_find(char *param, struct list *l);
 int list_exists(char *param, struct list *l);
 struct list *list_remove(char *param, struct list *l);
+int list_len(struct list *l);
+struct list *list_cat(struct list *dest, struct list *src, int duplicates);
 
 #endif				/* _LIST_H */

@@ -2,7 +2,7 @@
  *            ilenia.h
  *
  *  Tue Sep 28 11:06:51 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -22,6 +22,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#ifndef _ILENIA_H
+#define _ILENIA_H
+
+#include <db.h>
+
 struct pkglist *ilenia_ports;
 struct pkglist *ilenia_pkgs;
 struct repolist *ilenia_repos;
@@ -33,6 +38,7 @@ struct pkgmklist *ilenia_favoritepkgmk;
 char *post_pkgadd;
 int not_found_policy;
 int ask_for_update;
+DB *ilenia_dbports;
 
 #define CACHE "/var/cache/ilenia"
 #define ALIAS_FILE "/etc/ports/alias"
@@ -40,7 +46,11 @@ int ask_for_update;
 #define STOP_POLICY 1
 #define NEVERMIND_POLICY 2
 #define PATH_MAX 4096
+#define TRUE 1
+#define FALSE 0
 
 char *get_value(char s[], char *var);
 int parse_ileniarc();
 int ask(char *question, ...);
+
+#endif				/* _ILENIA_H */

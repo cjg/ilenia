@@ -5,7 +5,8 @@ INCLUDES =
 AM_CFLAGS =\
 	-Wall\
 	-g\
-	-D_GNU_SOURCE
+	-D_GNU_SOURCE\
+	-D_SYSUPNG
 
 bin_PROGRAMS = ilenia
 
@@ -44,9 +45,11 @@ ilenia_SOURCES = \
 	list.h\
 	list.c\
 	favoritepkgmk.h\
-	favoritepkgmk.c
+	favoritepkgmk.c\
+	dbutils.h\
+	dbutils.c
 
 ilenia_LDFLAGS = 
 
-ilenia_LDADD = 
+ilenia_LDADD = -ldb
 

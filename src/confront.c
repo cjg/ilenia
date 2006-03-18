@@ -2,7 +2,7 @@
  *            confront.c
  *
  *  Sat Jul 10 13:33:11 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -30,6 +30,7 @@
 #include "vercmp.h"
 #include "confront.h"
 #include "ilenia.h"
+#include "output.h"
 
 void prettyprint(char *str1, char *str2, char *str3, char *str4)
 {
@@ -144,10 +145,8 @@ char *pkglist_get_newer_favorite(char *name, int option)
 	if (repo && version) {
 		if (strcmp
 		    (pkglist_get_from_repo(name, repo, ilenia_ports),
-		     version)) {
-			printf("Error: fix your favorite!\n");
-			exit(EXIT_FAILURE);
-		}
+		     version))
+			error("%s", "fix your favorite!");
 	}
 
 	if (repo == NULL && version == NULL)
@@ -158,8 +157,8 @@ char *pkglist_get_newer_favorite(char *name, int option)
 		repo =
 		    pkglist_get_from_version(name, version, ilenia_ports);
 		if (repo == NULL)
-			printf("Warning: %s with version %s not found!\n",
-			       name, version);
+			warning("%s with version %s not found!",
+				name, version);
 		free(version);
 	}
 
@@ -169,8 +168,7 @@ char *pkglist_get_newer_favorite(char *name, int option)
 
 		if (pkglist_get_from_repo(name, repo, ilenia_ports) ==
 		    NULL)
-			printf("Warning: %s in repo %s not found!\n", name,
-			       repo);
+			warning("%s in repo %s not found!", name, repo);
 		else
 			return (strdup(repo));
 	}
@@ -193,6 +191,9 @@ char *pkglist_get_from_version(char *name, char *version,
 
 char *pkglist_get_from_repo(char *name, char *repo, struct pkglist *p)
 {
+	if (!repo)
+		return NULL;
+
 	while (p != NULL) {
 		if (strcmp(name, p->name) == 0) {
 			if (strcmp(repo, p->repo) == 0)

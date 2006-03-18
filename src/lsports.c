@@ -2,7 +2,7 @@
  *            lsports.c
  *
  *  Sat Jul 10 12:57:55 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -34,8 +34,9 @@
 #include "repolist.h"
 #include "aliaslist.h"
 #include "ilenia.h"
+#include "dbutils.h"
 
-FILE *cachefile;
+//FILE *cachefile;
 
 #define PORTS_LOCATION "/usr/ports"
 
@@ -311,9 +312,9 @@ struct repolist *parse_cvsup(char *path, struct repolist *r)
 	return (r);
 }
 
-struct deplist *deplist_from_deprow(char *deprow)
+struct list *deplist_from_deprow(char *deprow)
 {
-	struct deplist *d = NULL;
+	struct list *d = NULL;
 
 	if (strlen(deprow) <= 0)
 		return (NULL);
@@ -331,7 +332,7 @@ struct deplist *deplist_from_deprow(char *deprow)
 
 	while (deps != NULL) {
 		trim(deps->data);
-		d = deplist_add(deps->data, d);
+		d = list_add(deps->data, d);
 		deps = deps->next;
 	}
 
@@ -345,7 +346,8 @@ int parse_pkgfile(char *filename, char *repo)
 	char *line = NULL;
 	ssize_t nread;
 
-	struct deplist *d = NULL;
+	struct list *d = NULL;
+	struct list *l = NULL;
 
 	char *name = NULL, *version = NULL, *release = NULL;
 
@@ -383,17 +385,23 @@ int parse_pkgfile(char *filename, char *repo)
 		return (EXIT_FAILURE);
 
 	version = sedchr(version, ' ', '_');
-
-	fprintf(cachefile, "%s %s-%s %s", name, version, release, repo);
-
+	sprintf(version, "%s-%s", version, release);
+	//fprintf(cachefile, "%s %s-%s %s", name, version, release, repo);
+	l=list_add(name, l);
+	l=list_add(version, l);
+	l=list_add(repo, l);
+	//db_insert(name, version, release, repo);
+	/*
 	while (d != NULL) {
-		fprintf(cachefile, " %s", d->name);
+		//fprintf(cachefile, " %s", d->name);
 		d = d->next;
 	}
-
-	fprintf(cachefile, "\n");
-	if (line)
-		free(line);
+	*/
+	l=list_cat(l, d, 0);
+	db_insert(l);
+	l=NULL;
+	//fprintf(cachefile, "\n");
+	line = NULL;
 	fclose(file);
 	return (EXIT_SUCCESS);
 }
@@ -433,16 +441,16 @@ int read_from_dir(char *repo_name, char *prefix)
 int build_cache(struct repolist *r)
 {
 	printf("Building cache!\n");
-	if (!(cachefile = fopen(CACHE, "w"))) {
+	/*if (!(cachefile = fopen(CACHE, "w"))) {
 		return (EXIT_FAILURE);
-	}
+		}*/
 	while (r != NULL) {
 		read_from_dir(r->name, r->path);
 		r = r->next;
 	}
-	fclose(cachefile);
-	chmod(CACHE,
-	      S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	//fclose(cachefile);
+	/*chmod(CACHE,
+	  S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);*/
 	printf("cache built!\n");
 	return (EXIT_SUCCESS);
 }

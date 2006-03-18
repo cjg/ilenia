@@ -2,7 +2,7 @@
  *            pkglist.c
  *
  *  Mon Oct 03 12:45:04 2005
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ilenia.h"
 #include "pkglist.h"
 #include "deplist.h"
 
@@ -170,18 +171,18 @@ int pkglist_exists(char *param, struct pkglist *p)
 {
 	while (p != NULL) {
 		if (!strcmp(p->name, param))
-			return (EXIT_SUCCESS);
+			return TRUE;
 		p = p->next;
 	}
-	return (EXIT_FAILURE);
+	return FALSE;
 }
 
 struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
 			    int duplicates)
 {
 	while (src != NULL) {
-		if (duplicates == 1
-		    || pkglist_exists(src->name, dest) != 0)
+		if (duplicates == TRUE
+		    || !pkglist_exists(src->name, dest))
 			dest =
 			    pkglist_add_reversed(src->name, src->version,
 						 src->repo, src->depends,

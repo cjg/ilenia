@@ -2,7 +2,7 @@
  *            manipulator.c
  *
  *  Sat Jul 10 12:51:53 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -216,33 +216,46 @@ void strprintf(char **dest, char *fmt, ...)
 {
 	va_list ap;
 	char *p, *d, *sval = NULL;
-	int ival;
+	int ival, dsize, dlen;
+
 	va_start(ap, fmt);
-	d = (char *) malloc(sizeof(char));
+	dsize = sizeof(char);
+	dlen = 0;
+	d = (char *) malloc(dsize);
+	memset(d, 0, dsize);
+
 	for (p = fmt; *p; p++) {
 		if (*p != '%') {
-			d = (char *) realloc(d, strlen(d) + 2);
-			d[strlen(d)] = *p;
+			dsize += 2;
+			d = (char *) realloc(d, dsize);
+			memset(d + dlen, 0, dsize - dlen);
+			d[dlen] = *p;
+			dlen++;
 			continue;
 		}
 		switch (*++p) {
 		case 'd':
 			ival = va_arg(ap, int);
 			char *tmp = itoa(ival);
-			d = (char *) realloc(d,
-					     strlen(d) + strlen(tmp) + 1);
+			dsize += strlen(tmp) + 1;
+			dlen += strlen(tmp);
+			d = (char *) realloc(d, dsize);
 			strcat(d, tmp);
 			free(tmp);
 			break;
 		case 's':
 			sval = va_arg(ap, char *);
-			d = (char *) realloc(d,
-					     strlen(d) + strlen(sval) + 1);
+			dsize += strlen(sval) + 1;
+			dlen += strlen(sval);
+			d = (char *) realloc(d, dsize);
 			strcat(d, sval);
 			break;
 		default:
-			d = (char *) realloc(d, strlen(d) + 2);
-			d[strlen(d)] = *p;
+			dsize += 2;
+			d = (char *) realloc(d, dsize);
+			memset(d + dlen, 0, dsize - dlen);
+			dlen++;
+			d[dlen] = *p;
 		}
 	}
 

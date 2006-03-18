@@ -2,7 +2,7 @@
  *            list.c
  *
  *  Thu Nov 17 13:39:56 2005
- *  Copyright  2005  Coviello Giuseppe
+ *  Copyright  2005 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "ilenia.h"
 #include "list.h"
 
 struct list *list_add(char *data, struct list *l)
@@ -61,9 +62,27 @@ struct list *list_find(char *param, struct list *l)
 int list_exists(char *param, struct list *l)
 {
 	while (l != NULL) {
-		if (strcmp(l->data, param) == 0)
-			return (EXIT_SUCCESS);
+		if (!strcmp(l->data, param))
+			return TRUE;
 		l = l->next;
 	}
-	return (EXIT_FAILURE);
+	return FALSE;
+}
+
+int list_len(struct list *l)
+{
+	int i;
+	struct list *tmp;
+	for (tmp = l, i = 0; tmp; tmp = tmp->next, i++);
+	return i;
+}
+
+struct list *list_cat(struct list *dest, struct list *src, int duplicates)
+{
+	while (src != NULL) {
+		if (duplicates == 1 || list_exists(src->data, dest) != 0)
+			dest = list_add(src->data, dest);
+		src = src->next;
+	}
+	return dest;
 }

@@ -2,7 +2,7 @@
 .SH NAME
 ilenia \- update/list ports collection and compile-install/update packages with dependencies
 .SH SYNOPSIS
-\fBilenia [options] [collection] [packages]\fP
+\fBilenia [options] [collections or packages]\fP
 .SH DESCRIPTION
 \fBilenia\fP was a replacement of the standard CRUX ports tool.
 \fBilenia\fP connects to one or more master repositories and updates the local copy of a
@@ -16,7 +16,7 @@ A \fIport\fP is a directory containing all necessary files for building a softwa
 .SH OPTIONS
 .TP
 .B "\-u, \-\-update"
-Update ports.
+Update ports tree.
 .TP
 .B "\-l, \-\-list"
 List ports. When specified lists ports of the specified collection(s).
@@ -28,20 +28,20 @@ Search for ports.
 List version differences between local ports and installed packages.
 .TP
 .B "\-p, \-\-updated"
-Show the ports that are newer than installed packages.
+Show the ports with higher version than installed packages ones.
 .TP 
-.B "\-U"
-Update or install the specified package with relativese dependencies, if no package is
+.B "\-U, \-\-update\-pkg"
+Update or install the specified package with relatives dependencies, if no package is
 specified, ilenia updates all packages.
 .TP
-.B "\-D"
-Show ths dependencies of the specified package.
+.B "\-D, \-\-dependencies"
+Show the dependencies of the specified package.
 .TP
-.B "\-T"
+.B "\-T, \-\-dependents"
 Show the dependents packages of the specified package.
 .TP
-.B "\-R"
-Remove the specified package checking if there is installed any didepent package.
+.B "\-R, \-\-remove"
+Remove the specified package checking if there is installed any dedepent package.
 .TP
 .B "\-\-no\-favorite\-repo"
 Used with \-d \-p and \-U options. Ignore the user's favorite repository for ports listed in /etc/ports/favoriterepo
@@ -58,10 +58,10 @@ Used with \-T and \-R options, shows or removes all dependents packages
 .B "\-\-cache"
 Forces ilenia to rebuild her cachefile, useful when you modify ports in a local repository 
 .TP
-.B "\-v, \-\-version"
+.B "\-V, \-\-version"
 Print version and exit.
 .TP
-.B "\-h, \-\-help"
+.B "\-?, \-\-help"
 Print help and exit.
 .SH LOCAL REPOSITORY
 .TP
@@ -91,6 +91,9 @@ File where the informations about the favorite version are stored.
 File where the informations about the alias are stored.
 In each row could be a list of equivalent packages (such as: sendmail exim postfix). Ilenia don't install a package as dependencies if you have an equivalent ones installed.
 .TP
+.B "/etc/ports/favoritepkgmk"
+File where the informations to let ilenia use non default pkgmk.conf for certain packages are stored.
+.TP
 .B "/etc/ilenia.rc"
 File contening optional features like "POST_PKGADD"
 .SH POST_PKGADD
@@ -101,9 +104,12 @@ For example, I use:
 POST_PKGADD  = "pkgmk \-c; aplay /home/slash/sounds/grolsch_plop.wav"
 .SH ASK_FOR_UPDATE
 .TP
-Now ilenia, when you are trying to update all packages, asks you if you're sure to do that. If you like, the old way: without any question; you can set the ASK_FOR_UPDATE variable to "No" (I use this).
+When you are trying to update all packages, ilenia asks you if you're sure to do that. If you like, the old way: without any question; you can set the ASK_FOR_UPDATE variable to "No" (I use this).
+.SH NOT_FOUND_POLICY
+.TP
+When a dependence isn't found ilenia can act in three ways: asking you if she can procede (setting this variable as "Ask", the default), stopping the build and install process (setting this variable as "Stop") or contnuing with next package (setting the value "Nevermind").
 .SH SEE ALSO
-pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1), httpup(8)
+pkgadd(8), pkgrm(8), pkginfo(8), rsync(1), cvsup(1), httpup(8)
 .SH AUTHOR
 .nf
 Coviello Giuseppe <immigrant@email.it>

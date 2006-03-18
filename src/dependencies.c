@@ -2,7 +2,7 @@
  *            dependencies.c
  *
  *  Sat Sep 11 18:04:21 2004
- *  Copyright  2004 - 2005  Coviello Giuseppe
+ *  Copyright  2004 - 2006  Coviello Giuseppe
  *  immigrant@email.it
  ****************************************************************************/
 
@@ -36,8 +36,11 @@ struct pkglist *get_package_dependencies(char *name, char *repo)
 {
 	struct pkglist *pkg = NULL;
 	struct pkglist *dependencies = NULL;
-	pkg = pkglist_find(name, ilenia_ports);
+	//pkg = pkglist_find(name, ilenia_ports);
+	pkg = db_get(name);
 	pkg = pkglist_select_from_repo(repo, pkg);
+	if (!pkg)
+		return NULL;
 	while (pkg->depends != NULL) {
 		char *repo = NULL, *version;
 		repo =
@@ -65,7 +68,7 @@ struct pkglist *pkglist_remove_duplicates(struct pkglist *p)
 {
 	struct pkglist *paus = NULL;
 	while (p != NULL) {
-		if (pkglist_exists(p->name, paus) != 0)
+		if (!pkglist_exists(p->name, paus))
 			paus = pkglist_add_reversed(p->name, "", p->repo,
 						    NULL, paus);
 		p = p->next;
@@ -116,8 +119,7 @@ struct pkglist *find_dependents(struct pkglist *p)
 								   name,
 								   ilenia_ports))))
 			{
-				if (deplist_exists(p->name, tmp->depends)
-				    == EXIT_SUCCESS) {
+				if (deplist_exists(p->name, tmp->depends)) {
 					if (pkglist_find
 					    (pkgs->name,
 					     dependents) == NULL)
@@ -140,18 +142,18 @@ struct pkglist *get_dependencies(char *name)
 	struct pkglist *p = NULL;
 	char *repo, *version;
 	int i = -10;
-
-	if (pkglist_exists(name, ilenia_ports) == 0) {
-		repo = pkglist_get_newer_favorite(name, REGULAR);
-		version = pkglist_get_from_repo(name, repo, ilenia_ports);
-		p = pkglist_add_reversed(name, version, repo, NULL, p);
-		while (i != pkglist_len(p)) {
-			i = pkglist_len(p);
-			p = find_dependencies(p);
-		}
-	} else {
-		p = pkglist_add(name, "", "not found", NULL, p);
+	//ilenia_ports = db_get(name);
+	//if (pkglist_exists(name, ilenia_ports) == 0) {
+	repo = pkglist_get_newer_favorite(name, REGULAR);
+	version = pkglist_get_from_repo(name, repo, ilenia_ports);
+	p = pkglist_add_reversed(name, version, repo, NULL, p);
+	while (i != pkglist_len(p)) {
+		i = pkglist_len(p);
+		p = find_dependencies(p);
 	}
+	/*} else {
+	  p = pkglist_add(name, "", "not found", NULL, p);
+	  }*/
 	return (p);
 }
 
@@ -186,7 +188,7 @@ void print_dependencies(char *name)
 
 		printf("%s [", p->name);
 
-		if (pkglist_exists(p->name, ilenia_pkgs) != 0) {
+		if (!pkglist_exists(p->name, ilenia_pkgs)) {
 			printf(" ]\n");
 			p = p->next;
 			continue;
