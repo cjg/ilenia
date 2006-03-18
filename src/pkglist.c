@@ -27,10 +27,10 @@
 #include <string.h>
 #include "ilenia.h"
 #include "pkglist.h"
-#include "deplist.h"
+#include "list.h"
 
 struct pkglist *pkglist_add(char *name, char *version, char *repo,
-			    struct deplist *d, struct pkglist *p)
+			    struct list *d, struct pkglist *p)
 {
 	struct pkglist *paus = NULL;
 	paus = (struct pkglist *) malloc(sizeof(struct pkglist));
@@ -51,7 +51,7 @@ struct pkglist *pkglist_add(char *name, char *version, char *repo,
 }
 
 struct pkglist *pkglist_add_ordered(char *name, char *version, char *repo,
-				    struct deplist *d, struct pkglist *p)
+				    struct list *d, struct pkglist *p)
 {
 	struct pkglist *paus1 = NULL;
 	struct pkglist *paus2 = NULL;
@@ -88,7 +88,7 @@ struct pkglist *pkglist_add_ordered(char *name, char *version, char *repo,
 }
 
 struct pkglist *pkglist_add_reversed(char *name, char *version,
-				     char *repo, struct deplist *d,
+				     char *repo, struct list *d,
 				     struct pkglist *p)
 {
 	struct pkglist *paus1 = NULL;
@@ -113,7 +113,7 @@ struct pkglist *pkglist_add_reversed(char *name, char *version,
 	return (p);
 }
 
-struct pkglist *pkglist_add_deplist(struct deplist *d, struct pkglist *p)
+struct pkglist *pkglist_add_deplist(struct list *d, struct pkglist *p)
 {
 	p->depends = d;
 	return (p);

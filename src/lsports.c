@@ -347,11 +347,12 @@ int parse_pkgfile(char *filename, char *repo)
 	ssize_t nread;
 
 	struct list *d = NULL;
-	struct list *l = NULL;
+	struct pkglist *p = NULL;
 
 	char *name = NULL, *version = NULL, *release = NULL;
 
 	file = fopen(filename, "r");
+
 	if (file == NULL)
 		return (EXIT_FAILURE);
 
@@ -386,24 +387,13 @@ int parse_pkgfile(char *filename, char *repo)
 
 	version = sedchr(version, ' ', '_');
 	sprintf(version, "%s-%s", version, release);
-	//fprintf(cachefile, "%s %s-%s %s", name, version, release, repo);
-	l=list_add(name, l);
-	l=list_add(version, l);
-	l=list_add(repo, l);
-	//db_insert(name, version, release, repo);
-	/*
-	while (d != NULL) {
-		//fprintf(cachefile, " %s", d->name);
-		d = d->next;
-	}
-	*/
-	l=list_cat(l, d, 0);
-	db_insert(l);
-	l=NULL;
-	//fprintf(cachefile, "\n");
+
+	p=pkglist_add(name, version, repo, d, p);
+	dbports_insert(p);
+
 	line = NULL;
 	fclose(file);
-	return (EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 int read_from_dir(char *repo_name, char *prefix)
@@ -476,23 +466,24 @@ struct pkglist *lsports()
 
 	while (nread > 0) {
 		//int i, num = count(line, ' ');
-		struct list *splitted_line;
 		char *name, *version, *repo;
-		struct deplist *d = NULL;
+		struct list *d = NULL;
 
-		splitted_line = split(line, " ");
-		name = splitted_line->data;
-		splitted_line = splitted_line->next;
-		version = splitted_line->data;
-		splitted_line = splitted_line->next;
-		repo = splitted_line->data;
-		splitted_line = splitted_line->next;
-
+		d = split(line, " ");
+		name = d->data;
+		d=d->next;
+		version = d->data;
+		d=d->next;
+		repo = d->data;
+		d=d->next;
+		
+		/*
 		while (splitted_line != NULL) {
 			trim(splitted_line->data);
 			d = deplist_add(splitted_line->data, d);
 			splitted_line = splitted_line->next;
 		}
+		*/
 
 		trim(name);
 		trim(version);

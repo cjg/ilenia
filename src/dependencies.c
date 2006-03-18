@@ -44,19 +44,19 @@ struct pkglist *get_package_dependencies(char *name, char *repo)
 	while (pkg->depends != NULL) {
 		char *repo = NULL, *version;
 		repo =
-		    pkglist_get_newer_favorite(pkg->depends->name,
+		    pkglist_get_newer_favorite(pkg->depends->data,
 					       REGULAR);
 		if (repo != NULL) {
-			version = pkglist_get_from_repo(pkg->depends->name,
+			version = pkglist_get_from_repo(pkg->depends->data,
 							repo,
 							ilenia_ports);
 			dependencies =
-			    pkglist_add_reversed(pkg->depends->name,
+			    pkglist_add_reversed(pkg->depends->data,
 						 version, repo, NULL,
 						 dependencies);
 		} else
 			dependencies =
-			    pkglist_add_reversed(pkg->depends->name, "",
+			    pkglist_add_reversed(pkg->depends->data, "",
 						 "not found", NULL,
 						 dependencies);
 		pkg->depends = pkg->depends->next;

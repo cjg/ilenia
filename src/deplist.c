@@ -52,3 +52,13 @@ int deplist_exists(char *param, struct deplist *d)
 	}
 	return FALSE;
 }
+
+int deplist_len(struct deplist *d)
+{
+	int i;
+	struct deplist *daus;
+	if(d==NULL)
+		return 0;
+	for (daus = d, i = 0; daus; daus = daus->next, i++);
+	return i;
+}

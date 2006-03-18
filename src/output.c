@@ -61,7 +61,7 @@ void info(char *name, int options)
 	/*
 	struct repolist *repo;
 <<<<<<< .working
-	/*reponame = pkglist_get_newer_favorite(name, options);
+	reponame = pkglist_get_newer_favorite(name, options);
 	
 	struct pkglist *p=NULL;
 	p=db_get(name);

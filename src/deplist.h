@@ -32,5 +32,6 @@ struct deplist {
 
 struct deplist *deplist_add(char *name, struct deplist *d);
 int deplist_exists(char *param, struct deplist *d);
+int deplist_len(struct deplist *d);
 
 #endif				/* _DEPLIST_H */
