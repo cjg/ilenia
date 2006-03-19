@@ -67,12 +67,8 @@ int rsync(char *filename)
 	return (exec("/etc/ports", "/etc/ports/drivers/rsync", args));
 }
 
-
-int update_repo(char *name)
+int update_repo_helper(char *name)
 {
-	if (getuid() != 0)
-		error("only root can update the ports tree");
-
 	FILE *file;
 	char *filename = NULL;
 	if ((file = fopen(CACHE, "w"))) {
@@ -80,7 +76,7 @@ int update_repo(char *name)
 	}
 
 	strprintf(&filename, "%s.local", name);
-	if (is_file("/etc/ports/", filename) == EXIT_SUCCESS)
+	if (is_file("/etc/ports/", filename))
 		return (EXIT_SUCCESS);
 
 	strprintf(&filename, "%s.cvsup", name);
@@ -99,8 +95,18 @@ int update_repo(char *name)
 	if (is_file("/etc/ports/", filename))
 		return (rsync(filename));
 
-	error("%s not found!", name);
 	return EXIT_FAILURE;
+}
+
+int update_repo(char *name)
+{
+	if (getuid() != 0)
+		error("only root can update the ports tree");
+
+	int ret=update_repo_helper(name);
+	if(ret)
+		error("%s not found!", name);
+	return EXIT_SUCCESS;
 }
 
 int update_all_repos()
@@ -125,9 +131,11 @@ int update_all_repos()
 		    mid(info_file->d_name, 0,
 			strlen(info_file->d_name) -
 			strlen(strstr(info_file->d_name, ".")));
+		printf("%s\n", name);
 		if (strlen(name))
-			update_repo(name);
+			update_repo_helper(name);
 	}
 
 	return status;
 }
+
