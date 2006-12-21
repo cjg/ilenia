@@ -96,7 +96,7 @@ int parse_ileniarc()
 	}
 	if (line)
 		free(line);
-	return EXIT_SUCCESS;
+	return (EXIT_SUCCESS);
 }
 
 int ask(char *question, ...)
@@ -113,7 +113,7 @@ int ask(char *question, ...)
 	if (getline(&line, &n, stdin)) {
 		trim(line);
 		if (!strcasecmp(line, "Y") || !strlen(line))
-			return TRUE;
+			return (EXIT_FAILURE);
 	}
-	return FALSE;
+	return (EXIT_SUCCESS);
 }

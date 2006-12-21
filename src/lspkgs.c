@@ -56,6 +56,13 @@ struct pkglist *lspkgs()
 			name = strdup(line);
 		else {
 			p = pkglist_add_ordered(name, line, NULL, NULL, p);
+			struct aliaslist *a = NULL;
+			a=aliaslist_get(name, ilenia_aliases);
+			while(a!=NULL) {
+				p = pkglist_add_ordered(a->name, "alias", 
+						name, NULL, p);
+				a=a->next;
+			}
 			name = NULL;
 			newrecord = 0;
 		}

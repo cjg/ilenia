@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "ilenia.h"
 #include "deplist.h"
 
 struct deplist *deplist_add(char *name, struct deplist *d)
@@ -46,9 +45,9 @@ struct deplist *deplist_add(char *name, struct deplist *d)
 int deplist_exists(char *param, struct deplist *d)
 {
 	while (d != NULL) {
-		if (!strcmp(d->name, param))
-			return TRUE;
+		if (strcmp(d->name, param) == 0)
+			return (EXIT_SUCCESS);
 		d = d->next;
 	}
-	return FALSE;
+	return (EXIT_FAILURE);
 }

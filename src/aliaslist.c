@@ -58,11 +58,11 @@ struct aliaslist *aliaslist_get(char *param, struct aliaseslist *s)
 int aliaslist_exists(char *param, struct aliaslist *a)
 {
 	while (a != NULL) {
-		if (!strcmp(a->name, param))
-			return TRUE;
+		if (strcmp(a->name, param) == 0)
+			return (EXIT_SUCCESS);
 		a = a->next;
 	}
-	return FALSE;
+	return (EXIT_FAILURE);
 }
 
 struct aliaseslist *aliaseslist_add(struct aliaslist *a,

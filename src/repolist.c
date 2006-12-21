@@ -24,15 +24,19 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "ilenia.h"
 #include "repolist.h"
+#include "manipulator.h"
 
-struct repolist *repolist_add(char *name, char *path, struct repolist *r)
+struct repolist *repolist_add(char *name, char *path, char *supfile, struct repolist *r)
 {
 	struct repolist *raus = NULL;
 	raus = (struct repolist *) malloc(sizeof(struct repolist));
 	strcpy(raus->name, name);
 	strcpy(raus->path, path);
+	while(strstr(raus->name, "//"))
+		strcpy(raus->name, sed(raus->name, "//", "/"));
+	raus->supfile = (char *) malloc(strlen(supfile) + 1);
+	strcpy(raus->supfile, supfile);
 	if (r == NULL) {
 		r = raus;
 		r->next = NULL;
@@ -48,7 +52,7 @@ struct repolist *repolist_find(char *param, struct repolist *r)
 	struct repolist *raus = NULL;
 	while (r != NULL) {
 		if (strcmp(r->name, param) == 0) {
-			raus = repolist_add(r->name, r->path, raus);
+			raus = repolist_add(r->name, r->path, r->supfile, raus);
 		}
 		r = r->next;
 	}
@@ -58,9 +62,9 @@ struct repolist *repolist_find(char *param, struct repolist *r)
 int repolist_exists(char *param, struct repolist *r)
 {
 	while (r != NULL) {
-		if (!strcmp(r->name, param))
-			return TRUE;
+		if (strcmp(r->name, param) == 0)
+			return (EXIT_SUCCESS);
 		r = r->next;
 	}
-	return FALSE;
+	return (EXIT_FAILURE);
 }

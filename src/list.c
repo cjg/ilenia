@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "ilenia.h"
 #include "list.h"
 
 struct list *list_add(char *data, struct list *l)
@@ -62,9 +61,9 @@ struct list *list_find(char *param, struct list *l)
 int list_exists(char *param, struct list *l)
 {
 	while (l != NULL) {
-		if (!strcmp(l->data, param))
-			return TRUE;
+		if (strcmp(l->data, param) == 0)
+			return (EXIT_SUCCESS);
 		l = l->next;
 	}
-	return FALSE;
+	return (EXIT_FAILURE);
 }

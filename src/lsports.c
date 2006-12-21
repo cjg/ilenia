@@ -81,7 +81,7 @@ struct repolist *parse_rsync(char *path, struct repolist *r)
 			repo = strcat(mad_prefix, repo);
 			sed(repo, "//", "/");
 		}
-		r = repolist_add(repo, prefix, r);
+		r = repolist_add(repo, prefix, path, r);
 		fclose(file);
 		return (r);
 	}
@@ -120,7 +120,7 @@ struct repolist *parse_local(char *path, struct repolist *r)
 	repo = mid(repo, 1, strlen(repo) - strlen(index(repo, '.')) - 1);
 	mad_prefix = strdup("local/");
 	repo = strcat(mad_prefix, repo);
-	r = repolist_add(repo, prefix, r);
+	r = repolist_add(repo, prefix, path, r);
 	fclose(file);
 	return (r);
 }
@@ -129,6 +129,10 @@ struct repolist *parse_local(char *path, struct repolist *r)
 
 struct repolist *parse_cvs(char *percorso, struct repolist *p)
 {
+	/*
+	printf("%s\n", percorso);
+	return p;
+	*/
 	FILE *file;
 
 	if ((file = fopen(percorso, "r"))) {
@@ -192,7 +196,7 @@ struct repolist *parse_cvs(char *percorso, struct repolist *p)
 				if (strlen(mad_prefix) > 0)
 					collezione =
 					    strcat(mad_prefix, collezione);
-				p = repolist_add(collezione, prefix, p);
+				p = repolist_add(collezione, prefix, percorso, p);
 				return (p);
 			}
 		}
@@ -244,7 +248,7 @@ struct repolist *parse_httpup(char *path, struct repolist *r)
 			repo = strcat(mad_prefix, repo);
 			sed(repo, "//", "/");
 		}
-		r = repolist_add(repo, prefix, r);
+		r = repolist_add(repo, prefix, path, r);
 		return (r);
 	}
 	return (r);
@@ -301,7 +305,7 @@ struct repolist *parse_cvsup(char *path, struct repolist *r)
 				repo = strdup(line);
 
 			strtok(repo, " ");
-			r = repolist_add(repo, prefix, r);
+			r = repolist_add(repo, prefix, path, r);
 		}
 	}
 
@@ -517,7 +521,7 @@ struct repolist *build_repolist()
 		if (strstr(info_file->d_name, ".") == NULL)
 			continue;
 
-		extension = strstr(info_file->d_name, ".");
+		extension = rindex(info_file->d_name, '.');
 
 		char filename[strlen(info_file->d_name) + 11];
 

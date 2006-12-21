@@ -38,8 +38,8 @@
 #include "pkgutils.h"
 #include "favoritepkgmk.h"
 
-const char *argp_program_version = VERSION;
-const char *argp_program_bug_address = "<immigrant@email.it>";
+const char *argp_program_version = "2.0 Patching The Patched One";
+const char *argp_program_bug_address = "Giuseppe Coviello <cjg@cruxppc.org>";
 static char doc[] = "Package manager for CRUX";
 static char args_doc[] = "ACT ARG1...";
 
@@ -68,7 +68,7 @@ static struct argp_option options[] = {
 	{"update", 'u', 0, 0, "Update ports tree"},
 	{"list", 'l', 0, 0, "List ports"},
 	{"search", 's', 0, 0, "Search for ports"},
-	{"info", 'i', 0, 0, "Get info on a port"},
+	//{"info", 'i', 0, 0, "Get info on a port"},
 	{"diff", 'd', 0, 0, "List version differences"},
 	{"updated", 'p', 0, 0, "List ports with newer version"},
 	{"depedencies", 'D', 0, 0, "List dependencies of a package"},
@@ -228,7 +228,7 @@ int main(int argc, char **argv)
 			return (EXIT_SUCCESS);
 		}
 		while (arguments.args) {
-			if (!repolist_exists(arguments.args->data,
+			if (repolist_exists(arguments.args->data,
 					    ilenia_repos)) {
 				warning("repository %s not found!\n",
 					arguments.args->data);

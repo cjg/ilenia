@@ -28,10 +28,11 @@
 struct repolist {
 	char name[255];
 	char path[255];
+	char *supfile;
 	struct repolist *next;
 };
 
-struct repolist *repolist_add(char *name, char *path, struct repolist *r);
+struct repolist *repolist_add(char *name, char *path, char *supfile, struct repolist *r);
 struct repolist *repolist_find(char *param, struct repolist *r);
 int repolist_exists(char *param, struct repolist *r);
 
