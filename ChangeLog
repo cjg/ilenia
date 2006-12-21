@@ -1,3 +1,9 @@
+2.0.1:
+	- bugfix: managing cvs repositories
+	- bugfix: managing supfiles with more than a dot in their names
+	- bugfix: executing install-scripts not marked as executable files
+	- bugfix: alias working again
+	- bugfix: no segfault while managing favoriteversion
 2.0:
 	- feature: not found policy
 	- feature: favorite pkgmk.conf
