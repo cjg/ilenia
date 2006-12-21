@@ -1,3 +1,11 @@
+21/12/2006 - ilenia-2.0.1 released
+This is essentially a bug fix release: solved bugs about:
+     - Segmentation fault while managing favoriteversion
+     - Executing pre-install and post-install script not marked as executable
+     files 
+     - Managing supfiles with more than a dot in their names (for example
+     ppc.*.cvs)
+     - Working with alias
 11/03/2006 - ilenia-2.0 released
 There are many new things in this release: beginning from the sourcecode that
 had been rewritten to have a better usage of memory and an "unified error and
