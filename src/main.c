@@ -38,7 +38,7 @@
 #include "pkgutils.h"
 #include "favoritepkgmk.h"
 
-const char *argp_program_version = "2.0 Patching The Patched One";
+const char *argp_program_version = VERSION;
 const char *argp_program_bug_address = "Giuseppe Coviello <cjg@cruxppc.org>";
 static char doc[] = "Package manager for CRUX";
 static char args_doc[] = "ACT ARG1...";
