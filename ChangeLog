@@ -1,3 +1,9 @@
+2.1:
+	- feature: added the --info action to obtain informations about
+	some ports
+	- feature: added the --fetch-only option 
+	- bugfix:  detected and solved a bug that forced ilenia to rebuild
+	up-to-date packages while using sysupng
 2.0.1:
 	- bugfix: managing cvs repositories
 	- bugfix: managing supfiles with more than a dot in their names

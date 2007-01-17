@@ -71,7 +71,7 @@ void installscript(char path[], char *script)
 	}
 }
 
-int build_install_pkg(int option, char *name)
+int build_install_pkg(int option, int fetch_only, char *name)
 {
 	struct repolist *r;
 	char *pkgmk_conf;
@@ -102,22 +102,24 @@ int build_install_pkg(int option, char *name)
 
 	strcat(path, name);
 
-	installscript(path, "pre-install");
+	if(!fetch_only)
+		installscript(path, "pre-install");
 
 	if (pkglist_find(name, ilenia_pkgs))
 		install_action = strdup("-u");
 	else
 		install_action = strdup("-i");
-
+	
 	char *args[] =
-	    { "", "-d", "-cf", pkgmk_conf, install_action, NULL };
+		{ "", (fetch_only ? "-do" : "-d"), "-cf", pkgmk_conf, install_action, NULL };
 
 	if (exec(path, "pkgmk", args) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
 
-	installscript(path, "post-install");
-
-	do_post_pkgadd(path);
+	if(!fetch_only) {
+		installscript(path, "post-install");
+		do_post_pkgadd(path);
+	}
 
 	return (EXIT_SUCCESS);
 }
@@ -146,7 +148,8 @@ struct pkglist *skim_dependencies(struct pkglist *d,
 			d = d->next;
 			continue;
 		}
-		if (pkglist_exists(d->name, ilenia_pkgs) != 1
+		
+		if (pkglist_exists(d->name, ilenia_pkgs) != EXIT_SUCCESS
 		    || pkglist_exists(d->name, outdated) == 0)
 			p = pkglist_add_reversed(d->name, d->version,
 						 d->repo, NULL, p);
@@ -155,7 +158,7 @@ struct pkglist *skim_dependencies(struct pkglist *d,
 	return p;
 }
 
-int update_pkg(int option, char *name)
+int update_pkg(int option, int fetch_only, char *name)
 {
 	if (getuid() != 0)
 		error("only root can update or install packages");
@@ -182,7 +185,7 @@ int update_pkg(int option, char *name)
 		}
 
 		printf("install now]\n");
-		if (build_install_pkg(option, d->name) != 0)
+		if (build_install_pkg(option, fetch_only, d->name) != 0)
 			return (EXIT_FAILURE);
 		d = d->next;
 	}
@@ -194,13 +197,13 @@ int update_pkg(int option, char *name)
 
 	printf("%s [install now]\n", name);
 
-	if (build_install_pkg(option, name) != 0)
+	if (build_install_pkg(option, fetch_only, name) != 0)
 		return (EXIT_FAILURE);
 
 	return (EXIT_SUCCESS);
 }
 
-int update_system(int options)
+int update_system(int options, int fetch_only)
 {
 	if (getuid() != 0)
 		error("only root can update or install packages");
@@ -256,7 +259,7 @@ int update_system(int options)
 	}
 
 	while (q != NULL) {
-		if (build_install_pkg(options, q->name) != EXIT_SUCCESS)
+		if (build_install_pkg(options, fetch_only, q->name) != EXIT_SUCCESS)
 			return (EXIT_FAILURE);
 		q = q->next;
 	}

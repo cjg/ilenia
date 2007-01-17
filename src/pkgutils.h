@@ -26,8 +26,8 @@
 #define _PKGUTILS_H
 
 #define NODEPS -1
-int update_pkg(int options, char *name);
-int update_system(int options);
+int update_pkg(int options, int fetch_only, char *name);
+int update_system(int options, int fetch_only);
 int remove_pkg(char *name, int checkdeps, int all);
 
 #endif				/* _PKGUTILS_H */

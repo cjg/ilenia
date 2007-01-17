@@ -38,9 +38,9 @@
 #include "pkgutils.h"
 #include "favoritepkgmk.h"
 
-const char *argp_program_version = VERSION;
+const char *argp_program_version = "ilenia " VERSION;
 const char *argp_program_bug_address = "Giuseppe Coviello <cjg@cruxppc.org>";
-static char doc[] = "Package manager for CRUX";
+static char doc[] = "Package manager for CRUX (and CRUXPPC of course)";
 static char args_doc[] = "ACT ARG1...";
 
 #define OPT_CACHE 1
@@ -49,6 +49,7 @@ static char args_doc[] = "ACT ARG1...";
 #define OPT_NO_FAVORITE_VERSION 4
 #define OPT_NO_DEPS 5
 #define OPT_ALL 6
+#define OPT_FETCH_ONLY 7
 
 #define ACT_UPDATE 10
 #define ACT_LIST 11
@@ -68,7 +69,7 @@ static struct argp_option options[] = {
 	{"update", 'u', 0, 0, "Update ports tree"},
 	{"list", 'l', 0, 0, "List ports"},
 	{"search", 's', 0, 0, "Search for ports"},
-	//{"info", 'i', 0, 0, "Get info on a port"},
+	{"info", 'i', 0, 0, "Get info on a port"},
 	{"diff", 'd', 0, 0, "List version differences"},
 	{"updated", 'p', 0, 0, "List ports with newer version"},
 	{"depedencies", 'D', 0, 0, "List dependencies of a package"},
@@ -85,6 +86,7 @@ static struct argp_option options[] = {
 	 "Ignore the user's favorite versions"},
 	{"no-deps", OPT_NO_DEPS, 0, 0, "Do not check dependencies"},
 	{"all", OPT_ALL, 0, 0, "Shows or remove all dependents packages"},
+	{"fetch-only", OPT_FETCH_ONLY, 0, 0, "Just fetch the needed sources"},
 	{0}
 };
 
@@ -94,6 +96,7 @@ struct arguments {
 	int no_favorite_version;
 	int no_deps;
 	int all;
+	int fetch_only;
 	struct list *args;
 };
 
@@ -150,6 +153,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 	case OPT_ALL:
 		arguments->all = 1;
 		break;
+	case OPT_FETCH_ONLY:
+		arguments->fetch_only = 1;
+		break;
 	case ARGP_KEY_ARG:
 		arguments->args = list_add(arg, arguments->args);
 		break;
@@ -170,6 +176,7 @@ int main(int argc, char **argv)
 	arguments.no_favorite_version = 0;
 	arguments.no_deps = 1;
 	arguments.all = 0;
+	arguments.fetch_only = 0;
 	arguments.args = NULL;
 
 	if (argc < 2) {
@@ -206,10 +213,12 @@ int main(int argc, char **argv)
 	    arguments.no_favorite_repo + arguments.no_favorite_version;
 
 	int update_options = arguments.no_deps;
+
 	if (confront_options)
 		update_options = confront_options * update_options;
 
 	int status = EXIT_SUCCESS;
+	int fetch_only = arguments.fetch_only;
 
 	if (arguments.action == ACT_UPDATE) {
 		if (arguments.args == NULL) {
@@ -279,12 +288,12 @@ int main(int argc, char **argv)
 
 	if (arguments.action == ACT_UPDATE_PKG) {
 		if (arguments.args == NULL) {
-			status = update_system(update_options);
+			status = update_system(update_options, fetch_only);
 			return status;
 		}
 		while (arguments.args) {
 			status =
-			    update_pkg(update_options,
+				update_pkg(update_options, fetch_only,
 				       arguments.args->data);
 			arguments.args = arguments.args->next;
 		}

@@ -1,3 +1,10 @@
+17/01/2007 - ilenia-2.1 released
+Probably this will be the last release of ilenia 2.*: I'm woking on ilenia 3. In
+this release the are two new features: the "--info" action to obtain
+informations about a port (or some ports) and the "--fetch-only" option used
+with the "-U" ("--udpdate-pkg") action forces ilenia to just fetch the sources
+(something like 'pkgmk -do').
+
 21/12/2006 - ilenia-2.0.1 released
 This is essentially a bug fix release: solved bugs about:
      - Segmentation fault while managing favoriteversion
@@ -6,6 +13,7 @@ This is essentially a bug fix release: solved bugs about:
      - Managing supfiles with more than a dot in their names (for example
      ppc.*.cvs)
      - Working with alias
+
 11/03/2006 - ilenia-2.0 released
 There are many new things in this release: beginning from the sourcecode that
 had been rewritten to have a better usage of memory and an "unified error and

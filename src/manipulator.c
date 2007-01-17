@@ -26,18 +26,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "manipulator.h"
-
-/*
-char *trim(char s[])
-{
-	int n;
-	while (*s && *s <= 32)
-		++s;
-	for (n = strlen(s) - 1; n >= 0 && s[n] <= 32; --n)
-		s[n] = 0;
-	return s;
-}*/
 
 void ltrim(char s[])
 {
@@ -262,4 +252,64 @@ void strprintf(char **dest, char *fmt, ...)
 	d[strlen(d)] = '\0';
 	*dest = d;
 	va_end(ap);
+}
+
+extern char *strdup_printf(const char *fmt, ...)
+{
+	int n;
+	int size;
+	char *s;
+	va_list ap;
+	
+	size = 1;
+	
+	s = (char *) malloc(size);
+
+	va_start(ap, fmt);
+	n = vsnprintf (s, size, fmt, ap);
+	va_end(ap);
+
+	if (n > -1 && n < size)
+		return s;
+	
+	size = n + 1;
+	s = (char *) realloc(s, size);
+	va_start(ap, fmt);
+	n = vsnprintf (s, size, fmt, ap);
+	va_end(ap);
+
+	return s;
+}
+
+char * strreplace(char *s, char *find, char *replace, int n_replace)
+{
+	char *sptr;
+	int find_len;
+	int replace_len;
+	int diff_len;
+	
+	find_len = strlen(find);
+	replace_len = strlen(replace);
+	diff_len = replace_len - find_len;
+	
+	for(sptr=s;*sptr && n_replace;sptr++) {
+		if(strncmp(sptr, find, find_len))
+			continue;
+
+		if(diff_len > 0)
+			s = realloc(s, strlen(s) + diff_len + 1);
+		
+		if(diff_len)
+			bcopy(sptr + find_len, sptr + replace_len,
+			      strlen(sptr + find_len));
+		
+		if(diff_len < 0)
+			*(sptr + strlen(sptr) + diff_len) = 0;
+		
+		memcpy(sptr, replace, replace_len);
+
+		sptr+=strlen(replace);
+		--n_replace;
+	}
+	return s;
 }

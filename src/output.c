@@ -30,6 +30,8 @@
 #include "ilenia.h"
 #include "repolist.h"
 #include "confront.h"
+#include "manipulator.h"
+#include "utils.h"
 
 void error(char *fmt, ...)
 {
@@ -54,15 +56,60 @@ void warning(char *fmt, ...)
 	va_end(args);
 }
 
+
 void info(char *name, int options)
 {
-	char *reponame;
+	char *reponame, *path, *pkgfile_path;
 	struct repolist *repo;
+	pkglist *p;
 	reponame = pkglist_get_newer_favorite(name, options);
 	if (reponame == NULL)
 		error("%s not found!", name);
 	repo = repolist_find(reponame, ilenia_repos);
-	printf("%s%s/%s\n", repo->path, repo->name, name);
+	p = pkglist_select_from_repo(repo->name, ilenia_ports);
+	p = pkglist_find(name, p);
+	
+	path = strdup_printf("%s/%s/%s", repo->path, repo->name, name);
+	pkgfile_path = strdup_printf("%s/%s/%s/Pkgfile", repo->path, repo->name, name);
+
+	FILE *f;
+	f = fopen(pkgfile_path, "r");
+	if(!f)
+		exit(1);
+
+	printf("Name: %s\nVersion: %s\n", p->name, p->version);
+	char *line = NULL;
+	size_t n;
+	int nread;
+
+	while((nread = getline(&line, &n, f)) > 0) {
+		char *_line = strdup(line);
+		trim(_line);
+		if(*_line != '#')
+			continue;
+		_line++;
+		trim(_line);
+		while(strstr(_line, "  "))
+			strreplaceall(_line, "  ", " ");
+		printf("%s\n", _line);
+		free(_line);
+	}
+	
+	free(line);
+	fclose(f);
+
+	printf("Repository: %s\n", repo->name);
+	printf("Path: %s\n", path);
+	printf("Installed: %s\n", (pkglist_exists(p->name, ilenia_pkgs) ==
+				   EXIT_SUCCESS) ? "yes" : "no");
+	printf("README: %s\n", (is_file(path, "README") == EXIT_SUCCESS) ? "yes"
+	       : "no");
+	printf("pre-install: %s\n", (is_file(path, "pre-install") ==
+				     EXIT_SUCCESS) ? "yes" : "no");
+	printf("post-install: %s\n", (is_file(path, "post-install") ==
+				      EXIT_SUCCESS) ? "yes" : "no");
+	free(pkgfile_path);
+	free(path);
 }
 
 

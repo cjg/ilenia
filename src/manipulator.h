@@ -40,5 +40,8 @@ int count(char *s, int delim);
 int old_splitsplit(char *s, char *delim, char *splitted[]);
 struct list *split(char *s, char *delim);
 void strprintf(char **dest, char *fmt, ...);
+extern char *strdup_printf(const char *fmt, ...);
+char * strreplace(char *s, char *find, char *replace, int n_replace);
+#define strreplaceall(s, find, replace) strreplace((s), (find), (replace), -1)
 
 #endif				/* _MANIPULATOR_H */

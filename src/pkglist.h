@@ -25,13 +25,13 @@
 #ifndef _PKGLIST_H
 #define _PKGLIST_H
 
-struct pkglist {
+typedef struct pkglist {
 	char name[255];
 	char version[255];
 	char repo[255];
 	struct deplist *depends;
 	struct pkglist *next;
-};
+} pkglist;
 
 struct pkglist *pkglist_add(char *name, char *version, char *repo,
 			    struct deplist *d, struct pkglist *p);
