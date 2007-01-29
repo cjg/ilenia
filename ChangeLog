@@ -1,3 +1,8 @@
+2.2
+	- feature: added the support for repositories hierachy available
+	through REPOS_HIERACHY in ilenia.rc
+	- feature: added outdated check of dependencies while
+	installing/updating a package
 2.1:
 	- feature: added the --info action to obtain informations about
 	some ports

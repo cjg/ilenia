@@ -44,136 +44,40 @@ struct pkglist *pkglist_confront(int type, int options, int print)
 	if (print)
 		prettyprint("Name", "Installed Version", "Repository",
 			    "Port Version");
-	char *repo = NULL;
-	char *version = NULL;
-	struct pkglist *ilenia_pkgs_ptr = ilenia_pkgs;
-	while (ilenia_pkgs_ptr) {
-		repo =
-		    pkglist_get_newer_favorite(ilenia_pkgs_ptr->name, options);
 
-		if (repo == NULL) {
+	struct pkglist *ilenia_pkgs_ptr = ilenia_pkgs;
+	struct pkglist *tmp = NULL;
+	while (ilenia_pkgs_ptr) {
+		tmp = pkglist_find(ilenia_pkgs_ptr->name, ilenia_ports);
+
+		if(!tmp) {
 			ilenia_pkgs_ptr = ilenia_pkgs_ptr->next;
 			continue;
 		}
 
-		version =
-		    pkglist_get_from_repo(ilenia_pkgs_ptr->name, repo,
-					  ilenia_ports);
 		int test;
 
 		if (type == DIFF)
-			test = strcmp(ilenia_pkgs_ptr->version, version);
+			test = strcmp(ilenia_pkgs_ptr->version, tmp->version);
 		else
-			test = vercmp(ilenia_pkgs_ptr->version, version);
+			test = vercmp(ilenia_pkgs_ptr->version, tmp->version);
 
 		if (test == 0) {
 			ilenia_pkgs_ptr = ilenia_pkgs_ptr->next;
 			continue;
 		}
 
-		p = pkglist_add_ordered(ilenia_pkgs_ptr->name, version, repo,
+		p = pkglist_add_ordered(ilenia_pkgs_ptr->name, tmp->version, tmp->repo,
 					NULL, p);
+
 		if (print)
 			prettyprint(ilenia_pkgs_ptr->name,
-				    ilenia_pkgs_ptr->version, repo, version);
+				    ilenia_pkgs_ptr->version, tmp->repo, tmp->version);
 
 		ilenia_pkgs_ptr = ilenia_pkgs_ptr->next;
 	}
 
-	if (repo)
-		free(repo);
-
-	version = NULL;
-
 	return (p);
-}
-
-char *pkglist_get_newer(char *name, struct pkglist *p)
-{
-	char *version = NULL;
-	char *repo = NULL;
-
-	while (p != NULL) {
-		if (strcmp(name, p->name) != 0) {
-			p = p->next;
-			continue;
-		}
-
-		if (repo == NULL) {
-			version = strdup(p->version);
-			repo = strdup(p->repo);
-			p = p->next;
-			continue;
-		}
-
-
-		if (vercmp(version, p->version)) {
-			version = strdup(p->version);
-			repo = strdup(p->repo);
-		}
-		p = p->next;
-	}
-
-	if (version)
-		free(version);
-
-	if (repo)
-		return (strdup(repo));
-
-	return (NULL);
-}
-
-char *pkglist_get_newer_favorite(char *name, int option)
-{
-	char *repo = NULL;
-	char *version = NULL;
-	struct pkglist *p = NULL;
-
-	if (option != NO_FAVORITE_REPO && option != NO_FAVORITES) {
-		p = pkglist_find(name, ilenia_favoriterepo);
-		if (p)
-			repo = p->repo;
-		p = NULL;
-	}
-
-	if (option != NO_FAVORITE_VERSION && option != NO_FAVORITES) {
-		p = pkglist_find(name, ilenia_favoriteversion);
-		if (p)
-			version = p->version;
-		p = NULL;
-	}
-
-	if (repo && version) {
-		if (strcmp
-		    (pkglist_get_from_repo(name, repo, ilenia_ports),
-		     version))
-			error("%s", "fix your favorite!");
-	}
-
-	if (repo == NULL && version == NULL)
-		repo = pkglist_get_newer(name, pkglist_find(name,
-							    ilenia_ports));
-
-	if (version) {
-		repo =
-		    pkglist_get_from_version(name, version, ilenia_ports);
-		if (repo == NULL)
-			warning("%s with version %s not found!",
-				name, version);
-	}
-
-	if (repo) {
-		if (strcmp(repo, "!lock") == 0)
-			return (NULL);
-
-		if (pkglist_get_from_repo(name, repo, ilenia_ports) ==
-		    NULL)
-			warning("%s in repo %s not found!", name, repo);
-		else
-			return (strdup(repo));
-	}
-
-	return (NULL);
 }
 
 char *pkglist_get_from_version(char *name, char *version,

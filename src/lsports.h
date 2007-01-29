@@ -26,6 +26,7 @@
 #define _LSPORTS_H
 
 struct pkglist *lsports();
+struct pkglist *apply_favorites(struct pkglist *);
 struct repolist *build_repolist();
 
 #endif				/* _LSPORTS_H */

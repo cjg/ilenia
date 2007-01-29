@@ -1,3 +1,12 @@
+29/01/2007 - ilenia-2.2 released
+Probably this will be really the last release of ilenia 2.*: ilenia 3 works at
+50%. After about three years of repositories anarchy, where only the higher
+version was the priority to use a ports from a repository instead of another
+one, ilenia 2.2 introudes the repositories hierachy available trhough the
+variable REPOS_HIERACHY in ilenia.rc and the option "--no-repos-hierachy" to
+disable at run-time the hierachy. Another new feature of ilenia 2.2 is the
+checking of outdated dependencies while installing or updating a package.
+
 17/01/2007 - ilenia-2.1 released
 Probably this will be the last release of ilenia 2.*: I'm woking on ilenia 3. In
 this release the are two new features: the "--info" action to obtain

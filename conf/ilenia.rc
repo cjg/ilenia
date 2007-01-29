@@ -5,5 +5,6 @@
 # POST_PKGADD = ""
 # ASK_FOR_UPDATE = "Yes" or "No"
 # NOT_FOUND_POLICY = "Ask" or "Stop" or "Nevermind"
+# REPOS_HIERACHY = ppc/core opt/core x86/core 
 
 # End of file

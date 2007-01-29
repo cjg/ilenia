@@ -50,6 +50,7 @@ static char args_doc[] = "ACT ARG1...";
 #define OPT_NO_DEPS 5
 #define OPT_ALL 6
 #define OPT_FETCH_ONLY 7
+#define OPT_NO_REPOSITORIES_HIERACHY 8
 
 #define ACT_UPDATE 10
 #define ACT_LIST 11
@@ -87,6 +88,8 @@ static struct argp_option options[] = {
 	{"no-deps", OPT_NO_DEPS, 0, 0, "Do not check dependencies"},
 	{"all", OPT_ALL, 0, 0, "Shows or remove all dependents packages"},
 	{"fetch-only", OPT_FETCH_ONLY, 0, 0, "Just fetch the needed sources"},
+	{"no-repos-hierachy", OPT_NO_REPOSITORIES_HIERACHY, 0, 0, 
+	 "Do not use the repositories hierachy"},
 	{0}
 };
 
@@ -97,6 +100,7 @@ struct arguments {
 	int no_deps;
 	int all;
 	int fetch_only;
+	int repositories_hierachy;
 	struct list *args;
 };
 
@@ -156,6 +160,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 	case OPT_FETCH_ONLY:
 		arguments->fetch_only = 1;
 		break;
+	case OPT_NO_REPOSITORIES_HIERACHY:
+		arguments->repositories_hierachy = 0;
+		break;
 	case ARGP_KEY_ARG:
 		arguments->args = list_add(arg, arguments->args);
 		break;
@@ -177,6 +184,7 @@ int main(int argc, char **argv)
 	arguments.no_deps = 1;
 	arguments.all = 0;
 	arguments.fetch_only = 0;
+	arguments.repositories_hierachy = 1;
 	arguments.args = NULL;
 
 	if (argc < 2) {
@@ -199,13 +207,30 @@ int main(int argc, char **argv)
 			fclose(file);
 	}
 
-	ilenia_favoriterepo = get_favorite(FAVORITE_REPO);
-	ilenia_favoriteversion = get_favorite(FAVORITE_VERSION);
+	ilenia_favoriterepo = NULL;
+	ilenia_favoriteversion = NULL;
+
+	if(!arguments.no_favorite_repo)
+		ilenia_favoriterepo = get_favorite(FAVORITE_REPO);
+
+	if(!arguments.no_favorite_version)
+		ilenia_favoriteversion = get_favorite(FAVORITE_VERSION);
+
 	ilenia_aliases = aliaseslist_build();
 	ilenia_ports = lsports();
 	ilenia_pkgs = lspkgs();
 	ilenia_favoritepkgmk = pkgmklist_build();
 
+	while(arguments.repositories_hierachy && ilenia_reposhierachy) {
+		ilenia_favoriterepo = pkglist_cat(ilenia_favoriterepo,
+						  pkglist_select_from_repo(ilenia_reposhierachy->data,
+									   ilenia_ports), 0);
+		ilenia_reposhierachy = ilenia_reposhierachy->next;
+	}
+
+	if(arguments.action != ACT_LIST && arguments.action != ACT_SEARCH)
+		ilenia_ports = apply_favorites(ilenia_ports);
+	
 	if (arguments.action > 21 || arguments.action == 0)
 		error("%s", "please perform an action at a time!");
 

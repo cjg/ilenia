@@ -190,3 +190,18 @@ struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
 	}
 	return (dest);
 }
+
+struct pkglist *pkglist_remove(char *name, struct pkglist *p)
+{
+	struct pkglist *newp = NULL;
+	while(p) {
+		if(!strcmp(name, p->name)) {
+			p = p->next;
+			continue;
+		}
+		newp = pkglist_add_reversed(p->name, p->version, p->repo,
+					    p->depends, newp);
+		p = p->next;
+	}
+	return newp;
+}

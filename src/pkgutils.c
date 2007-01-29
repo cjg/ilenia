@@ -76,19 +76,20 @@ int build_install_pkg(int option, int fetch_only, char *name)
 	struct repolist *r;
 	char *pkgmk_conf;
 	char path[PATH_MAX];
-	char *repo;
 	char *install_action;
+	struct pkglist *p = NULL;
 
 	pkgmk_conf = pkgmklist_get_pkgmk_conf(name, ilenia_favoritepkgmk);
+
 	if (pkgmk_conf == NULL)
 		pkgmk_conf = strdup("/etc/pkgmk.conf");
 
-	repo = pkglist_get_newer_favorite(name, option);
+	p = pkglist_find(name, ilenia_ports);
 
-	if (repo == NULL)
+	if (!p)
 		error("%s not found or locked!", name);
 
-	r = repolist_find(repo, ilenia_repos);
+	r = repolist_find(p->repo, ilenia_repos);
 
 	strcpy(path, r->path);
 
@@ -164,13 +165,23 @@ int update_pkg(int option, int fetch_only, char *name)
 		error("only root can update or install packages");
 
 	struct pkglist *d = NULL;
+	struct pkglist *tmp = NULL;
 	if (option >= 0)
 		d = get_dependencies(name);
-
+	
 	while (d != NULL) {
 		if (!strcmp(name, d->name))
 			break;
 		printf("%s [", d->name);
+
+		tmp = pkglist_find(d->name, ilenia_pkgs);
+
+		if(tmp && strverscmp(d->version, tmp->version) <= 0) {
+			printf("installed]\n");
+			d=d->next;
+			continue;
+		}
+
 		if (strcmp(d->repo, "not found") == 0) {
 			printf("not found]\n");
 			not_found_helper();
@@ -178,13 +189,11 @@ int update_pkg(int option, int fetch_only, char *name)
 			continue;
 		}
 
-		if (pkglist_exists(d->name, ilenia_pkgs) == 0) {
-			printf("installed]\n");
-			d = d->next;
-			continue;
-		}
+		if(tmp)
+			printf("update now]\n");
+		else
+			printf("install now]\n");
 
-		printf("install now]\n");
 		if (build_install_pkg(option, fetch_only, d->name) != 0)
 			return (EXIT_FAILURE);
 		d = d->next;
@@ -217,18 +226,7 @@ int update_system(int options, int fetch_only)
 		printf("All packages are up-to-date\n");
 		return (EXIT_SUCCESS);
 	}
-
-	while (p != NULL) {
-		if (pkglist_exists(p->name, q) == 0)
-			continue;
-
-		char *repo = pkglist_get_newer(p->name, ilenia_ports);
-		char *version = pkglist_get_from_repo(p->name, repo,
-						      ilenia_ports);
-
-		q = pkglist_add_ordered(p->name, version, repo, NULL, q);
-		p = p->next;
-	}
+	q = p;
 
 #ifdef _SYSUPNG
 	/*

@@ -32,6 +32,7 @@ struct pkglist *ilenia_favoriterepo;
 struct pkglist *ilenia_favoriteversion;
 struct aliaseslist *ilenia_aliases;
 struct pkgmklist *ilenia_favoritepkgmk;
+struct list *ilenia_reposhierachy;
 
 char *post_pkgadd;
 int not_found_policy;

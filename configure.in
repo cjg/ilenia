@@ -2,10 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(ilenia, 2.1, Giuseppe Coviello <cjg@cruxppc.org>)
-AM_INIT_AUTOMAKE(ilenia, 2.1)
+AC_INIT(ilenia, 2.2, Giuseppe Coviello <cjg@cruxppc.org>)
+AM_INIT_AUTOMAKE(ilenia, 2.2)
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
+
+# AC_SUBST([mandir], [$\{prefix\}/man])
 
 # Checks for programs.
 AC_PROG_CC

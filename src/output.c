@@ -59,15 +59,18 @@ void warning(char *fmt, ...)
 
 void info(char *name, int options)
 {
-	char *reponame, *path, *pkgfile_path;
+	char *path, *pkgfile_path;
 	struct repolist *repo;
-	pkglist *p;
-	reponame = pkglist_get_newer_favorite(name, options);
-	if (reponame == NULL)
-		error("%s not found!", name);
-	repo = repolist_find(reponame, ilenia_repos);
-	p = pkglist_select_from_repo(repo->name, ilenia_ports);
-	p = pkglist_find(name, p);
+	pkglist *p = NULL;
+
+	p = pkglist_find(name, ilenia_ports);
+
+	if(!p) {
+		warning("%s not found!", name);
+		return;
+	}
+
+	repo = repolist_find(p->repo, ilenia_repos);
 	
 	path = strdup_printf("%s/%s/%s", repo->path, repo->name, name);
 	pkgfile_path = strdup_printf("%s/%s/%s/Pkgfile", repo->path, repo->name, name);

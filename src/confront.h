@@ -34,8 +34,6 @@
 #define NO_FAVORITES	     5
 
 struct pkglist *pkglist_confront(int type, int options, int print);
-char *pkglist_get_newer(char *name, struct pkglist *p);
-char *pkglist_get_newer_favorite(char *name, int option);
 char *pkglist_get_from_version(char *nome, char *version,
 			       struct pkglist *p);
 char *pkglist_get_from_repo(char *name, char *repo, struct pkglist *p);

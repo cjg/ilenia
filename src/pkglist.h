@@ -47,6 +47,6 @@ int pkglist_len(struct pkglist *p);
 int pkglist_exists(char *param, struct pkglist *p);
 struct pkglist *pkglist_cat(struct pkglist *dest, struct pkglist *src,
 			    int duplicates);
-struct pkglist *pkglist_remove(char *name, char *repo, struct pkglist *p);
+struct pkglist *pkglist_remove(char *name, struct pkglist *p);
 
 #endif				/* _PKGLIST_H */

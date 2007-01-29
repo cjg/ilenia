@@ -63,6 +63,7 @@ int parse_ileniarc()
 	ask_for_update = 1;
 	post_pkgadd = strdup("");
 	not_found_policy = ASK_POLICY;
+	ilenia_reposhierachy = NULL;
 	file = fopen("/etc/ilenia.rc", "r");
 	if (file == NULL) {
 		warning("you don't have any ilenia.rc file.");
@@ -91,6 +92,12 @@ int parse_ileniarc()
 				not_found_policy = STOP_POLICY;
 			else if (strcasecmp(tmp, "nevermind") == 0)
 				not_found_policy = NEVERMIND_POLICY;
+		}
+		if (strstr(line, "REPOS_HIERACHY")) {
+			char *tmp = get_value(line, "REPOS_HIERACHY");
+			while(strstr(tmp, "  "))
+			      strreplace(tmp, "  ", " ", -1);
+			ilenia_reposhierachy = split(tmp, " ");
 		}
 
 	}

@@ -34,6 +34,7 @@
 #include "repolist.h"
 #include "aliaslist.h"
 #include "ilenia.h"
+#include "vercmp.h"
 
 FILE *cachefile;
 
@@ -388,7 +389,25 @@ int parse_pkgfile(char *filename, char *repo)
 
 	version = sedchr(version, ' ', '_');
 
-	fprintf(cachefile, "%s %s-%s %s", name, version, release, repo);
+	char *dirname = filename;
+	*(strrchr(dirname, '/')) = 0;
+	dirname = strrchr(filename, '/');
+	++dirname;
+
+	if(strcmp(name, dirname))
+		return EXIT_FAILURE;
+
+	char *tmp = strdup_printf("%s %s-%s %s", name, version, release, repo);
+	
+	if(sscanf(tmp, "%s %s %s", name, version, repo)!=3) {
+		free(tmp);
+		return EXIT_FAILURE;
+	}
+
+	
+	fprintf(cachefile, "%s", tmp);
+
+	free(tmp);
 
 	while (d != NULL) {
 		fprintf(cachefile, " %s", d->name);
@@ -475,7 +494,6 @@ struct pkglist *lsports()
 		struct list *splitted_line;
 		char *name, *version, *repo;
 		struct deplist *d = NULL;
-
 		splitted_line = split(line, " ");
 		name = splitted_line->data;
 		splitted_line = splitted_line->next;
@@ -493,7 +511,7 @@ struct pkglist *lsports()
 		trim(name);
 		trim(version);
 		trim(repo);
-
+		//if(!(f=pkglist_find(name, ilenia_favoriterepo)) || !strcmp(f->repo, repo))
 		p = pkglist_add_ordered(name, version, repo, d, p);
 		free(name);
 		free(version);
@@ -542,4 +560,38 @@ struct repolist *build_repolist()
 	closedir(dir);
 
 	return (r);
+}
+
+struct pkglist *apply_favorites(struct pkglist *p)
+{
+	struct pkglist *newp=NULL;
+	struct pkglist *tmp=NULL;
+	while(p) {
+		if((tmp=pkglist_find(p->name, ilenia_favoriterepo)) &&
+		    strcmp(tmp->repo, p->repo)){
+
+			p = p->next;
+			continue;
+		}
+		
+		if((tmp=pkglist_find(p->name, ilenia_favoriteversion)) &&
+		   strcmp(tmp->version, p->version)){
+			p = p->next;
+			continue;
+		}
+ 
+		if((tmp=pkglist_find(p->name, newp))) {
+			if(vercmp(tmp->version, p->version))
+				newp = pkglist_remove(p->name, newp);
+			else {
+				p = p->next;
+				continue;
+			} 
+		}
+
+		newp = pkglist_add_ordered(p->name, p->version, p->repo, p->depends, newp);
+			
+		p = p->next;
+	}
+	return newp;
 }
