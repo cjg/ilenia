@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* job.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,24 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _JOB_H
+#define _JOB_H
+#include "port.h"
 
-#include "list.h"
-#include "dict.h"
+typedef enum { NOT_EXECUTED_RT, FAILED_RT, SUCCESSED_RT } job_result_t;
+typedef enum { UPDATE_JOB, FETCH_JOB, REMOVE_JOB } job_type_t;
+typedef struct {
+	port_t *port;
+	job_type_t type;
+	int have_readme;
+	int have_preinstall;
+	int have_postinstall;
+	job_result_t result;
+	char *post_pkgadd;
+} job_t;
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd);
+void job_dump(job_t * self);
+int job_execute(job_t * self);
 
 #endif

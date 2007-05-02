@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* remove.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _REMOVE_H
+#define _REMOVE_H
 
-#include "list.h"
-#include "dict.h"
+#include "conf.h"
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+int remove_packages(list_t * packages_name, list_t * packages, dict_t * ports,
+		    conf_t * conf, int all);
 
 #endif

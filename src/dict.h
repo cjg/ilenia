@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* dict.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,27 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _DICT_H
+#define _DICT_H
 
-#include "list.h"
-#include "dict.h"
+typedef struct {
+	char *key;
+	void *value;
+} element_t;
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+typedef struct {
+	unsigned length;
+	element_t **elements;
+	unsigned size;
+} dict_t;
+
+dict_t *dict_new(void);
+void dict_free(dict_t * self, void data_free(void *));
+dict_t *dict_add(dict_t * self, char *key, void *data);
+void *dict_get(dict_t * self, char *key);
+dict_t *dict_remove(dict_t * self, char *key, void data_free(void *));
+void dict_dump(dict_t * self, void data_dump(void *));
+#define dict_free(self, data_free) dict_free((self), \
+					     (void (*)(void *)) (data_free))
 
 #endif

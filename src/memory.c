@@ -1,4 +1,4 @@
-/* output.h */
+/* memory.c */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,15 +20,69 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _OUTPUT_H
-#define _OUTPUT_H
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 
-int coloredprintf(FILE * stream, const char *format, ...);
-int uncoloredprintf(FILE * stream, const char *format, ...);
-void warning(const char *format, ...);
-void error(const char *format, ...);
-typedef int (*cprintf_t) (FILE *, const char *, ...);
-cprintf_t cprintf;
+void *xmalloc(size_t size)
+{
+	void *ptr;
+	ptr = malloc(size);
+	if (!ptr)
+		abort();
+	return ptr;
+}
 
-#endif
+void *xrealloc(void *ptr, size_t size)
+{
+	ptr = realloc(ptr, size);
+	if (!ptr)
+		abort();
+	return ptr;
+}
+
+char *xstrdup(const char *s)
+{
+	char *dup;
+	dup = strdup(s);
+	if (!dup)
+		abort();
+	return (dup);
+}
+
+char *xstrndup(const char *s, size_t n)
+{
+	char *dup;
+	dup = strndup(s, n);
+	if (!dup)
+		abort();
+	return (dup);
+}
+
+char *xstrdup_printf(const char *fmt, ...)
+{
+	int n;
+	int size;
+	char *s;
+	va_list ap;
+
+	size = 1;
+
+	s = xmalloc(size);
+
+	va_start(ap, fmt);
+	n = vsnprintf(s, size, fmt, ap);
+	va_end(ap);
+
+	if (n > -1 && n < size)
+		return s;
+
+	size = n + 1;
+	s = (char *)xrealloc(s, size);
+	va_start(ap, fmt);
+	n = vsnprintf(s, size, fmt, ap);
+	va_end(ap);
+
+	return s;
+}

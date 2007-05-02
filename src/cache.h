@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* cache.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _CACHE_H
+#define _CACHE_H
 
-#include "list.h"
 #include "dict.h"
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+int cache_build(dict_t * repositories);
+void cache_update_stamp(void);
+int cache_is_update(char *cache_file);
+
+#ifndef CACHE_FILE
+#define CACHE_FILE ".ilenia.cache"
+#endif
+#ifndef STAMP_FILE
+#define STAMP_FILE "/usr/ports/.ilenia.stamp"
+#endif
 
 #endif

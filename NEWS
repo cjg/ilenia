@@ -1,7 +1,19 @@
-29/01/2007 - ilenia-2.2 released
+04/04/2007 - ilenia-3.0 released
+Fine, I'll stop to backport new features to ilenia-2.*: ilenia-3.0 is ready!
+ilenia-3.0 comes with many new features like the colored output; the trees
+output for show the dependencies; the search by description command and the
+support of wildcards in the search command; the support for shell commands in
+version fields of Pkgfile.
+ilenia-3.0 uses a new unique configuration file: /etc/ilenia.conf; right the
+user has to port the configurations contained by /etc/ilenia.rc,
+/etc/ports/{aliases,favoriterepo,favoriteversion,favoritepkgmk}.
+ilenia-3.0 runs faster than ilenia-2.* and ilenia-1.* and it is more precise and
+secure than the precedent versions.
+
+27/01/2007 - ilenia-2.2 released
 Probably this will be really the last release of ilenia 2.*: ilenia 3 works at
 50%. After about three years of repositories anarchy, where only the higher
-version was the priority to use a ports from a repository instead of another
+version was the priority to use a port from a repository instead of another
 one, ilenia 2.2 introudes the repositories hierachy available trhough the
 variable REPOS_HIERACHY in ilenia.rc and the option "--no-repos-hierachy" to
 disable at run-time the hierachy. Another new feature of ilenia 2.2 is the
@@ -65,7 +77,7 @@ for .cvs supfiles of crux ppc.
 Ilenia now with some new features like the secure removing 
 of packages ("secure" means "with dependencies check").
 With ilenia 1.1 you can store your ports tree in more
-floxible way: ilenia knows where you have the ports tree
+flexible way: ilenia knows where you have the ports tree
 reading from .cvsup and .httpup file; for example you can
 store ports from crux (base and opt), crux-it, clc and 
 various people in different directories under /usr/ports, 

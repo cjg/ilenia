@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* memory.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _MEMORY_H
+#define _MEMORY_H
 
-#include "list.h"
-#include "dict.h"
+#include <stdlib.h>
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+void *xmalloc(size_t size);
+void *xrealloc(void *ptr, size_t size);
+char *xstrdup(const char *s);
+char *xstrndup(const char *s, size_t n);
+char *xstrdup_printf(const char *fmt, ...);
+void xfree(void *ptr);
+void xexit(int status);
 
 #endif

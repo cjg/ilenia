@@ -1,4 +1,21 @@
-2.2
+3.0:
+	- feature: colorized output
+	- feature: dependencies tree output
+	- feature: the command --search-desc for searching ports by
+	description
+	- feature: the verbose options for --search and --dependencies
+	command
+	- feature: configuration's variables can be overrated setting
+	shell environment variables
+	- feature: handling shell commands in Pkgfile's 'version'
+	variables
+	- feature: supporting wildcards for search command
+	- change: new (better) internal data structures
+	- change: new unique configuration file
+	- change: using per user cache file
+	- change: a new man page
+	- bugfix: no more memory leak
+2.2:
 	- feature: added the support for repositories hierachy available
 	through REPOS_HIERACHY in ilenia.rc
 	- feature: added outdated check of dependencies while
@@ -32,20 +49,20 @@
 	- feature: --cache forces ilenia to rebuild the cache
 	- feature: introduced ilenia.rc file
 	- feature: introduced the POST_PKGADD commands
-	- change:  better way to parse *.{cvsup,cvs,httpup,local} file
-	- change:  more logical way to manage repositories information
-	- bugfix:  reduced CPU usage while compiling packages (thanks to
+	- change: better way to parse *.{cvsup,cvs,httpup,local} file
+	- change: more logical way to manage repositories information
+	- bugfix: reduced CPU usage while compiling packages (thanks to
 	nullpointer)
-	- bugfix:  evited to build two or more times the same package from
+	- bugfix: eviting to build two or more times the same package from
 	various repositories during `ilenia -U`	
 1.2:
 	- feature: support for crux ppc's .cvs supfile
-	- change:  a better support for pre and post install scripts
-	- bugfix:  fixed segfaults when trying to install non existent ports
+	- change: a better support for pre and post install scripts
+	- bugfix: fixed segfaults when trying to install non existent ports
 1.1:
 	- feature: -R remove packages checking dependents
 	- feature: -T shows dependents package of the specified package
 	- feature: flexible way of storing ports 
-	- change:  now ilenia has only a cache file in /var/cache/ilenia
-	- change:  a better support for dependencies
+	- change: now ilenia has only a cache file in /var/cache/ilenia
+	- change: a better support for dependencies
 	- various bugfixes

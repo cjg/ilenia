@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* ini.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,31 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _INI_H
 
-#include "list.h"
+#define _INI_H
+
 #include "dict.h"
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+typedef struct {
+	char *filepath;
+	dict_t *sections;
+} ini_t;
+
+extern ini_t *ini_new(char *filepath);
+extern void ini_free(ini_t * self);
+extern ini_t *ini_add(ini_t * self, char *section);
+extern ini_t *ini_remove(ini_t * self, char *section);
+extern ini_t *ini_set(ini_t * self, char *section, char *var, char *value);
+extern ini_t *ini_set_default(ini_t * self, char *section, char *var,
+			      char *value);
+extern ini_t *ini_unset(ini_t * self, char *section, char *var);
+extern int ini_has_section(ini_t * self, char *section);
+extern int ini_has_var(ini_t * self, char *section, char *var);
+extern char *ini_get(ini_t * self, char *section, char *var);
+extern int ini_load(ini_t * self);
+extern int ini_save(ini_t * self);
+extern void ini_dump(ini_t * self);
+dict_t *ini_get_vars(ini_t * self, char *section);
 
 #endif

@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* str.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _STR_H
+#define _STR_H
 
-#include "list.h"
-#include "dict.h"
+int strequ(const char *s1, const char *s2);
+char *strltrim(char *s);
+char *strrtrim(char *s);
+char *strtrim(char *s);
+char *strappend(char *dest, const char *src);
+char *strprepend(char *dest, const char *src);
+char *strreplace(char *s, const char *find, const char *replace, int n_replace);
+char *strupper(char *s);
+char *strlower(char *s);
+int strsplit(const char *str, const char sep, char ***ptr_array);
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+#define strreplaceall(s, find, replace) strreplace((s), (find), (replace), -1)
 
 #endif

@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* rsync.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#ifndef _RSYNC_H
+#define _RSYNC_H
+#include "repository.h"
+#include "driver.h"
 
-#include "list.h"
-#include "dict.h"
-
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+repository_t *rsync_get_repository(driver_t * self, char *supfile,
+				   list_t * repositories_hierarchy);
+void rsync_update(repository_t * repository);
 
 #endif

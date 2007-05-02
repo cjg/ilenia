@@ -1,31 +1,34 @@
-/***************************************************************************
- *            update.h
- *
- *  Thu Jul 15 18:17:19 2004
- *  Copyright  2004 - 2006  Coviello Giuseppe
- *  immigrant@email.it
- ****************************************************************************/
+/* update.h */
 
-/*
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+/* ilenia -- A package manager for CRUX
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Library General Public License for more details.
+ * Copyright (C) 2006 - 2007
+ *     Giuseppe Coviello <cjg@cruxppc.org>
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
 #ifndef _UPDATE_H
 #define _UPDATE_H
+#include "port.h"
+#include "dict.h"
+#include "conf.h"
 
-int update_repo(char *name);
-int update_all_repos();
+int update_package(list_t * ports_name, dict_t * ports, conf_t * conf,
+		   int fetch_only);
+int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
+		  int ask_for_update, int not_found_policy);
 
-#endif				/* _LIST_H */
+#endif

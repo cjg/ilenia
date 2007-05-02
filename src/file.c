@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* file.c */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
+#include <stdio.h>
+#include <assert.h>
 
-#include "list.h"
-#include "dict.h"
+int is_file(char *path)
+{
+	FILE *file;
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+	assert(path != NULL);
 
-#endif
+	file = fopen(path, "r");
+	if (file == NULL)
+		return 0;
+
+	fclose(file);
+	return 1;
+}

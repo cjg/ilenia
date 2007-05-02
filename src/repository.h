@@ -1,4 +1,4 @@
-/* dependencies.h */
+/* repository.h */
 
 /* ilenia -- A package manager for CRUX
  *
@@ -20,20 +20,27 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _DEPENDENCIES_H
-#define _DEPENDENCIES_H
-
-#include "list.h"
+#ifndef _REPOSITORY_H
+#define _REPOSITORY_H
 #include "dict.h"
+#include "list.h"
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds);
-void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all);
-void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all);
+typedef struct {
+	char *name;
+	char *path;
+	char *supfile;
+	void *driver;
+	int priority;
+} repository_t;
+
+repository_t *repository_new(char *name, char *path, char *supfile,
+			     void *driver, list_t * repositories_hierarchy);
+dict_t *repositories_dict_init(list_t * drivers,
+			       list_t * repositories_hierarchy);
+void repositories_dict_update(dict_t * self, list_t * repositories_name);
+void repositories_dict_update_all(dict_t * self);
+void repositories_dict_dump(dict_t * self);
+void repository_dump(repository_t * self);
+void repository_free(repository_t * self);
 
 #endif

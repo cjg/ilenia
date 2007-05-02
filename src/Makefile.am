@@ -1,53 +1,63 @@
-## Process this file with automake to produce Makefile.in
+if !DEBUG
+DEBUG_FLAG = -DNDEBUG 
+else
+DEBUG_FLAG = -O0 -g -Wall -Wpointer-arith -Wstrict-prototypes -W
+endif
 
-INCLUDES =
-
-AM_CFLAGS =\
-	-Wall\
-	-g\
-	-D_GNU_SOURCE\
-	-D_SYSUPNG
+if BAD_MAINTAINERS
+BAD_MAINTAINERS_FLAG = -D_ENABLE_BAD_MAINTAINERS
+endif
 
 bin_PROGRAMS = ilenia
-
-ilenia_SOURCES = \
-	main.c\
-	update.c\
-	update.h\
-	confront.c\
-	confront.h\
-	pkglist.c\
-	pkglist.h\
-	lspkgs.c\
-	lspkgs.h\
-	lsports.c\
-	lsports.h\
-	manipulator.c\
-	manipulator.h\
-	output.c\
-	output.h\
-	pkgutils.c\
-	pkgutils.h\
-	vercmp.c\
-	vercmp.h\
-	dependencies.c\
-	dependencies.h\
-	ilenia.h\
-	deplist.c\
-	deplist.h\
-	ileniarc.c\
-	repolist.h\
-	repolist.c\
-	aliaslist.h\
-	aliaslist.c\
-	utils.h\
-	utils.c\
+ilenia_SOURCES =\
+	ilenia.c\
+	memory.h\
+	memory.c\
+	str.h\
+	str.c\
 	list.h\
 	list.c\
-	favoritepkgmk.h\
-	favoritepkgmk.c
+	dict.h\
+	dict.c\
+	repository.h\
+	repository.c\
+	port.h\
+	port.c\
+	dependencies.h\
+	dependencies.c\
+	package.h\
+	package.c\
+	ini.h\
+	ini.c\
+	conf.h\
+	conf.c\
+	cache.h\
+	cache.c\
+	exec.h\
+	exec.c\
+	driver.h\
+	driver.c\
+	rsync.h\
+	rsync.c\
+	httpup.h\
+	httpup.c\
+	cvs.h\
+	cvs.c\
+	local.h\
+	local.c\
+	output.h\
+	output.c\
+	info.h\
+	info.c\
+	update.h\
+	update.c\
+	file.h\
+	file.c\
+	job.h\
+	job.c\
+	remove.h\
+	remove.c
 
-ilenia_LDFLAGS = 
-
-ilenia_LDADD = 
+AM_CFLAGS = -D_GNU_SOURCE $(BAD_MAINTAINERS_FLAG) $(DEBUG_FLAG)
+ilenia_LDADD = -lpthread
 
