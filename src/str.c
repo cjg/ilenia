@@ -75,102 +75,51 @@ char *strtrim(char *s)
 	return s;
 }
 
-char *strappend(char *dest, const char *src)
+char *strappend(char **dest, const char *src)
 {
-	assert(dest != NULL);
-	assert(src != NULL);
-	dest = xrealloc(dest, strlen(dest) + strlen(src) + 1);
-	strcat(dest, src);
-	return dest;
+	assert(dest != NULL && src != NULL);
+	*dest = xrealloc(*dest, strlen(*dest) + strlen(src) + 1);
+	strcat(*dest, src);
+	return *dest;
 }
 
-char *strprepend(char *dest, const char *src)
+char *strprepend(char **dest, const char *src)
 {
-	assert(dest && src);
-	dest = xrealloc(dest, strlen(dest) + strlen(src) + 1);
-	bcopy(dest, dest + strlen(src), strlen(dest) + 1);
-	memcpy(dest, src, strlen(src));
-	return dest;
+	assert(dest != NULL && src != NULL);
+	*dest = xrealloc(*dest, strlen(*dest) + strlen(src) + 1);
+	memmove(*dest + strlen(src), *dest, strlen(*dest) + 1);
+	memcpy(*dest, src, strlen(src));
+	return *dest;
 }
 
-char *strreplace(char *s, const char *from, const char *to, int max)
+char * strreplace(char **s, const char *find, const char *replace, 
+		  int n_replace)
 {
-	int fromlen, tolen, buflen, i;
-	char *sptr, *buf, *tptr;
+	char *found;
+	size_t s_len, find_len, replace_len, offset;
 
-	assert(s != NULL && from != NULL && to != NULL);
+	assert(s != NULL && *s != NULL && find != NULL && replace != NULL);
 
-	if (strstr(s, from) == NULL)
-		return s;
-
-	fromlen = strlen(from);
-	tolen = strlen(to);
-	buflen = strlen(s);
-
-	if ((buflen / fromlen) * (tolen + 1) > buflen)
-		buflen = (buflen / fromlen) * (tolen + 1);
-
-	buf = xmalloc(buflen);
-	memset(buf, 0, buflen);
-	i = 0;
-	sptr = s;
-	while ((tptr = strstr(sptr, from)) != NULL && max-- != 0) {
-		strncpy(buf + i, sptr, tptr - sptr);
-		i += tptr - sptr + tolen;
-		strcat(buf, to);
-		sptr = tptr + fromlen;
+	found = NULL;
+	s_len = strlen(*s);
+	find_len = strlen(find);
+	replace_len = strlen(replace);
+	offset = 0;
+	while ((found = strstr(*s + offset, find)) != NULL 
+	       && n_replace-- != 0) {
+		offset = found - *s;
+		if(replace_len > find_len)
+			*s = xrealloc(*s, s_len + replace_len - find_len + 1);
+		memmove(*s + offset + replace_len, *s + offset + find_len,
+			s_len - offset - find_len);
+		memcpy(*s + offset, replace, replace_len);
+		s_len += replace_len - find_len;
+		*(*s + s_len) = 0;
+		offset += replace_len;
 	}
 
-	if (*sptr != 0)
-		strncat(buf, sptr, strlen(sptr));
-
-	if (strlen(buf) > strlen(s))
-		s = xrealloc(s, strlen(buf) + 1);
-
-	strcpy(s, buf);
-	free(buf);
-	return s;
+	return *s;
 }
-
-/* char *strreplace(char *s, const char *find, const char *replace, int n_replace) */
-/* { */
-/* 	char *sptr, *tmp; */
-/* 	int find_len; */
-/* 	int replace_len; */
-/* 	int diff_len; */
-/* 	size_t size, len; */
-
-/* 	assert(s != NULL && find != NULL && replace != NULL); */
-
-/* 	find_len = strlen(find); */
-/* 	replace_len = strlen(replace); */
-/* 	diff_len = replace_len - find_len; */
-/* 	size = len = strlen(s); */
-
-/* 	for (sptr = s; strlen(sptr) >= find_len && n_replace; sptr++) { */
-/* 		if (strncmp(sptr, find, find_len)) */
-/* 			continue; */
-
-/* 		if (diff_len > 0 && size < len + diff_len) { */
-/* 			size = len + diff_len + 1; */
-/* 			s = xrealloc(s, size); */
-/* 		} */
-
-/* 		if (diff_len) { */
-/* 			len += diff_len; */
-/* 			tmp = xstrdup(sptr + find_len); */
-/* 			strcpy(sptr + replace_len, tmp); */
-/* 			free(tmp); */
-/* 		} */
-
-/* 		memcpy(sptr, replace, replace_len); */
-
-/* 		sptr += replace_len; */
-/* 		--n_replace; */
-/* 	} */
-
-/* 	return s; */
-/* } */
 
 #define strreplaceall(s, find, replace) strreplace((s), (find), (replace), ALL)
 

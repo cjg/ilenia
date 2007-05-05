@@ -66,9 +66,9 @@ repository_t *cvs_get_repository(driver_t * self, char *supfile,
 
 	if (local_dir && local_path) {
 		path = xstrdup_printf("%s/%s", local_path, local_dir);
-		strreplaceall(path, "\"", "");
+		strreplaceall(&path, "\"", "");
 		while (strstr(path, "//"))
-			strreplaceall(path, "//", "/");
+			strreplaceall(&path, "//", "/");
 		if (!strncmp("/usr/ports/", path, 11))
 			name = xstrdup(path + 11);
 		else

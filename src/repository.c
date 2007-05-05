@@ -43,7 +43,7 @@ static int get_priority(char *name, list_t * repositories_hierarchy)
 	while (repositories_hierarchy->length && priority >= 0) {
 		if (!strcmp(name, (char *)list_get(repositories_hierarchy,
 						   repositories_hierarchy->length
-						   - priority - 1)))
+						   - priority)))
 			break;
 		priority--;
 	}

@@ -67,16 +67,16 @@ cache_parse_pkgfile(repository_t * repository, char *dir_name, FILE * cachefile)
 		    && strchr(line, ':') != NULL) {
 			free(deprow);
 			deprow = strtrim(xstrdup(strchr(line, ':') + 1));
-			strreplaceall(deprow, ",", " ");
+			strreplaceall(&deprow, ",", " ");
 			while (strstr(deprow, "  "))
-				strreplaceall(deprow, "  ", " ");
+				strreplaceall(&deprow, "  ", " ");
 		} else if (strstr(line, "Description") != NULL
 			   && strchr(line, ':') != NULL) {
 			free(description);
 			description = strtrim(xstrdup(strchr(line, ':') + 1));
-			strreplaceall(description, ",", " ");
+			strreplaceall(&description, ",", " ");
 			while (strstr(description, "  "))
-				strreplaceall(description, "  ", " ");
+				strreplaceall(&description, "  ", " ");
 		} else if (strncmp("name=", line, 5) == 0) {
 			free(name);
 			name = strtrim(xstrdup(strchr(line, '=') + 1));
@@ -94,7 +94,7 @@ cache_parse_pkgfile(repository_t * repository, char *dir_name, FILE * cachefile)
 				strtrim(version);
 			}
 #endif
-			strreplaceall(version, " ", "_");
+			strreplaceall(&version, " ", "_");
 			strtrim(version);
 		} else if (strncmp("release=", line, 8) == 0) {
 			free(release);

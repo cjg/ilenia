@@ -201,9 +201,12 @@ int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
 			     PRT_NOTINSTALLED)
 			    && dict_get(seen, pport->name) == NULL) {
 				dict_add(seen, pport->name, "");
-				list_append(jobs, job_new(pport, fetch_only ?
-							  FETCH_JOB :
-							  UPDATE_JOB, NULL));
+				if(pport->repository != NULL)
+					list_append(jobs, job_new(pport, 
+								  fetch_only ?
+								  FETCH_JOB :
+								  UPDATE_JOB,
+								  NULL));
 			}
 		}
 

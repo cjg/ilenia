@@ -58,7 +58,7 @@ repository_t *local_get_repository(driver_t * self, char *supfile,
 		path = strtrim(xstrdup(strchr(line, '=') + 1));
 		name = xstrdup(strrchr(supfile, '/'));
 		*(strrchr(name, '.')) = 0;
-		strprepend(name, "local");
+		strprepend(&name, "local");
 		repository = repository_new(name, path, supfile, self,
 					    repositories_hierarchy);
 		break;

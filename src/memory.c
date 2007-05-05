@@ -79,7 +79,8 @@ char *xstrdup_printf(const char *fmt, ...)
 		return s;
 
 	size = n + 1;
-	s = (char *)xrealloc(s, size);
+	free(s);
+	s = xmalloc(size);
 	va_start(ap, fmt);
 	n = vsnprintf(s, size, fmt, ap);
 	va_end(ap);

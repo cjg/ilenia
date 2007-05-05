@@ -38,21 +38,25 @@
 #include "memory.h"
 #include "remove.h"
 
-const char *argp_program_version = "ilenia " VERSION;
+const char *argp_program_version = "ilenia " VERSION 
+	"\n"
+	"Copyright (C) 2006-2007 Giuseppe Coviello.\n"
+	"This is free software.  You may redistribute copies of it under the terms of\n"
+	"the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n"
+	"There is NO WARRANTY, to the extent permitted by law.";
 const char *argp_program_bug_address = "Giuseppe Coviello <cjg@cruxppc.org>";
 static char doc[] = "A package manager for CRUX (and CRUX PPC of course)";
 static char args_doc[] = "ACT [ARG(S)]";
 
 enum OPT { OPT_CACHE = 300, OPT_REPOSITORY_LIST, OPT_NO_FAVOURITE_REPOSITORIES,
-	OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY,
-	OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
-	OPT_NO_COLORS
+	   OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY,
+	   OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
+	   OPT_NO_COLORS
 };
 
-enum ACT { ACT_UPDATE =
-	    300, ACT_LIST, ACT_SEARCH, ACT_INFO, ACT_DIFF, ACT_UPDATED,
-	ACT_DEPENDENCIES, ACT_UPDATE_PKG, ACT_DEPENDENTS, ACT_REMOVE,
-	ACT_REPOSITORY_LIST, ACT_SEARCHDESC
+enum ACT { ACT_UPDATE = 300, ACT_LIST, ACT_SEARCH, ACT_INFO, ACT_README,
+	   ACT_DIFF, ACT_UPDATED, ACT_DEPENDENCIES, ACT_UPDATE_PKG,
+	   ACT_DEPENDENTS, ACT_REMOVE, ACT_REPOSITORY_LIST, ACT_SEARCHDESC
 };
 
 static struct argp_option options[] = {
@@ -63,6 +67,7 @@ static struct argp_option options[] = {
 	{"search-desc", ACT_SEARCHDESC, 0, 0,
 	 "Search for ports by description", 1},
 	{"info", 'i', 0, 0, "Get info on a port", 1},
+	{"show-readme", 'r', 0, 0, "Show the README of a port", 1},
 	{"diff", 'd', 0, 0, "List version differences", 1},
 	{"updated", 'p', 0, 0, "List ports with newer version", 1},
 	{"depedencies", 'D', 0, 0, "List dependencies of a package", 1},
@@ -245,8 +250,10 @@ int main(int argc, char **argv)
 		}
 		for (i = 0; i < arguments.args->length; i++) {
 			char *key = xstrdup(list_get(arguments.args, i));
-			if (isalpha(*key) && isalpha(*(key + strlen(key) - 1)))
-				strappend(strprepend(key, "*"), "*");
+			if (isalpha(*key) && isalpha(*(key + strlen(key) - 1))) {
+				strprepend(&key, "*");
+				strappend(&key, "*");
+			}
 			list = list_query(ports_list, port_query_by_description,
 					  key);
 			if (arguments.verbose)
@@ -295,6 +302,15 @@ int main(int argc, char **argv)
 		}
 		for (i = 0; i < arguments.args->length; i++)
 			info_dump(list_get(arguments.args, i), ports_dict);
+		break;
+	case ACT_README:
+		if (!arguments.args->length) {
+			warning("action --show-readme requires at "
+				"least an argument!");
+			break;
+		}
+		for (i = 0; i < arguments.args->length; i++)
+			readme_dump(list_get(arguments.args, i), ports_dict);
 		break;
 	case ACT_REPOSITORY_LIST:
 		repositories_dict_dump(repositories);
@@ -358,6 +374,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 		break;
 	case 'i':
 		arguments->action = ACT_INFO;
+		break;
+	case 'r':
+		arguments->action = ACT_README;
 		break;
 	case 'd':
 		arguments->action = ACT_DIFF;

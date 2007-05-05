@@ -1,3 +1,11 @@
+05/05/2007 - ilenia-3.1 released
+After a month and a day a new release. ilenia-3.1 has a new feature
+(--show-readme) to show, using your favourite pager, the README of the
+port. There are also some little bugfixes: it is fixed the segmentation faul
+caused during a system update when a dependece port isn't found; it is fixed the
+segmentation fault when trying to obtain information about an "orphaned" port 
+(a port that is installed but it isn't found in any repository).
+
 04/04/2007 - ilenia-3.0 released
 Fine, I'll stop to backport new features to ilenia-2.*: ilenia-3.0 is ready!
 ilenia-3.0 comes with many new features like the colored output; the trees

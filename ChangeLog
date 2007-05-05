@@ -1,68 +1,159 @@
-3.0:
-	- feature: colorized output
-	- feature: dependencies tree output
-	- feature: the command --search-desc for searching ports by
+2007-05-05  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/ilenia.c: added the command --show-readme
+	
+	* src/info.c: added readme_dump and port_readme_dump functions
+
+	* src/str.c (strprepend, strappend): modified to eliminate memory
+	leak 	
+	(strreplace): rewritten, now it is safer, faster and smarter
+
+2007-04-04  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 3.0
+
+	* feature: colorized output
+
+	* feature: dependencies tree output
+
+	* feature: the command --search-desc for searching ports by
 	description
-	- feature: the verbose options for --search and --dependencies
+
+	* feature: the verbose options for --search and --dependencies
 	command
-	- feature: configuration's variables can be overrated setting
+
+	* feature: configuration's variables can be overrated setting
 	shell environment variables
-	- feature: handling shell commands in Pkgfile's 'version'
+
+	* feature: handling shell commands in Pkgfile's 'version'
 	variables
-	- feature: supporting wildcards for search command
-	- change: new (better) internal data structures
-	- change: new unique configuration file
-	- change: using per user cache file
-	- change: a new man page
-	- bugfix: no more memory leak
-2.2:
-	- feature: added the support for repositories hierachy available
+
+	* feature: supporting wildcards for search command
+
+	* change: new (better) internal data structures
+
+	* change: new unique configuration file
+
+	* change: using per user cache file
+
+	* change: a new man page
+
+	* bugfix: no more memory leak
+
+2007-01-27  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 2.2
+
+	* feature: added the support for repositories hierachy available
 	through REPOS_HIERACHY in ilenia.rc
-	- feature: added outdated check of dependencies while
+
+	* feature: added outdated check of dependencies while
 	installing/updating a package
-2.1:
-	- feature: added the --info action to obtain informations about
+
+2007-01-17  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 2.1
+
+	* feature: added the --info action to obtain informations about
 	some ports
-	- feature: added the --fetch-only option 
-	- bugfix:  detected and solved a bug that forced ilenia to rebuild
+
+	* feature: added the --fetch-only option 
+
+	* bugfix:  detected and solved a bug that forced ilenia to rebuild
 	up-to-date packages while using sysupng
-2.0.1:
-	- bugfix: managing cvs repositories
-	- bugfix: managing supfiles with more than a dot in their names
-	- bugfix: executing install-scripts not marked as executable files
-	- bugfix: alias working again
-	- bugfix: no segfault while managing favoriteversion
-2.0:
-	- feature: not found policy
-	- feature: favorite pkgmk.conf
-	- feature: sysupng
-	- change: unified error and warning messages system
-	- bugfix: code rewritten to reduce the waste of memory
-1.5:
-	- feature: rsync support
-1.4:
-	- feature: introduced alias
-	- feature: added a little search function
-	- bugfix: fixed segfaults when managing ports with bad version field
-1.3:	
-	- feature: support for local repository
-	- feature: --cache forces ilenia to rebuild the cache
-	- feature: introduced ilenia.rc file
-	- feature: introduced the POST_PKGADD commands
-	- change: better way to parse *.{cvsup,cvs,httpup,local} file
-	- change: more logical way to manage repositories information
-	- bugfix: reduced CPU usage while compiling packages (thanks to
+
+2006-12-21  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 2.0.1
+
+	* bugfix: managing cvs repositories
+
+	* bugfix: managing supfiles with more than a dot in their names
+
+	* bugfix: executing install-scripts not marked as executable files
+
+	* bugfix: alias working again
+
+	* bugfix: no segfault while managing favoriteversion
+
+2006-03-11  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 2.0
+
+	* feature: not found policy
+
+	* feature: favorite pkgmk.conf
+
+	* feature: sysupng
+
+	* change: unified error and warning messages system
+
+	* bugfix: code rewritten to reduce the waste of memory
+
+2005-11-14  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 1.5
+	
+	* feature: rsync support
+
+2005-10-02  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 1.4
+
+	* feature: introduced alias
+
+	* feature: added a little search function
+
+	* bugfix: fixed segfaults when managing ports with bad version field
+
+2005-03-25  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 1.3
+	
+	* feature: support for local repository
+
+	* feature: --cache forces ilenia to rebuild the cache
+
+	* feature: introduced ilenia.rc file
+
+	* feature: introduced the POST_PKGADD commands
+
+	* change: better way to parse *.{cvsup,cvs,httpup,local} file
+
+	* change: more logical way to manage repositories information
+
+	* bugfix: reduced CPU usage while compiling packages (thanks to
 	nullpointer)
-	- bugfix: eviting to build two or more times the same package from
+
+	* bugfix: eviting to build two or more times the same package from
 	various repositories during `ilenia -U`	
-1.2:
-	- feature: support for crux ppc's .cvs supfile
-	- change: a better support for pre and post install scripts
-	- bugfix: fixed segfaults when trying to install non existent ports
-1.1:
-	- feature: -R remove packages checking dependents
-	- feature: -T shows dependents package of the specified package
-	- feature: flexible way of storing ports 
-	- change: now ilenia has only a cache file in /var/cache/ilenia
-	- change: a better support for dependencies
-	- various bugfixes
+
+2005-01-29  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 1.2
+
+	* feature: support for crux ppc's .cvs supfile
+
+	* change: a better support for pre and post install scripts
+
+	* bugfix: fixed segfaults when trying to install non existent ports
+
+2004-12-30  Giuseppe Coviello <cjg@cruxppc.org>
+
+	* Version 1.1
+
+	* feature: -R remove packages checking dependents
+
+	* feature: -T shows dependents package of the specified package
+
+	* feature: flexible way of storing ports 
+
+	* change: now ilenia has only a cache file in /var/cache/ilenia
+
+	* change: a better support for dependencies
+
+	* various bugfixes
+
+2004-11-07  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* Version 1.0

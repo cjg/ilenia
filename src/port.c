@@ -136,16 +136,16 @@ list_t *ports_list_init(dict_t * repositories)
 		nread = getline(&line, &n, cachefile);
 	}
 
-	while (nread > 0) {
+	while (nread > 0) { 
 		*(line + strlen(line) - 1) = 0;
 		description = strchr(line, '%') + 1;
 		description = xstrndup(description, strlen(description) -
 				       strlen(strchr(description, '%')));
 		if (strlen(description) > 0)
-			strreplace(line, description, "", 1);
-		strreplace(line, "%%", "", 1);
+			strreplace(&line, description, "", 1);
+		strreplace(&line, "%%", "", 1);
 		while (strstr(line, "  ") != NULL)
-			strreplaceall(line, "  ", " ");
+			strreplaceall(&line, "  ", " ");
 		splitted = NULL;
 		nsplit = strsplit(line, ' ', &splitted);
 		list_append(self, port_new(splitted[0],
@@ -160,6 +160,7 @@ list_t *ports_list_init(dict_t * repositories)
 		free(splitted);
 		nread = getline(&line, &n, cachefile);
 	}
+	if(line)
 	free(line);
 	fclose(cachefile);
 

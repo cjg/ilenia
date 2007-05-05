@@ -86,9 +86,9 @@ conf_t *conf_init(void)
 
 	tmp = ini_get(ini, "ilenia", "repositories_hierarchy");
 	if (tmp != NULL) {
-		strreplace(tmp, "\t", " ", -1);
+		strreplace(&tmp, "\t", " ", -1);
 		while (strstr(tmp, "  "))
-			strreplace(tmp, "  ", " ", -1);
+			strreplace(&tmp, "  ", " ", -1);
 
 		splitted = NULL;
 		nsplits = strsplit(tmp, ' ', &splitted);
@@ -130,9 +130,9 @@ conf_t *conf_init(void)
 	for (i = 0; vars != NULL && i < vars->length; i++) {
 		tmp = vars->elements[i]->value;
 
-		strreplace(tmp, "\t", " ", -1);
+		strreplace(&tmp, "\t", " ", -1);
 		while (strstr(tmp, "  "))
-			strreplace(tmp, "  ", " ", -1);
+			strreplace(&tmp, "  ", " ", -1);
 
 		splitted = NULL;
 		nsplits = strsplit(tmp, ' ', &splitted);
