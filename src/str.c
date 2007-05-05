@@ -92,8 +92,7 @@ char *strprepend(char **dest, const char *src)
 	return *dest;
 }
 
-char * strreplace(char **s, const char *find, const char *replace, 
-		  int n_replace)
+char *strreplace(char **s, const char *find, const char *replace, int n_replace)
 {
 	char *found;
 	size_t s_len, find_len, replace_len, offset;
@@ -105,10 +104,9 @@ char * strreplace(char **s, const char *find, const char *replace,
 	find_len = strlen(find);
 	replace_len = strlen(replace);
 	offset = 0;
-	while ((found = strstr(*s + offset, find)) != NULL 
-	       && n_replace-- != 0) {
+	while ((found = strstr(*s + offset, find)) != NULL && n_replace-- != 0) {
 		offset = found - *s;
-		if(replace_len > find_len)
+		if (replace_len > find_len)
 			*s = xrealloc(*s, s_len + replace_len - find_len + 1);
 		memmove(*s + offset + replace_len, *s + offset + find_len,
 			s_len - offset - find_len);

@@ -37,7 +37,7 @@ void port_info_dump(port_t * port)
 	size_t n;
 
 	assert(port != NULL);
-	
+
 	path =
 	    xstrdup_printf("%s/%s/Pkgfile", port->repository->path, port->name);
 
@@ -100,14 +100,14 @@ void info_dump(char *port_name, dict_t * ports_dict)
 
 	assert(port_name != NULL && ports_dict != NULL);
 
-	if ((port = dict_get(ports_dict, port_name)) == NULL || 
+	if ((port = dict_get(ports_dict, port_name)) == NULL ||
 	    port->repository == NULL)
 		return warning("%s not found!", port_name);
 
 	port_info_dump(port);
 }
 
-void port_readme_dump(port_t *port)
+void port_readme_dump(port_t * port)
 {
 	char *path, *pager;
 
@@ -117,11 +117,11 @@ void port_readme_dump(port_t *port)
 			      port->name);
 
 	pager = getenv("PAGER");
-	
+
 	if (pager == NULL)
 		pager = "less";
 
-	if(is_file(path)) {
+	if (is_file(path)) {
 		strprepend(&path, " ");
 		system(strprepend(&path, pager));
 	} else
@@ -135,7 +135,7 @@ void readme_dump(char *port_name, dict_t * ports_dict)
 
 	assert(port_name != NULL && ports_dict != NULL);
 
-	if ((port = dict_get(ports_dict, port_name)) == NULL || 
+	if ((port = dict_get(ports_dict, port_name)) == NULL ||
 	    port->repository == NULL)
 		return warning("%s not found!", port_name);
 

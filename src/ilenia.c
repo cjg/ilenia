@@ -38,25 +38,25 @@
 #include "memory.h"
 #include "remove.h"
 
-const char *argp_program_version = "ilenia " VERSION 
-	"\n"
-	"Copyright (C) 2006-2007 Giuseppe Coviello.\n"
-	"This is free software.  You may redistribute copies of it under the terms of\n"
-	"the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n"
-	"There is NO WARRANTY, to the extent permitted by law.";
+const char *argp_program_version = "ilenia " VERSION
+    "\n"
+    "Copyright (C) 2006-2007 Giuseppe Coviello.\n"
+    "This is free software.  You may redistribute copies of it under the terms of\n"
+    "the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n"
+    "There is NO WARRANTY, to the extent permitted by law.";
 const char *argp_program_bug_address = "Giuseppe Coviello <cjg@cruxppc.org>";
 static char doc[] = "A package manager for CRUX (and CRUX PPC of course)";
 static char args_doc[] = "ACT [ARG(S)]";
 
 enum OPT { OPT_CACHE = 300, OPT_REPOSITORY_LIST, OPT_NO_FAVOURITE_REPOSITORIES,
-	   OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY,
-	   OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
-	   OPT_NO_COLORS
+	OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY,
+	OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
+	OPT_NO_COLORS
 };
 
 enum ACT { ACT_UPDATE = 300, ACT_LIST, ACT_SEARCH, ACT_INFO, ACT_README,
-	   ACT_DIFF, ACT_UPDATED, ACT_DEPENDENCIES, ACT_UPDATE_PKG,
-	   ACT_DEPENDENTS, ACT_REMOVE, ACT_REPOSITORY_LIST, ACT_SEARCHDESC
+	ACT_DIFF, ACT_UPDATED, ACT_DEPENDENCIES, ACT_UPDATE_PKG,
+	ACT_DEPENDENTS, ACT_REMOVE, ACT_REPOSITORY_LIST, ACT_SEARCHDESC
 };
 
 static struct argp_option options[] = {

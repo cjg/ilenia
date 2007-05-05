@@ -184,10 +184,10 @@ int cache_build(dict_t * repositories)
 void cache_update_stamp(void)
 {
 	FILE *file;
-	if(is_file(STAMP_FILE))
+	if (is_file(STAMP_FILE))
 		unlink(STAMP_FILE);
 	file = fopen(STAMP_FILE, "w");
-	if(file != NULL)
+	if (file != NULL)
 		fclose(file);
 }
 

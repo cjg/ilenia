@@ -136,7 +136,7 @@ list_t *ports_list_init(dict_t * repositories)
 		nread = getline(&line, &n, cachefile);
 	}
 
-	while (nread > 0) { 
+	while (nread > 0) {
 		*(line + strlen(line) - 1) = 0;
 		description = strchr(line, '%') + 1;
 		description = xstrndup(description, strlen(description) -
@@ -160,8 +160,8 @@ list_t *ports_list_init(dict_t * repositories)
 		free(splitted);
 		nread = getline(&line, &n, cachefile);
 	}
-	if(line)
-	free(line);
+	if (line)
+		free(line);
 	fclose(cachefile);
 
 	return self;
@@ -225,14 +225,14 @@ dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf)
 		     dict_get(conf->locked_versions, port->name))) {
 			if (!strcmp(port->version, locked_version))
 				dict_add(self, port->name, port);
-		} else if (locked_version == NULL && 
-			   (found =  dict_get(conf->favourite_repositories,
-					      port->name)) != NULL) { 
-			if(strcmp(found->repository->name,
-				  port->repository->name) == 0)
-			dict_add(self, port->name, port);
+		} else if (locked_version == NULL &&
+			   (found = dict_get(conf->favourite_repositories,
+					     port->name)) != NULL) {
+			if (strcmp(found->repository->name,
+				   port->repository->name) == 0)
+				dict_add(self, port->name, port);
 		} else if (!locked_version
-			 && !(found = dict_get(self, port->name)))
+			   && !(found = dict_get(self, port->name)))
 			dict_add(self, port->name, port);
 		else if (!locked_version && port->repository->priority >
 			 found->repository->priority)

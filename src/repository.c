@@ -42,8 +42,8 @@ static int get_priority(char *name, list_t * repositories_hierarchy)
 	priority = repositories_hierarchy->length;
 	while (repositories_hierarchy->length && priority >= 0) {
 		if (!strcmp(name, (char *)list_get(repositories_hierarchy,
-						   repositories_hierarchy->length
-						   - priority)))
+						   repositories_hierarchy->
+						   length - priority)))
 			break;
 		priority--;
 	}
@@ -73,7 +73,8 @@ repository_t *repository_new(char *name, char *path, char *supfile,
 	return self;
 }
 
-dict_t *repositories_dict_init(list_t * drivers, list_t * repositories_hierarchy)
+dict_t *repositories_dict_init(list_t * drivers,
+			       list_t * repositories_hierarchy)
 {
 	dict_t *self;
 	DIR *dir;

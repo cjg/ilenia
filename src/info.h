@@ -27,6 +27,6 @@
 void info_dump(char *port_name, dict_t * ports_dict);
 void port_info_dump(port_t * port);
 void readme_dump(char *port_name, dict_t * ports_dict);
-void port_readme_dump(port_t *port);
+void port_readme_dump(port_t * port);
 
 #endif

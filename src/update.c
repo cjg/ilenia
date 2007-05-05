@@ -201,8 +201,8 @@ int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
 			     PRT_NOTINSTALLED)
 			    && dict_get(seen, pport->name) == NULL) {
 				dict_add(seen, pport->name, "");
-				if(pport->repository != NULL)
-					list_append(jobs, job_new(pport, 
+				if (pport->repository != NULL)
+					list_append(jobs, job_new(pport,
 								  fetch_only ?
 								  FETCH_JOB :
 								  UPDATE_JOB,
@@ -264,7 +264,7 @@ int update_package(list_t * ports_name, dict_t * ports, conf_t * conf,
 	dependencies = list_new();
 	for (i = 0; i < ports_name->length; i++) {
 		if ((port = dict_get(ports, ports_name->elements[i])) == NULL ||
-			port->repository == NULL) {
+		    port->repository == NULL) {
 			error("%s not found!", ports_name->elements[i]);
 			dict_free(not_founds, port_free);
 			list_free(dependencies, NULL);

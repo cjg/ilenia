@@ -29,7 +29,8 @@ char *strrtrim(char *s);
 char *strtrim(char *s);
 char *strappend(char **dest, const char *src);
 char *strprepend(char **dest, const char *src);
-char *strreplace(char **s, const char *find, const char *replace, int n_replace);
+char *strreplace(char **s, const char *find, const char *replace,
+		 int n_replace);
 char *strupper(char *s);
 char *strlower(char *s);
 int strsplit(const char *str, const char sep, char ***ptr_array);

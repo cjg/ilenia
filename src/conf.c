@@ -186,7 +186,8 @@ void conf_dump(conf_t * self)
 	printf("NOT_FOUND_POLICY = %s\n", policies[self->not_found_policy]);
 	printf("REPOSITORIES_HIERARCHY = ");
 	for (i = 0; i < self->repositories_hierarchy->length; i++)
-		printf("%s ", (char *)list_get(self->repositories_hierarchy, i));
+		printf("%s ",
+		       (char *)list_get(self->repositories_hierarchy, i));
 	printf("\n");
 	printf("FAVOURITE_REPOSITORIES =\n");
 	for (i = 0; i < self->favourite_repositories->length; i++) {
