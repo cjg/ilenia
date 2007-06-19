@@ -25,9 +25,11 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "output.h"
 #include "memory.h"
 #include "str.h"
+#include "exec.h"
 
 #define BLACK   "\033[0;30m"
 #define RED     "\033[0;31m"
@@ -104,7 +106,7 @@ int coloredprintf(FILE * stream, const char *format, ...)
 		return printf(format);
 
 	va_start(ap, format);
-	ret = vcprintf(stream, format, ap, 1);
+	ret = vcprintf(stream, format, ap, isatty(fileno(stream)));
 	va_end(ap);
 
 	return ret;
@@ -153,4 +155,59 @@ void error(const char *format, ...)
 		vcprintf(stderr, format, ap, 0);
 	cprintf(stderr, "[DEFAULT]\n");
 	va_end(ap);
+}
+
+void xterm_set_title(const char *format, ...)
+{
+	char *format_dup;
+	va_list ap;
+
+	assert (format != NULL);
+
+	if (getenv("TERM") == NULL ||
+	    strncmp(getenv("TERM"), "xterm", 5) != 0 ||
+	    !isatty(fileno(stdout)))
+		return;
+	
+	va_start(ap, format);
+
+	format_dup = xstrdup_printf("\x1b]0;%s\x07", format);
+
+	vfprintf(stderr, format_dup, ap);
+	
+	free(format_dup);
+	va_end(ap);
+}
+
+void xterm_reset_title(const char *default_xterm_title)
+{
+	char *prompt_command;
+	char *title;
+
+	if (getenv("TERM") == NULL ||
+	    strncmp(getenv("TERM"), "xterm", 5) != 0 ||
+	    !isatty(fileno(stdout)))
+		return;
+
+	title = NULL;
+	
+	if((prompt_command = getenv("PROMPT_COMMAND")) != NULL) {
+		execlogp(prompt_command, NULL, &title);
+		if (strlen(title) == 0) {
+			free(title);
+			title = NULL;
+		}
+	}
+
+	if(title != NULL)
+		fprintf(stderr, "\x1b]0;%s\x07", title);
+	else if(strlen(default_xterm_title) == 0) {
+		char *pwd = getenv("PWD");
+		strreplace(&pwd, getenv("HOME"), "~", 1);
+		fprintf(stderr, "\x1b]0;%s@%s:%s\x07", getenv("LOGNAME"),
+			getenv("HOSTNAME"), pwd);
+	} else
+		fprintf(stderr, "\x1b]0;%s\x07", default_xterm_title);
+	
+	free(title);
 }

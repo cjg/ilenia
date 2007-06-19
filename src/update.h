@@ -26,9 +26,8 @@
 #include "dict.h"
 #include "conf.h"
 
-int update_package(list_t * ports_name, dict_t * ports, conf_t * conf,
-		   int fetch_only);
-int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
-		  int ask_for_update, int not_found_policy);
+int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
+		   conf_t * conf, int just_install);
+int update_system(dict_t * ports, int fetch_only, conf_t *conf);
 
 #endif

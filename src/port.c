@@ -104,7 +104,7 @@ void port_free(port_t * self)
 	free(self);
 }
 
-list_t *ports_list_init(dict_t * repositories)
+list_t *ports_list_init(dict_t * repositories, int enable_xterm_title)
 {
 	list_t *self;
 	FILE *cachefile;
@@ -115,7 +115,7 @@ list_t *ports_list_init(dict_t * repositories)
 	cache_file = xstrdup_printf("%s/%s", getenv("HOME"), CACHE_FILE);
 
 	if (!is_file(cache_file) || cache_is_update(cache_file)) {
-		if (cache_build(repositories)) {
+		if (cache_build(repositories, enable_xterm_title)) {
 			free(cache_file);
 			return NULL;
 		}
@@ -132,7 +132,7 @@ list_t *ports_list_init(dict_t * repositories)
 	nread = getline(&line, &n, cachefile);
 
 	if (nread < 0) {
-		cache_build(repositories);
+		cache_build(repositories, enable_xterm_title);
 		nread = getline(&line, &n, cachefile);
 	}
 
@@ -298,12 +298,14 @@ void port_swap(port_t * port1, port_t * port2)
 	port1 = tmp;
 }
 
-void port_show_outdated(dict_t * ports, list_t * packages)
+void port_show_outdated(dict_t * ports, list_t * packages, int enable_xterm_title)
 {
 	unsigned i;
 	port_t *port, *package;
 
 	assert(ports);
+	if (enable_xterm_title)
+		xterm_set_title("Finding outdated packages ...");
 	for (i = 0; i < ports->length; i++) {
 		port = ports->elements[i]->value;
 		if (port->status == PRT_OUTDATED) {
@@ -315,12 +317,14 @@ void port_show_outdated(dict_t * ports, list_t * packages)
 	}
 }
 
-void port_show_diffs(dict_t * ports, list_t * packages)
+void port_show_diffs(dict_t * ports, list_t * packages, int enable_xterm_title)
 {
 	unsigned i;
 	port_t *port, *package;
 
 	assert(ports);
+	if (enable_xterm_title)
+		xterm_set_title("Finding packages with different versions ...");
 	for (i = 0; i < ports->length; i++) {
 		port = ports->elements[i]->value;
 		if (port->status == PRT_OUTDATED || port->status == PRT_DIFF) {

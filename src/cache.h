@@ -25,7 +25,7 @@
 
 #include "dict.h"
 
-int cache_build(dict_t * repositories);
+int cache_build(dict_t * repositories, int enable_xterm_title);
 void cache_update_stamp(void);
 int cache_is_update(char *cache_file);
 

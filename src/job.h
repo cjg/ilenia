@@ -34,9 +34,11 @@ typedef struct {
 	int have_postinstall;
 	job_result_t result;
 	char *post_pkgadd;
+	int enable_log;
 } job_t;
 
-job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd);
+job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd, 
+	       int enable_log);
 void job_dump(job_t * self);
 int job_execute(job_t * self);
 

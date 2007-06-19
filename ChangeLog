@@ -1,4 +1,53 @@
+2007-06-19  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/ilenia.c: managing the just_install feature via the
+	--just-install option
+
+	* src/update.c (update_package): added the just_install feature to
+	avoid the update of outdate dependencies
+
+2007-06-18  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* conf/ilenia.conf: added the skeleton for ENABLE_LOG variable
+
+	* src/conf.c (conf_init): added the support for enabling/disabling
+	the log facility
+
+	* src/job.c: added a simple log facility to trace
+	install/update/remove packages actions
+
+2007-06-16  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* conf/ilenia.conf: added the skeleton for ENABLE_XTERM_TITLE and
+	DEFAULT_XTERM_TITLE variables
+
+	* src/update.c: added support for xterm_set_title
+	(update_system): post_pkgadd in update_system working again
+
+	* src/repository.c: added support for xterm_set_title
+
+	* src/remove.c: added support for xterm_set_title
+
+	* src/port.c: added support for xterm_set_title
+
+	* src/dependencies.c: added support for xterm_set_title
+
+	* src/cache.c (cache_build): added support for xterm_set_title
+
+	* src/conf.c (conf_init): added the support for enabling/disabling
+	setting xterm's titlebar via ENABLE_XTERM_TITLE variable, and the
+	DEFAULT_XTERM_TITLE for setting the default reset title
+
+	* src/output.c: created two functions xterm_set_title and
+	xterm_resret_title for setting custom strings in the xterm's titlebar
+	(coloredprintf): added a check for the output stream: if the
+	stream isn't a tty coloredprintf acts like uncoloredprintf,
+	usefull when redirecting output to file
+	
+	
 2007-05-05  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* Version 3.1
 
 	* src/ilenia.c: added the command --show-readme
 	

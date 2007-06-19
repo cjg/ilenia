@@ -29,6 +29,7 @@
 #include "output.h"
 #include "update.h"
 #include "dependencies.h"
+#include "str.h"
 
 int ask_yn(char *s, ...)
 {
@@ -169,8 +170,7 @@ static void dump_report(list_t * jobs)
 	printf("\n");
 }
 
-int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
-		  int ask_for_update, int not_found_policy)
+int update_system(dict_t * ports, int fetch_only, conf_t *conf)
 {
 	unsigned i, j;
 	int ret;
@@ -180,7 +180,7 @@ int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
 	dict_t *seen, *not_founds;
 	job_t *job;
 
-	assert(ports != NULL && aliases != NULL);
+	assert(ports != NULL && conf != NULL);
 
 	jobs = list_new();
 	seen = dict_new();
@@ -192,8 +192,9 @@ int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
 			continue;
 
 		dependencies = list_new();
-		dependencies_list(dependencies, port->name, ports, aliases,
-				  not_founds);
+		dependencies_list(dependencies, port->name, ports, 
+				  conf->aliases, not_founds, 
+				  conf->enable_xterm_title);
 		for (j = 0; dependencies != NULL && j < dependencies->length;
 		     j++) {
 			pport = dependencies->elements[j];
@@ -206,14 +207,15 @@ int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
 								  fetch_only ?
 								  FETCH_JOB :
 								  UPDATE_JOB,
-								  NULL));
+								  conf->post_pkgadd,
+								  conf->enable_log));
 			}
 		}
 
 		list_free(dependencies, NULL);
 	}
 
-	if (update_manage_not_founds(not_founds, not_found_policy)) {
+	if (update_manage_not_founds(not_founds, conf->not_found_policy)) {
 		dict_free(not_founds, port_free);
 		dict_free(seen, NULL);
 		list_free(jobs, NULL);
@@ -222,14 +224,21 @@ int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
 
 	dict_free(not_founds, port_free);
 	dict_free(seen, NULL);
-
-	if (jobs->length && update_manage_ask(jobs, ask_for_update)) {
+	if (conf->enable_xterm_title)
+		xterm_set_title("Enable update?");
+	if (jobs->length && update_manage_ask(jobs, conf->ask_for_update)) {
 		list_free(jobs, free);
 		return 0;
 	}
 
 	for (ret = 0, i = 0; ret == 0 && i < jobs->length; i++) {
 		job = jobs->elements[i];
+		if (conf->enable_xterm_title)
+			xterm_set_title("%s %s (%d on %d) ...",
+					job->port->status ==
+					PRT_NOTINSTALLED ? "Installing" :
+					"Updating",
+					job->port->name, i + 1, jobs->length);
 		cprintf(stdout, "[CYAN]==> %s %s (%d on %d)[DEFAULT]\n",
 			job->port->status ==
 			PRT_NOTINSTALLED ? "Installing" : "Updating",
@@ -247,8 +256,8 @@ int update_system(dict_t * ports, dict_t * aliases, int fetch_only,
 	return ret;
 }
 
-int update_package(list_t * ports_name, dict_t * ports, conf_t * conf,
-		   int fetch_only)
+int update_package(list_t * ports_name, dict_t * ports, int fetch_only, 
+		   conf_t * conf, int just_install)
 {
 	port_t *port;
 	list_t *dependencies;
@@ -271,7 +280,8 @@ int update_package(list_t * ports_name, dict_t * ports, conf_t * conf,
 			return 1;
 		}
 		dependencies_list(dependencies, ports_name->elements[i], ports,
-				  conf->aliases, not_founds);
+				  conf->aliases, not_founds, 
+				  conf->enable_xterm_title);
 		if (port->status != PRT_NOTINSTALLED)
 			port->status = PRT_OUTDATED;
 	}
@@ -286,15 +296,19 @@ int update_package(list_t * ports_name, dict_t * ports, conf_t * conf,
 	for (i = 0; i < dependencies->length; i++) {
 		port = dependencies->elements[i];
 		if ((port->status != PRT_INSTALLED && port->status != PRT_DIFF)
+		    && (port->status != PRT_OUTDATED || !just_install 
+			|| list_get_position(ports_name, strequ, port->name) != -1)
 		    && port->repository != NULL)
 			list_append(jobs, job_new(port, fetch_only ? FETCH_JOB :
 						  UPDATE_JOB,
-						  conf->post_pkgadd));
+						  conf->post_pkgadd,
+					    conf->enable_log));
 	}
 
 	dict_free(not_founds, port_free);
 	list_free(dependencies, NULL);
-
+	if (conf->enable_xterm_title)
+		xterm_set_title("Enable update?");
 	if (update_manage_ask(jobs, 1)) {
 		list_free(jobs, free);
 		return 0;
@@ -302,6 +316,12 @@ int update_package(list_t * ports_name, dict_t * ports, conf_t * conf,
 
 	for (ret = 0, i = 0; ret == 0 && i < jobs->length; i++) {
 		job = jobs->elements[i];
+		if (conf->enable_xterm_title)
+			xterm_set_title("%s %s (%d on %d) ...",
+					job->port->status ==
+					PRT_NOTINSTALLED ? "Installing" :
+					"Updating",
+					job->port->name, i + 1, jobs->length);
 		cprintf(stdout, "[CYAN]==> %s %s (%d on %d)[DEFAULT]\n",
 			job->port->status ==
 			PRT_NOTINSTALLED ? "Installing" : "Updating",

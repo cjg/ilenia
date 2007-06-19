@@ -58,6 +58,9 @@ conf_t *conf_init(void)
 	ini_set_default(ini, "ilenia", "repositories_hierarchy", xstrdup(""));
 	ini_set_default(ini, "ilenia", "enable_colors", xstrdup("Yes"));
 	ini_set_default(ini, "ilenia", "verbose", xstrdup("No"));
+	ini_set_default(ini, "ilenia", "enable_xterm_title", xstrdup("Yes"));
+	ini_set_default(ini, "ilenia", "default_xterm_title", xstrdup(""));
+	ini_set_default(ini, "ilenia", "enable_log", xstrdup("Yes"));
 	ini_add(ini, "favourite_repositories");
 	ini_add(ini, "locked_versions");
 	ini_add(ini, "aliases");
@@ -112,6 +115,24 @@ conf_t *conf_init(void)
 	else
 		self->verbose = 0;
 
+	if ((tmp = getenv("ENABLE_XTERM_TITLE")) == NULL)
+		tmp = ini_get(ini, "ilenia", "enable_xterm_title");
+	if (!strcasecmp(tmp, "NO"))
+		self->enable_xterm_title = 0;
+	else
+		self->enable_xterm_title = 1;
+	
+	if ((tmp = getenv("DEFAULT_XTERM_TITLE")) == NULL)
+		tmp = ini_get(ini, "ilenia", "default_xterm_title");
+	self->default_xterm_title = xstrdup(tmp);
+
+	if ((tmp = getenv("ENABLE_LOG")) == NULL)
+		tmp = ini_get(ini, "ilenia", "enable_log");
+	if (!strcasecmp(tmp, "NO"))
+		self->enable_log = 0;
+	else
+		self->enable_log = 1;
+
 	self->favourite_repositories = dict_new();
 	vars = ini_get_vars(ini, "favourite_repositories");
 
@@ -121,6 +142,7 @@ conf_t *conf_init(void)
 
 	self->locked_versions = dict_new();
 	vars = ini_get_vars(ini, "locked_versions");
+
 	for (i = 0; vars && i < vars->length; i++)
 		dict_add(self->locked_versions, vars->elements[i]->key,
 			 xstrdup(vars->elements[i]->value));
@@ -167,6 +189,7 @@ void conf_free(conf_t * self)
 {
 	assert(self != NULL);
 	free(self->post_pkgadd);
+	free(self->default_xterm_title);
 	list_free(self->repositories_hierarchy, free);
 	dict_free(self->favourite_repositories, NULL);
 	dict_free(self->locked_versions, free);
@@ -243,36 +266,4 @@ void conf_reparse(conf_t * self, list_t * ports)
 
 	dict_free(self->favourite_repositories, free);
 	self->favourite_repositories = favourite_repositories;
-
-/* 	pkgmk_confs = dict_new(); */
-
-/* 	for (i = 0; i < self->pkgmk_confs->length; i++) { */
-/* 		port_name = */
-/* 		    xstrdup(self->favourite_repositories->elements[i]->key); */
-/* /\* 		repository_name = *\/ */
-/* /\* 		    xstrdup(self->favourite_repositories->elements[i]->value); *\/ */
-/* 		pkgmk_conf = */
-/* 		    xstrdup(self->favourite_repositories->elements[i]->value); */
-/* 		if(!is_file(pkgmk_conf)) { */
-/* 			warning("pkgmk's conf %s, not found!", pkgmk_conf); */
-/* 			free(port_name); */
-/* 			free(pkgmk_conf); */
-/* 			continue; */
-/* 		} */
-/* 		list1 = list_query(ports, port_query_by_name, port_name); */
-/* /\* 		list2 = *\/ */
-/* /\* 		    list_query(list1, port_query_by_repository, *\/ */
-/* /\* 			       repository_name); *\/ */
-/* 		for (j = 0; j < list1->length; j++) { */
-/* 			port = list_get(list1, j); */
-/* 			dict_add(pkgmk_conf, port->name, pkgmk_conf); */
-/* 		} */
-/* 		list_free(list1, NULL); */
-/* /\* 		list_free(list2, NULL); *\/ */
-/* 		free(port_name); */
-/* /\* 		free(repository_name); *\/ */
-/* 	} */
-
-/* 	dict_free(self->pkgmk_confs, free); */
-/* 	self->pkgmk_conf = pkgmk_conf; */
 }

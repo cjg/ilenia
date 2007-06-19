@@ -37,8 +37,8 @@ repository_t *repository_new(char *name, char *path, char *supfile,
 			     void *driver, list_t * repositories_hierarchy);
 dict_t *repositories_dict_init(list_t * drivers,
 			       list_t * repositories_hierarchy);
-void repositories_dict_update(dict_t * self, list_t * repositories_name);
-void repositories_dict_update_all(dict_t * self);
+void repositories_dict_update(dict_t * self, list_t * repositories_name, int enable_xterm_title);
+void repositories_dict_update_all(dict_t * self, int enable_xterm_title);
 void repositories_dict_dump(dict_t * self);
 void repository_dump(repository_t * self);
 void repository_free(repository_t * self);

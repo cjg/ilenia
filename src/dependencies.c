@@ -215,7 +215,8 @@ static list_t *dependencies_list_merge(list_t * list1, list_t * list2)
 }
 
 list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
-			  dict_t * aliases, dict_t * not_founds)
+			  dict_t * aliases, dict_t * not_founds, int
+			  enable_xterm_title)
 {
 	port_t *port;
 	list_t *deplist;
@@ -230,7 +231,9 @@ list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
 		warning("%s not found!", port_name);
 		return NULL;
 	}
-
+	
+	if (enable_xterm_title)
+		xterm_set_title("Calculating dependencies ...");
 	dependencies_explode(port, ports_dict, aliases, not_founds);
 	seen = dict_new();
 	deep = dependencies_compact(port, 0, seen);
@@ -247,7 +250,8 @@ list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
 
 void
 dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose)
+		  dict_t * not_founds, int tree, int verbose, 
+		  int enable_xterm_title)
 {
 	unsigned i;
 	port_t *port;
@@ -256,7 +260,7 @@ dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
 
 	assert(ports_name != NULL && ports_dict != NULL && aliases != NULL &&
 	       not_founds != NULL);
-
+	
 	for (i = 0; i < ports_name->length; i++) {
 		if ((port = dict_get(ports_dict,
 				     (char *)ports_name->elements[i])) ==
@@ -283,7 +287,8 @@ dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
 		deplist = list_new();
 		for (i = 0; i < ports_name->length; i++)
 			dependencies_list(deplist, ports_name->elements[i],
-					  ports_dict, aliases, not_founds);
+					  ports_dict, aliases, not_founds,
+				enable_xterm_title);
 		if (deplist == NULL)
 			return;
 		if (verbose)
@@ -333,7 +338,7 @@ static void dependents_list_append(list_t * self, port_t * port, dict_t *
 }
 
 list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
-			int all)
+			int all, int enable_xterm_title)
 {
 	list_t *self;
 	dict_t *seen;
@@ -345,6 +350,9 @@ list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
 		warning("%s not found!", port_name);
 		return NULL;
 	}
+
+	if (enable_xterm_title)
+		xterm_set_title("Calculating dependents ...");
 
 	self = list_new();
 	seen = dict_new();
@@ -408,11 +416,13 @@ static void dependents_tree_dump(port_t * port, dict_t * ports_dict, dict_t
 }
 
 void dependents_list_dump(port_t * port, dict_t * ports_dict,
-			  dict_t * aliases, int verbose, int all)
+			  dict_t * aliases, int verbose, int all, 
+			  int enable_xterm_title)
 {
 	list_t *detlist;
 
-	detlist = dependents_list(port->name, ports_dict, aliases, all);
+	detlist = dependents_list(port->name, ports_dict, aliases, all, 
+				  enable_xterm_title);
 	if (detlist == NULL)
 		return;
 	if (verbose)
@@ -423,7 +433,7 @@ void dependents_list_dump(port_t * port, dict_t * ports_dict,
 }
 
 void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all)
+		     dict_t * aliases, int tree, int verbose, int all, int enable_xterm_title)
 {
 	port_t *port;
 	dict_t *seen;
@@ -436,5 +446,5 @@ void dependents_dump(char *port_name, dict_t * ports_dict,
 				     seen, verbose, all);
 		dict_free(seen, NULL);
 	} else
-		dependents_list_dump(port, ports_dict, aliases, verbose, all);
+		dependents_list_dump(port, ports_dict, aliases, verbose, all, enable_xterm_title);
 }

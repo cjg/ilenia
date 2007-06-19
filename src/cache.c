@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "output.h"
 #include "memory.h"
 #include "repository.h"
 #include "cache.h"
@@ -147,7 +148,7 @@ static void cache_from_repository(repository_t * repository, FILE * file)
 	closedir(dir);
 }
 
-int cache_build(dict_t * repositories)
+int cache_build(dict_t * repositories, int enable_xterm_title)
 {
 	FILE *file;
 	unsigned i;
@@ -168,6 +169,11 @@ int cache_build(dict_t * repositories)
 	current_dir = get_current_dir_name();
 
 	for (i = 0; i < repositories->length; i++) {
+		if (enable_xterm_title)
+			xterm_set_title("Caching repository %s (%d on %d) ...", 
+					((repository_t *)
+					 repositories->elements[i]->value)->name,
+					i + 1, repositories->length);
 		cache_from_repository(repositories->elements[i]->value, file);
 		printf(".");
 		fflush(stdout);
@@ -175,8 +181,6 @@ int cache_build(dict_t * repositories)
 	fclose(file);
 	chdir(current_dir);
 	free(current_dir);
-/* 	chmod(CACHE_FILE, */
-/* 	      S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); */
 	printf(" done!\n");
 	return 0;
 }

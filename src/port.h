@@ -49,13 +49,13 @@ port_t *port_new(char *name, char *version,
 void port_dump(port_t * self);
 void port_free(port_t * self);
 int port_have_readme(port_t * self);
-list_t *ports_list_init(dict_t * repositories);
+list_t *ports_list_init(dict_t * repositories, int enable_xterm_title);
 dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf);
 port_t *port_query_by_repository(port_t * self, char *repository_name);
 port_t *port_query_by_name(port_t * self, char *name);
 port_t *port_query_by_description(port_t * self, char *key);
 port_t *port_query_by_hash(port_t * self, unsigned long *hash);
-void port_show_outdated(dict_t * ports, list_t * packages);
-void port_show_diffs(dict_t * ports, list_t * packages);
+void port_show_outdated(dict_t * ports, list_t * packages, int enable_xterm_title);
+void port_show_diffs(dict_t * ports, list_t * packages, int enable_xterm_title);
 
 #endif

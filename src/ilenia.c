@@ -49,7 +49,7 @@ static char doc[] = "A package manager for CRUX (and CRUX PPC of course)";
 static char args_doc[] = "ACT [ARG(S)]";
 
 enum OPT { OPT_CACHE = 300, OPT_REPOSITORY_LIST, OPT_NO_FAVOURITE_REPOSITORIES,
-	OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY,
+	   OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY, OPT_JUST_INSTALL,
 	OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
 	OPT_NO_COLORS
 };
@@ -89,6 +89,8 @@ static struct argp_option options[] = {
 	{"all", OPT_ALL, 0, 0, "Shows or remove all dependents packages", 3},
 	{"fetch-only", OPT_FETCH_ONLY, 0, 0, "Just fetch the needed sources",
 	 3},
+	{"just-install", OPT_JUST_INSTALL, 0, 0, 
+	 "Just install dependencies don't update outdate ones"},
 	{"no-hierarchy", OPT_NO_REPOSITORIES_HIERARCHY, 0, 0,
 	 "Do not use the repositories gerarchy", 3},
 	{"no-aliases", OPT_NO_ALIASES, 0, 0, "Do no use aliases", 3},
@@ -105,6 +107,7 @@ struct arguments {
 	int no_deps;
 	int all;
 	int fetch_only;
+	int just_install;
 	int no_repositories_hierarchy;
 	int tree;
 	int verbose;
@@ -137,6 +140,7 @@ int main(int argc, char **argv)
 	arguments.no_deps = 1;
 	arguments.all = 0;
 	arguments.fetch_only = 0;
+	arguments.just_install = 0;
 	arguments.no_repositories_hierarchy = 0;
 	arguments.tree = 0;
 	arguments.verbose = 0;
@@ -183,9 +187,10 @@ int main(int argc, char **argv)
 		cprintf = coloredprintf;
 
 	if (arguments.rebuild_cache)
-		cache_build(repositories);
+		cache_build(repositories, conf->enable_xterm_title);
 	packages = packages_list_init();
-	if ((ports_list = ports_list_init(repositories)) == NULL) {
+	if ((ports_list = ports_list_init(repositories,
+					  conf->enable_xterm_title)) == NULL) {
 		list_free(arguments.args, NULL);
 		dict_free(repositories, repository_free);
 		list_free(packages, port_free);
@@ -265,10 +270,10 @@ int main(int argc, char **argv)
 		}
 		break;
 	case ACT_DIFF:
-		port_show_diffs(ports_dict, packages);
+		port_show_diffs(ports_dict, packages, conf->enable_xterm_title);
 		break;
 	case ACT_UPDATED:
-		port_show_outdated(ports_dict, packages);
+		port_show_outdated(ports_dict, packages, conf->enable_xterm_title);
 		break;
 	case ACT_DEPENDENCIES:
 		if (!arguments.args->length) {
@@ -280,7 +285,8 @@ int main(int argc, char **argv)
 		dependencies_dump(arguments.args,
 				  ports_dict, conf->aliases,
 				  not_founds,
-				  arguments.tree, arguments.verbose);
+				  arguments.tree, arguments.verbose, 
+				  conf->enable_xterm_title);
 		break;
 	case ACT_DEPENDENTS:
 		if (!arguments.args->length) {
@@ -292,7 +298,7 @@ int main(int argc, char **argv)
 			dependents_dump(list_get(arguments.args, i),
 					ports_dict, conf->aliases,
 					arguments.tree, arguments.verbose,
-					arguments.all);
+					arguments.all, conf->enable_xterm_title);
 		break;
 	case ACT_INFO:
 		if (!arguments.args->length) {
@@ -317,9 +323,11 @@ int main(int argc, char **argv)
 		break;
 	case ACT_UPDATE:
 		if (arguments.args->length)
-			repositories_dict_update(repositories, arguments.args);
+			repositories_dict_update(repositories, arguments.args,
+						 conf->enable_xterm_title); 
 		else
-			repositories_dict_update_all(repositories);
+			repositories_dict_update_all(repositories,
+				conf->enable_xterm_title);
 		break;
 	case ACT_REMOVE:
 		if (!arguments.args->length) {
@@ -333,18 +341,21 @@ int main(int argc, char **argv)
 	case ACT_UPDATE_PKG:
 		if (!arguments.args->length) {
 			update_system(ports_dict,
-				      conf->aliases, arguments.fetch_only,
-				      conf->ask_for_update,
-				      conf->not_found_policy);
+				      arguments.fetch_only,
+				      conf);
 			break;
 		}
-		update_package(arguments.args, ports_dict, conf,
-			       arguments.fetch_only);
+		update_package(arguments.args, ports_dict,
+			       arguments.fetch_only,
+			       conf, arguments.just_install);
 		break;
 	default:
 		if (!arguments.rebuild_cache)
 			warning("What can I do for you?");
 	}
+
+	if (conf->enable_xterm_title)
+		xterm_reset_title(conf->default_xterm_title);
 
 	list_free(arguments.args, NULL);
 	dict_free(repositories, repository_free);
@@ -416,6 +427,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 		break;
 	case OPT_FETCH_ONLY:
 		arguments->fetch_only = 1;
+		break;
+	case OPT_JUST_INSTALL:
+		arguments->just_install = 1;
 		break;
 	case OPT_NO_REPOSITORIES_HIERARCHY:
 		arguments->no_repositories_hierarchy = 1;

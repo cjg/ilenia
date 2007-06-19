@@ -112,7 +112,8 @@ dict_t *repositories_dict_init(list_t * drivers,
 	return self;
 }
 
-void repositories_dict_update(dict_t * self, list_t * repositories_name)
+void repositories_dict_update(dict_t * self, list_t * repositories_name, 
+	int enable_xterm_title)
 {
 	unsigned i;
 	repository_t *repository;
@@ -120,6 +121,10 @@ void repositories_dict_update(dict_t * self, list_t * repositories_name)
 	assert(self != NULL && repositories_name != NULL);
 
 	for (i = 0; i < repositories_name->length; i++) {
+		if (enable_xterm_title)
+			xterm_set_title("Updating %s (%d on %d) ...",
+					repositories_name->elements[i], i + 1,
+					repositories_name->length);
 		cprintf(stdout, "[CYAN]==> Updating %s (%d on %d)[DEFAULT]\n",
 			repositories_name->elements[i], i + 1,
 			repositories_name->length);
@@ -134,16 +139,19 @@ void repositories_dict_update(dict_t * self, list_t * repositories_name)
 	}
 }
 
-void repositories_dict_update_all(dict_t * self)
+void repositories_dict_update_all(dict_t * self, int enable_xterm_title)
 {
 	unsigned i;
 
 	assert(self != NULL);
 
 	for (i = 0; i < self->length; i++) {
+		if (enable_xterm_title)
+			xterm_set_title("Updating %s (%d on %d) ...",
+					self->elements[i]->key, i + 1,
+					self->length);
 		cprintf(stdout, "[CYAN]==> Updating %s (%d on %d)[DEFAULT]\n",
 			self->elements[i]->key, i + 1, self->length);
-
 		repository_update(self->elements[i]->value);
 	}
 }

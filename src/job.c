@@ -25,11 +25,15 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdarg.h>
+#include <time.h>
 #include "file.h"
 #include "exec.h"
 #include "output.h"
 #include "memory.h"
 #include "job.h"
+
+#define LOG "/var/log/ilenia"
 
 static void out_hook(char *line, void *data)
 {
@@ -48,6 +52,35 @@ static void err_hook(char *line, void *data)
 	else
 		fprintf(stderr, "\033[0;31m%s\033[0;00m", line);
 	fflush(stderr);
+}
+
+static void do_log(const char *format, ...)
+{
+	FILE *stream;
+	va_list ap;
+
+	assert (format != NULL);
+
+	if (is_file(LOG))
+		stream = fopen(LOG, "a");
+	else
+		stream = fopen(LOG, "w");
+
+	if (stream == NULL) {
+		warning("Cannot open or create the log file!");
+		return;
+	}
+
+	time_t t = time(NULL);
+	char *times = ctime(&t);
+	*(times + strlen(times) - 1) = 0;
+	va_start (ap, format);
+	fprintf (stream, "%s: ", times);
+	vfprintf(stream, format, ap);
+	fprintf (stream, "\n");
+	va_end (ap);
+
+	fclose(stream);
 }
 
 static int job_update_execute(job_t * self)
@@ -101,6 +134,11 @@ static int job_update_execute(job_t * self)
 			return ret;
 		}
 	}
+
+	if (self->enable_log)
+		do_log("%s %s-%s", 
+		       self->port->status == PRT_NOTINSTALLED ? "Installed" : 
+		       "Updated", self->port->name, self->port->version);
 
 	if (self->post_pkgadd != NULL) {
 		cprintf(stdout, "[CYAN]==> Executing post pkgadd command(s) "
@@ -166,10 +204,13 @@ static int job_remove_execute(job_t * self)
 
 	self->result = SUCCESSED_RT;
 
+	if (self->enable_log)
+		do_log("Removed %s-%s", self->port->name, self->port->version);
+
 	return 0;
 }
 
-job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd)
+job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd, int enable_log)
 {
 	job_t *self;
 	char *path;
@@ -200,6 +241,8 @@ job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd)
 
 	self->have_postinstall = is_file(path);
 	free(path);
+
+	self->enable_log = enable_log;
 
 	return self;
 }

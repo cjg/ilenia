@@ -33,6 +33,9 @@ typedef struct {
 	not_found_policies_t not_found_policy;
 	int enable_colors;
 	int verbose;
+	int enable_xterm_title;
+	char *default_xterm_title;
+	int enable_log;
 	list_t *repositories_hierarchy;
 	dict_t *favourite_repositories;
 	dict_t *locked_versions;

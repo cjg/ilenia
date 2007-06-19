@@ -30,5 +30,7 @@ void warning(const char *format, ...);
 void error(const char *format, ...);
 typedef int (*cprintf_t) (FILE *, const char *, ...);
 cprintf_t cprintf;
+void xterm_set_title(const char *format, ...);
+void xterm_reset_title(const char *default_xterm_title);
 
 #endif
