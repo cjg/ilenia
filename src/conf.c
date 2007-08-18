@@ -61,6 +61,7 @@ conf_t *conf_init(void)
 	ini_set_default(ini, "ilenia", "enable_xterm_title", xstrdup("Yes"));
 	ini_set_default(ini, "ilenia", "default_xterm_title", xstrdup(""));
 	ini_set_default(ini, "ilenia", "enable_log", xstrdup("Yes"));
+	ini_set_default(ini, "ilenia", "rejected_policy", xstrdup("CHECK"));
 	ini_add(ini, "favourite_repositories");
 	ini_add(ini, "locked_versions");
 	ini_add(ini, "aliases");
@@ -132,6 +133,15 @@ conf_t *conf_init(void)
 		self->enable_log = 0;
 	else
 		self->enable_log = 1;
+
+	if ((tmp = getenv("REJECTED_POLICY")) == NULL)
+		tmp = ini_get(ini, "ilenia", "rejected_policy");
+	if (!strcasecmp(tmp, "NEVERMIND"))
+		self->rejected_policy = REJ_NEVERMIND;
+	else if (!strcasecmp(tmp, "RUN"))
+		self->rejected_policy = REJ_RUN;
+	else
+		self->rejected_policy = REJ_CHECK;
 
 	self->favourite_repositories = dict_new();
 	vars = ini_get_vars(ini, "favourite_repositories");

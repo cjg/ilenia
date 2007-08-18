@@ -160,10 +160,6 @@ static unsigned dependencies_compact(port_t * port, unsigned deep,
 	for (i = 0; i < port->dependencies_exploded->length; i++) {
 		((port_t *)
 		 port->dependencies_exploded->elements[i])->deep = deep;
-		if (dict_get(seen, ((port_t *)
-				    port->dependencies_exploded->elements[i])->
-			     name) != NULL)
-			continue;
 		dict_add(seen, ((port_t *)
 				port->dependencies_exploded->elements[i])->name,
 			 port->dependencies_exploded->elements[i]);
@@ -362,7 +358,6 @@ list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
 	dict_free(seen, NULL);
 
 	return self;
-
 }
 
 static void dependents_tree_dump(port_t * port, dict_t * ports_dict, dict_t

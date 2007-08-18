@@ -26,6 +26,7 @@
 #include "dict.h"
 
 typedef enum { ASK, STOP, NEVERMIND } not_found_policies_t;
+typedef enum { REJ_CHECK, REJ_RUN, REJ_NEVERMIND } rejected_policies_t;
 
 typedef struct {
 	char *post_pkgadd;
@@ -36,6 +37,7 @@ typedef struct {
 	int enable_xterm_title;
 	char *default_xterm_title;
 	int enable_log;
+	rejected_policies_t rejected_policy;
 	list_t *repositories_hierarchy;
 	dict_t *favourite_repositories;
 	dict_t *locked_versions;

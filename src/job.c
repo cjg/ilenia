@@ -32,6 +32,7 @@
 #include "output.h"
 #include "memory.h"
 #include "job.h"
+#include "str.h"
 
 #define LOG "/var/log/ilenia"
 
@@ -81,6 +82,64 @@ static void do_log(const char *format, ...)
 	va_end (ap);
 
 	fclose(stream);
+}
+
+static char *get_value(const char *s)
+{
+	char *value = NULL;
+	value = strchr(s, '=');
+
+	if (!value)
+		return NULL;
+
+	++value;
+	strtrim(value);
+	if (*value == '"' && *(value + strlen(value) - 1) == '"') {
+		*(value + strlen(value) - 1) = 0;
+		value++;
+	}
+
+	return value;
+}
+
+static void get_flags(const char *filename, char **cflags, char **cxxflags)
+{
+	FILE *file;
+	char *line, *token;
+	size_t n;
+	int nread;
+
+	*cflags = NULL;
+	*cxxflags = NULL;
+
+	if (filename != NULL)
+		file = fopen(filename, "r");
+	else
+		file = fopen("/etc/pkgmk.conf", "r");
+
+	if(file == NULL)
+		return;
+
+	line = 0;
+	while((nread = getline(&line, &n, file)) >= 0) {
+		*(line + strlen(line) - 1) = 0;
+
+		strtrim(line);
+
+		if (*line == '#')
+			continue;
+
+		if ((token = strstr(line, "CFLAGS")) != NULL) {
+			free(*cflags);
+			*cflags = xstrdup(get_value(token));
+		} else if ((token = strstr(line, "CXXFLAGS")) != NULL) {
+			free(*cxxflags);
+			*cxxflags = xstrdup(get_value(line));
+		} else
+			continue;
+	}
+
+	free(line);
 }
 
 static int job_update_execute(job_t * self)
@@ -135,10 +194,20 @@ static int job_update_execute(job_t * self)
 		}
 	}
 
-	if (self->enable_log)
-		do_log("%s %s-%s", 
+	if (self->enable_log) {
+		char *dependencies = list_xstrdup(self->port->dependencies,
+						  ", ", xstrdup);
+		char *cflags, *cxxflags;
+		get_flags(self->port->pkgmk_conf, &cflags, &cxxflags);
+		do_log("%s %s-%s DEPENDENCIES=\"%s\" CFLAGS=\"%s\" "
+		       "CXXFLAGS=\"%s\"", 
 		       self->port->status == PRT_NOTINSTALLED ? "Installed" : 
-		       "Updated", self->port->name, self->port->version);
+		       "Updated", self->port->name, self->port->version,
+		       dependencies, cflags, cxxflags);
+		free(dependencies);
+		free(cflags);
+		free(cxxflags);
+	}
 
 	if (self->post_pkgadd != NULL) {
 		cprintf(stdout, "[CYAN]==> Executing post pkgadd command(s) "

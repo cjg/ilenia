@@ -1,3 +1,29 @@
+2007-08-18  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* Version 3.2
+
+2007-08-16  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* doc/ilenia.8.in: added the documentation for the --show-readme
+	command.
+	
+	* src/dependencies.c (dependencies_append_at_deep): solved a bug
+	while solving dependencies.
+
+2007-06-24  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* doc/ilenia.8.in: added the documentation for ENABLE_XTERM_TITLE,
+	DEFAULT_XTERM_TITLE, ENABLE_LOG and REJECTED_POLICY variables and
+	--just-install option.
+
+	* conf/ilenia.conf: added the skeleton for REJECTED_POLICY variable
+
+	* src/conf.c (conf_init): added the support for selecting the
+	policy in managing rejected files
+
+	* src/update.c: created two functions, rejected_manage and
+	rejected_count, to manage rejected files
+
 2007-06-19  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* src/ilenia.c: managing the just_install feature via the
@@ -201,8 +227,9 @@
 
 	* change: a better support for dependencies
 
-	* various bugfixes
+	* various bug-fixes
 
 2004-11-07  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* Version 1.0
+	

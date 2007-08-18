@@ -26,14 +26,18 @@
 #include <string.h>
 #include "list.h"
 #include "memory.h"
+#include "str.h"
 
 #undef list_free
 #undef list_query
 #undef list_get_position
 #undef list_dump
+#undef list_xstrdup
+
 
 #define BLOCKSIZE 512
 #define ELEMENTS_PER_BLOCK (BLOCKSIZE / sizeof(void *))
+
 
 list_t *list_new(void)
 {
@@ -107,11 +111,11 @@ list_t *list_insert(list_t * self, int position, void *data)
 
 	self->length++;
 
-	if (self->length >= self->size) {
+/* 	if (self->length >= self->size) { */
 		self->size += ELEMENTS_PER_BLOCK;
 		self->elements = xrealloc(self->elements,
 					  self->size * sizeof(void *));
-	}
+/* 	} */
 
 	bcopy(self->elements + position, self->elements + position + 1,
 	      (self->length - position - 1) * sizeof(void *));
@@ -212,4 +216,29 @@ list_t *list_reverse(list_t * self)
 	for (i = 0; i < self->length / 2; i++)
 		list_swap(self, i, self->length - 1 - i);
 	return self;
+}
+
+char *list_xstrdup(list_t *self, const char *sep, char *data_str(void *))
+{
+	unsigned i;
+	char *s, *data;
+	assert(self != NULL);
+
+	s = xstrdup("");
+
+	for(i = 0; i < self->length; i++) {
+		if(data_str != NULL)
+			data = data_str(*(self->elements + i));
+		else
+			data = xstrdup_printf("%p", *(self->elements + i));
+
+		strappend(&s, data);
+
+		free(data);
+
+		if(sep != NULL && (i + 1) < self->length)
+			strappend(&s, sep);
+	}
+
+	return s;
 }

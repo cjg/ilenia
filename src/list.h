@@ -44,6 +44,7 @@ list_t *list_query(list_t * self, void *data_query(void *, void *),
 		   void *data_query_arg);
 list_t *list_swap(list_t * self, unsigned position1, unsigned position2);
 list_t *list_reverse(list_t * self);
+char *list_xstrdup(list_t *self, const char * sep, char *data_str(void *));
 #define list_free(self, data_free) list_free((self), \
 					     (void (*)(void *)) (data_free))
 #define list_query(self, query, arg) list_query((self), \
@@ -53,4 +54,6 @@ list_t *list_reverse(list_t * self);
 						(void *(*)(void *, void*)) (query), \
 						(void *) (arg))
 #define list_dump(self, data_dump) list_dump((self), (void (*)(void *))(data_dump))
+#define list_xstrdup(self, sep, data_str) list_xstrdup((self), (sep), (char \
+								       *(*)(void *))(data_str))
 #endif

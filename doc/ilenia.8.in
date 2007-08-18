@@ -48,6 +48,10 @@ supplied shows the list of the ports founded from the repositories in ARG(S).
 Shows the list of the installed packages with lower version from the ones in the
 ports tree. The list is built according to the repositories hierarchy, locked
 versions and favourite repository rules.
+.TP 
+.B "\-r, \-\-show\-readme"
+Show the README of a port using the defaault pager (setted via the envirnment
+variable PAGER).
 .TP
 .B "\-\-repository\-list"
 Shows the list of the repositories used by ilenia.
@@ -91,9 +95,13 @@ respectively, remove all dependents packages or show all dependents packages.
 .B "\-\-cache"
 Forces the rebuild of the cache.
 .TP
-.B "\-\-fetch-only"
+.B "\-\-fetch\-only"
 It is used with the "\-\-update\-pkg" action, it forces to download only the
 required sources of the ports. 
+.TP
+.B "\-\-just\-install"
+It is userd with the "\-\-updatade\-pkg" action, it forces to don't update the
+outdated dependencies but just to install not installed ones.
 .TP
 .B "\-\-no\-aliases"
 Ignores the aliases list.
@@ -162,6 +170,25 @@ default and "No".
 .B VERBOSE
 It enables the verbosity for default (like using always the "\-\-verbose"
 option), possible values are "Yes" and "No", the default one.
+.TP
+.B ENABLE_XTERM_TITLE
+It enables the setting informations in the xterm title bar, possible values are
+"Yes" and "No", the default is "Yes".
+.TP
+.B DEFAULT_XTERM_TITLE
+It is the default xterm title, the one to restore (if ENABLE_XTERM_TITLE is
+setted to "Yes")  when ilenia exits. The default is $LOGNAME@$HOSTNAME:$PWD.
+.TP
+.B ENABLE_LOG
+It enables the simple log for tracking install/update/remove actions; the
+logfile is /var/log/ilenia. Possible values are "Yes" and "No", the default is
+"Yes".
+.TP
+.B REJECTED_POLICY 
+It configures the policy in managing rejected files while updating
+packages. Possible values are "Check", to check how many rejected files there
+are, "Run" to run rejmerge(8) if there are some rejected files, "Nevermind" to
+disable the check for rejected files.
 .PP
 The section "[favourite_repositories]" configures the favourite repositories; a
 port in this list can be updated or installed only from the associated

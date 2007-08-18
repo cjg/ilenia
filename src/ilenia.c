@@ -38,7 +38,7 @@
 #include "memory.h"
 #include "remove.h"
 
-const char *argp_program_version = "ilenia " VERSION
+const char *argp_program_version = "ilenia " VERSION " (No Holiday)"
     "\n"
     "Copyright (C) 2006-2007 Giuseppe Coviello.\n"
     "This is free software.  You may redistribute copies of it under the terms of\n"

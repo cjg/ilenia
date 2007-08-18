@@ -1,94 +1,109 @@
-05/05/2007 - ilenia-3.1 released
-After a month and a day a new release. ilenia-3.1 has a new feature
-(--show-readme) to show, using your favourite pager, the README of the
-port. There are also some little bugfixes: it is fixed the segmentation faul
-caused during a system update when a dependece port isn't found; it is fixed the
-segmentation fault when trying to obtain information about an "orphaned" port 
-(a port that is installed but it isn't found in any repository).
+18/08/2007 - ilenia-3.2 released 
+Someone goes to the beach some goes to the mountain, everyone goes on holiday; I
+make a new release!  
+ilenia-3.2 comes out  with some interesting features (and  some less interesting
+ones,    of   course);    ilenia-3.2    has   a    log    system   to    monitor
+installing/upgrading/removing of  ports, like the other features  the log system
+can be enable or disabled via the configuration file.  
+Another  new  feature  of ilenia-3.2  is  the  check  for rejected  files  while
+installing packages;  after an  installation or an  upgrade ilenia can  look for
+rejected files and warn the user and optionally run rejmerge.  
+A long time  ago Biscuttiello said that he  had to install a port  but he didn't
+want to  update the  dozens dependencies  of that port,  and he  asked me  for a
+feature that  can disable  the updating of  dependencies while installing  a new
+package; I  thought that a feature  like that can be  potentially dangerous, and
+also the port to install wouldn't compile or work if it depends on new features,
+but Biscuttiello is the master of his system (like any user is the mastes of his
+system) and ilenia is his servant, and he  says what he do, and then i added the
+'--just-install'  option  that makes  ilenia  to just  install  a  port and  his
+dependencies and doesn't update outdated ones.  
+Finally the  last new  feature of ilenia-3.2  is the  setting on the  xterm (and
+compatibles) title  bar a  message displaying the  action that ilenia  is doing;
+this feature can be disabled or enabled via the configuration file.  
+Happy holiday!
 
-04/04/2007 - ilenia-3.0 released
-Fine, I'll stop to backport new features to ilenia-2.*: ilenia-3.0 is ready!
-ilenia-3.0 comes with many new features like the colored output; the trees
-output for show the dependencies; the search by description command and the
-support of wildcards in the search command; the support for shell commands in
-version fields of Pkgfile.
-ilenia-3.0 uses a new unique configuration file: /etc/ilenia.conf; right the
-user has to port the configurations contained by /etc/ilenia.rc,
-/etc/ports/{aliases,favoriterepo,favoriteversion,favoritepkgmk}.
+05/05/2007 - ilenia-3.1 released 
+After  a  month  and  a  day  a  new release.   ilenia-3.1  has  a  new  feature
+(--show-readme)  to  show,  using  your  favourite  pager,  the  README  of  the
+port. There  are also some  little bugfixes: it  is fixed the  segmentation faul
+caused during a system update when a dependece port isn't found; it is fixed the
+segmentation fault when trying to obtain information about an "orphaned" port (a
+port that is installed but it isn't found in any repository).
+
+04/04/2007 - ilenia-3.0 released 
+Fine, I'll stop to backport new features to ilenia-2.*: ilenia-3.0 is ready!  
+ilenia-3.0  comes with  many new  features like  the colored  output;  the trees
+output  for show the  dependencies; the  search by  description command  and the
+support of  wildcards in the search  command; the support for  shell commands in
+version fields of Pkgfile.  
+ilenia-3.0  uses a new  unique configuration  file: /etc/ilenia.conf;  right the
+user   has   to   port   the   configurations   contained   by   /etc/ilenia.rc,
+/etc/ports/{aliases,favoriterepo,favoriteversion,favoritepkgmk}.  
 ilenia-3.0 runs faster than ilenia-2.* and ilenia-1.* and it is more precise and
 secure than the precedent versions.
 
-27/01/2007 - ilenia-2.2 released
-Probably this will be really the last release of ilenia 2.*: ilenia 3 works at
-50%. After about three years of repositories anarchy, where only the higher
-version was the priority to use a port from a repository instead of another
-one, ilenia 2.2 introudes the repositories hierachy available trhough the
-variable REPOS_HIERACHY in ilenia.rc and the option "--no-repos-hierachy" to
-disable at run-time the hierachy. Another new feature of ilenia 2.2 is the
-checking of outdated dependencies while installing or updating a package.
+27/01/2007 - ilenia-2.2 released 
+Probably this will be  really the last release of ilenia 2.*:  ilenia 3 works at
+50%.  After about three  years of  repositories anarchy,  where only  the higher
+version was the priority to use a port from a repository instead of another one,
+ilenia 2.2  introudes the repositories  hierachy available trhough  the variable
+REPOS_HIERACHY in  ilenia.rc and the option "--no-repos-hierachy"  to disable at
+run-time the  hierachy.  Another new  feature of ilenia  2.2 is the  checking of
+outdated dependencies while installing or updating a package.
 
-17/01/2007 - ilenia-2.1 released
-Probably this will be the last release of ilenia 2.*: I'm woking on ilenia 3. In
-this release the are two new features: the "--info" action to obtain
-informations about a port (or some ports) and the "--fetch-only" option used
-with the "-U" ("--udpdate-pkg") action forces ilenia to just fetch the sources
+17/01/2007 - ilenia-2.1 released 
+Probably this will  be the last release  of ilenia 2.*: I'm woking  on ilenia 3.
+In  this  release the  are  two  new features:  the  "--info"  action to  obtain
+informations about  a port  (or some ports)  and the "--fetch-only"  option used
+with the "-U"  ("--udpdate-pkg") action forces ilenia to  just fetch the sources
 (something like 'pkgmk -do').
 
 21/12/2006 - ilenia-2.0.1 released
 This is essentially a bug fix release: solved bugs about:
-     - Segmentation fault while managing favoriteversion
-     - Executing pre-install and post-install script not marked as executable
-     files 
-     - Managing supfiles with more than a dot in their names (for example
-     ppc.*.cvs)
-     - Working with alias
+- Segmentation fault while managing favoriteversion
+- Executing pre-install and post-install script not marked as executable files 
+- Managing supfiles with more than a dot in their names (for example ppc.*.cvs)
+- Working with alias
 
-11/03/2006 - ilenia-2.0 released
-There are many new things in this release: beginning from the sourcecode that
-had been rewritten to have a better usage of memory and an "unified error and
-warning message system", all error and warning messages are managed by two
-function. 
-The more tangible, for the user, new features are: 
-- the "not found policy", when a dependence isn't found ilenia can act in three
-  ways asking you if she can procede (setting this variable as "Ask", the
-  default), stopping the build and install process (setting this variable as
+11/03/2006 - ilenia-2.0 released 
+There are  many new things in  this release: beginning from  the sourcecode that
+had been rewritten  to have a better  usage of memory and an  "unified error and
+warning  message system",  all error  and warning  messages are  managed  by two
+function.  The more tangible, for the user, new features are: 
+- the "not found policy", when a  dependence isn't found ilenia can act in three
+  ways  asking you  if she  can  procede (setting  this variable  as "Ask",  the
+  default), stopping  the build  and install process  (setting this  variable as
   "Stop") or contnuing with next package (setting the value "Nevermind"); 
-- the introduction of "/etc/favoritepkgmk", to use a non default pkgmk.conf for
-  certain packages;
-- the "sysupng", during a system update (`ilenia -U`), the packages won't be
+- the introduction of "/etc/favoritepkgmk", to  use a non default pkgmk.conf for
+  certain packages; 
+- the "sysupng",  during a  system update (`ilenia  -U`), the packages  won't be
   updated merely in alphabetic order but with dependencies check; for example if
-  gtk and pango are out of date, ilenia updates pango before of gtk.  
+  gtk and pango are out of date, ilenia updates pango before of gtk.
 
 14/12/2005 - ilenia-1.5 released
 This release has a full support for rsync repository.
 
-02/10/2005 - ilenia-1.4 released
-In every new release there are innovations and bugfixes:
-alias list (/etc/ports/alias) and search function (-s)
-are the innovations; fixed segafaults with ports with 
-bad version field and many other things that I don't 
-remember because I've made them many days ago are
-bugfixes.
+02/10/2005 - ilenia-1.4 released 
+In  every   new  release  there   are  innovations  and  bugfixes:   alias  list
+(/etc/ports/alias)  and   search  function  (-s)  are   the  innovations;  fixed
+segafaults with ports with bad version  field and many other things that I don't
+remember because I've made them many days ago are bugfixes.
 
-25/03/2005 - ilenia-1.3 released
-The more obvious innovation in this release are the 
-introduction of local repositories and POST_PKGADD commands
-definables in /etc/ilenia.rc. But the are many innovation's
-in the code that renders ilenia more powerful and secure.
+25/03/2005 - ilenia-1.3 released 
+The  more obvious  innovation  in this  release  are the  introduction of  local
+repositories and POST_PKGADD commands  definables in /etc/ilenia.rc. But the are
+many innovation's in the code that renders ilenia more powerful and secure.
 
-29/01/2005 - ilenia-1.2 released
-A little bugfix release for x86's users, a great release for
-ppc's users: from this release ilenia has the full support
-for .cvs supfiles of crux ppc.
+29/01/2005 - ilenia-1.2 released 
+A little bugfix  release for x86's users, a great release  for ppc's users: from
+this release ilenia has the full support for .cvs supfiles of crux ppc.
 
-30/12/2004 - ilenia-1.1 released
-Ilenia now with some new features like the secure removing 
-of packages ("secure" means "with dependencies check").
-With ilenia 1.1 you can store your ports tree in more
-flexible way: ilenia knows where you have the ports tree
-reading from .cvsup and .httpup file; for example you can
-store ports from crux (base and opt), crux-it, clc and 
-various people in different directories under /usr/ports, 
+30/12/2004 - ilenia-1.1 released 
+Ilenia now with some new features like the secure removing of packages ("secure"
+means "with dependencies check"). With ilenia  1.1 you can store your ports tree
+in more  flexible way: ilenia knows where  you have the ports  tree reading from
+.cvsup and  .httpup file; for  example you can  store ports from crux  (base and
+opt), crux-it, clc and various people in different directories under /usr/ports,
 something like:
 
 /usr/ports/clc:
@@ -101,12 +116,14 @@ base/  opt/
 devel/  games/  gnome/  multimedia/  network/  office/  science/  system/  x11/
 
 /usr/ports/people:
-acrux/  chw/   jaeger/  jolupa/  maol/        ogg/   sten/    tilman/    yankeegohome/
-alan/   dahl/  jdolan/  jue/     mhedenskog/  pazo/  stsp/    vico/      yhafri/
-albe/   han/   jheino/  jw/      noneus/      rrm3/  tbmnet/  wimpress/  zh_current/
+acrux/	 chw/           jaeger/  jolupa/  maol/      ogg/         sten/
+tilman/  yankeegohome/  alan/    dahl/    jdolan/    jue/         mhedenskog/  
+pazo/    stsp/          vico/    yhafri/  albe/      han/         jheino/      
+jw/      noneus/        rrm3/    tbmnet/  wimpress/  zh_current/
 
 The dependencies system of ilenia had been improved very much in this release.
 
-7/11/2004 - ilenia-1.0 released
-Now 'ilenia' can build, install and update packages
-while resolving the dependencies too. 
+07/11/2004 - ilenia-1.0 released 
+Now  'ilenia'  can  build,  install  and update  packages  while  resolving  the
+dependencies too.
+

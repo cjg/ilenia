@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include "job.h"
 #include "output.h"
 #include "update.h"
@@ -170,6 +172,54 @@ static void dump_report(list_t * jobs)
 	printf("\n");
 }
 
+static int rejected_count(void)
+{
+	DIR *dir;
+	struct dirent *entry;
+	int rejected;
+
+        dir = opendir("/var/lib/pkg/rejected");
+        if (!dir)
+                return 0;
+
+	rejected = 0;
+
+        while ((entry = readdir(dir))) {
+                if (*entry->d_name == '.')
+                        continue;
+		rejected++;
+        }
+
+        closedir(dir);
+	
+	return rejected;
+}
+
+static void rejected_manage(conf_t *conf)
+{
+	int rejected;
+
+	assert (conf != NULL);
+
+	if (conf->rejected_policy == REJ_NEVERMIND)
+		return;
+
+	rejected = rejected_count();
+
+	if (rejected == 0) {
+		printf("There isn't any rejected file!\n");
+		return;
+	}
+
+	if (conf->rejected_policy == REJ_RUN)
+		system("rejmerge");
+	else 
+		warning("there %s %d rejected file%s, run rejmerge!",
+			rejected == 1 ? "is" : "are",
+			rejected,
+			rejected == 1 ? "" : "s");
+}
+
 int update_system(dict_t * ports, int fetch_only, conf_t *conf)
 {
 	unsigned i, j;
@@ -253,6 +303,8 @@ int update_system(dict_t * ports, int fetch_only, conf_t *conf)
 
 	list_free(jobs, free);
 
+	rejected_manage(conf);
+
 	return ret;
 }
 
@@ -332,6 +384,8 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 	dump_report(jobs);
 
 	list_free(jobs, free);
+	
+	rejected_manage(conf);
 
 	return 0;
 }

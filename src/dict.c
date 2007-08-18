@@ -28,6 +28,7 @@
 #include <math.h>
 #include "dict.h"
 #include "memory.h"
+
 #undef dict_free
 
 #define BLOCKSIZE 512
