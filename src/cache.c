@@ -170,10 +170,10 @@ int cache_build(dict_t * repositories, int enable_xterm_title)
 
 	for (i = 0; i < repositories->length; i++) {
 		if (enable_xterm_title)
-			xterm_set_title("Caching repository %s (%d on %d) ...", 
+			xterm_set_title("Caching repository %s (%d on %d) ...",
 					((repository_t *)
-					 repositories->elements[i]->value)->name,
-					i + 1, repositories->length);
+					 repositories->elements[i]->value)->
+					name, i + 1, repositories->length);
 		cache_from_repository(repositories->elements[i]->value, file);
 		printf(".");
 		fflush(stdout);

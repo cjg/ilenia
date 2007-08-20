@@ -102,7 +102,7 @@ int remove_packages(list_t * packages_name, list_t * packages, dict_t * ports,
 
 		dependents = dependents_list(packages_name->elements[i],
 					     ports, conf->aliases, 0,
-			conf->enable_xterm_title);
+					     conf->enable_xterm_title);
 
 		for (j = 1; dependents != NULL && j < dependents->length; j++) {
 			if (dict_get
@@ -115,8 +115,8 @@ int remove_packages(list_t * packages_name, list_t * packages, dict_t * ports,
 				 "");
 
 			list_append(jobs, job_new(dependents->elements[j],
-						  REMOVE_JOB, "", 
-					    conf->enable_log));
+						  REMOVE_JOB, "",
+						  conf->enable_log));
 		}
 
 		list_free(dependents, NULL);

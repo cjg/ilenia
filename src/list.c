@@ -34,10 +34,8 @@
 #undef list_dump
 #undef list_xstrdup
 
-
 #define BLOCKSIZE 512
 #define ELEMENTS_PER_BLOCK (BLOCKSIZE / sizeof(void *))
-
 
 list_t *list_new(void)
 {
@@ -112,9 +110,8 @@ list_t *list_insert(list_t * self, int position, void *data)
 	self->length++;
 
 /* 	if (self->length >= self->size) { */
-		self->size += ELEMENTS_PER_BLOCK;
-		self->elements = xrealloc(self->elements,
-					  self->size * sizeof(void *));
+	self->size += ELEMENTS_PER_BLOCK;
+	self->elements = xrealloc(self->elements, self->size * sizeof(void *));
 /* 	} */
 
 	bcopy(self->elements + position, self->elements + position + 1,
@@ -218,7 +215,7 @@ list_t *list_reverse(list_t * self)
 	return self;
 }
 
-char *list_xstrdup(list_t *self, const char *sep, char *data_str(void *))
+char *list_xstrdup(list_t * self, const char *sep, char *data_str(void *))
 {
 	unsigned i;
 	char *s, *data;
@@ -226,8 +223,8 @@ char *list_xstrdup(list_t *self, const char *sep, char *data_str(void *))
 
 	s = xstrdup("");
 
-	for(i = 0; i < self->length; i++) {
-		if(data_str != NULL)
+	for (i = 0; i < self->length; i++) {
+		if (data_str != NULL)
 			data = data_str(*(self->elements + i));
 		else
 			data = xstrdup_printf("%p", *(self->elements + i));
@@ -236,7 +233,7 @@ char *list_xstrdup(list_t *self, const char *sep, char *data_str(void *))
 
 		free(data);
 
-		if(sep != NULL && (i + 1) < self->length)
+		if (sep != NULL && (i + 1) < self->length)
 			strappend(&s, sep);
 	}
 

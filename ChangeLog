@@ -1,3 +1,8 @@
+2007-08-20  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/port.c (ports_list_init): solved a bug that made doesn't
+	work for port that had the same value in name and description fields
+
 2007-08-18  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* Version 3.2

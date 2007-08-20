@@ -49,7 +49,7 @@ static char doc[] = "A package manager for CRUX (and CRUX PPC of course)";
 static char args_doc[] = "ACT [ARG(S)]";
 
 enum OPT { OPT_CACHE = 300, OPT_REPOSITORY_LIST, OPT_NO_FAVOURITE_REPOSITORIES,
-	   OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY, OPT_JUST_INSTALL,
+	OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY, OPT_JUST_INSTALL,
 	OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
 	OPT_NO_COLORS
 };
@@ -89,7 +89,7 @@ static struct argp_option options[] = {
 	{"all", OPT_ALL, 0, 0, "Shows or remove all dependents packages", 3},
 	{"fetch-only", OPT_FETCH_ONLY, 0, 0, "Just fetch the needed sources",
 	 3},
-	{"just-install", OPT_JUST_INSTALL, 0, 0, 
+	{"just-install", OPT_JUST_INSTALL, 0, 0,
 	 "Just install dependencies don't update outdate ones"},
 	{"no-hierarchy", OPT_NO_REPOSITORIES_HIERARCHY, 0, 0,
 	 "Do not use the repositories gerarchy", 3},
@@ -273,7 +273,8 @@ int main(int argc, char **argv)
 		port_show_diffs(ports_dict, packages, conf->enable_xterm_title);
 		break;
 	case ACT_UPDATED:
-		port_show_outdated(ports_dict, packages, conf->enable_xterm_title);
+		port_show_outdated(ports_dict, packages,
+				   conf->enable_xterm_title);
 		break;
 	case ACT_DEPENDENCIES:
 		if (!arguments.args->length) {
@@ -285,7 +286,7 @@ int main(int argc, char **argv)
 		dependencies_dump(arguments.args,
 				  ports_dict, conf->aliases,
 				  not_founds,
-				  arguments.tree, arguments.verbose, 
+				  arguments.tree, arguments.verbose,
 				  conf->enable_xterm_title);
 		break;
 	case ACT_DEPENDENTS:
@@ -298,7 +299,8 @@ int main(int argc, char **argv)
 			dependents_dump(list_get(arguments.args, i),
 					ports_dict, conf->aliases,
 					arguments.tree, arguments.verbose,
-					arguments.all, conf->enable_xterm_title);
+					arguments.all,
+					conf->enable_xterm_title);
 		break;
 	case ACT_INFO:
 		if (!arguments.args->length) {
@@ -324,10 +326,10 @@ int main(int argc, char **argv)
 	case ACT_UPDATE:
 		if (arguments.args->length)
 			repositories_dict_update(repositories, arguments.args,
-						 conf->enable_xterm_title); 
+						 conf->enable_xterm_title);
 		else
 			repositories_dict_update_all(repositories,
-				conf->enable_xterm_title);
+						     conf->enable_xterm_title);
 		break;
 	case ACT_REMOVE:
 		if (!arguments.args->length) {
@@ -340,9 +342,7 @@ int main(int argc, char **argv)
 		break;
 	case ACT_UPDATE_PKG:
 		if (!arguments.args->length) {
-			update_system(ports_dict,
-				      arguments.fetch_only,
-				      conf);
+			update_system(ports_dict, arguments.fetch_only, conf);
 			break;
 		}
 		update_package(arguments.args, ports_dict,

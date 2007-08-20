@@ -141,9 +141,13 @@ list_t *ports_list_init(dict_t * repositories, int enable_xterm_title)
 		description = strchr(line, '%') + 1;
 		description = xstrndup(description, strlen(description) -
 				       strlen(strchr(description, '%')));
-		if (strlen(description) > 0)
-			strreplace(&line, description, "", 1);
-		strreplace(&line, "%%", "", 1);
+		if (strlen(description) > 0) {
+			char *xdescription = xstrdup_printf("%%%s%%",
+							    description);
+			strreplace(&line, xdescription, "", 1);
+			free(xdescription);
+		} else
+			strreplace(&line, "%%", "", 1);
 		while (strstr(line, "  ") != NULL)
 			strreplaceall(&line, "  ", " ");
 		splitted = NULL;
@@ -298,7 +302,8 @@ void port_swap(port_t * port1, port_t * port2)
 	port1 = tmp;
 }
 
-void port_show_outdated(dict_t * ports, list_t * packages, int enable_xterm_title)
+void port_show_outdated(dict_t * ports, list_t * packages,
+			int enable_xterm_title)
 {
 	unsigned i;
 	port_t *port, *package;

@@ -122,7 +122,7 @@ conf_t *conf_init(void)
 		self->enable_xterm_title = 0;
 	else
 		self->enable_xterm_title = 1;
-	
+
 	if ((tmp = getenv("DEFAULT_XTERM_TITLE")) == NULL)
 		tmp = ini_get(ini, "ilenia", "default_xterm_title");
 	self->default_xterm_title = xstrdup(tmp);
