@@ -63,6 +63,8 @@ port_t *port_new(char *name, char *version,
 	self->hash = sdbm_hash(name);
 	self->description = description;
 	self->pkgmk_conf = NULL;
+	self->deep = 0;
+	self->cyclic_dependencies_status = CYCLIC_DEPENDENCIES_NOT_CHECKED;
 	return self;
 }
 
@@ -225,6 +227,9 @@ dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf)
 		if ((pkgmk_conf = dict_get(pkgmk_confs_exploded, port->name)) !=
 		    NULL)
 			port->pkgmk_conf = xstrdup(pkgmk_conf);
+		if (list_get_position(conf->never_install, strequ, port->name)
+		    != -1)
+			port->status = PRT_NEVERINSTALL;
 		if ((locked_version =
 		     dict_get(conf->locked_versions, port->name))) {
 			if (!strcmp(port->version, locked_version))
@@ -253,6 +258,8 @@ dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf)
 			dict_add(self, package->name, package);
 			continue;
 		}
+		if(port->status == PRT_NEVERINSTALL)
+			continue;
 		if ((cmp = strverscmp(port->version, package->version)) > 0)
 			port->status = PRT_OUTDATED;
 		else if (cmp < 0)

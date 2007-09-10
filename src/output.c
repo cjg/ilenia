@@ -31,6 +31,8 @@
 #include "str.h"
 #include "exec.h"
 
+// TODO: split from ilenia 
+
 #define BLACK   "\033[0;30m"
 #define RED     "\033[0;31m"
 #define GREEN   "\033[0;32m"
@@ -162,18 +164,19 @@ void xterm_set_title(const char *format, ...)
 	char *format_dup;
 	va_list ap;
 
-	assert(format != NULL);
+	assert (format != NULL);
 
 	if (getenv("TERM") == NULL ||
-	    strncmp(getenv("TERM"), "xterm", 5) != 0 || !isatty(fileno(stdout)))
+	    strncmp(getenv("TERM"), "xterm", 5) != 0 ||
+	    !isatty(fileno(stdout)))
 		return;
-
+	
 	va_start(ap, format);
 
 	format_dup = xstrdup_printf("\x1b]0;%s\x07", format);
 
 	vfprintf(stderr, format_dup, ap);
-
+	
 	free(format_dup);
 	va_end(ap);
 }
@@ -184,12 +187,13 @@ void xterm_reset_title(const char *default_xterm_title)
 	char *title;
 
 	if (getenv("TERM") == NULL ||
-	    strncmp(getenv("TERM"), "xterm", 5) != 0 || !isatty(fileno(stdout)))
+	    strncmp(getenv("TERM"), "xterm", 5) != 0 ||
+	    !isatty(fileno(stdout)))
 		return;
 
 	title = NULL;
-
-	if ((prompt_command = getenv("PROMPT_COMMAND")) != NULL) {
+	
+	if((prompt_command = getenv("PROMPT_COMMAND")) != NULL) {
 		execlogp(prompt_command, NULL, &title);
 		if (strlen(title) == 0) {
 			free(title);
@@ -197,15 +201,15 @@ void xterm_reset_title(const char *default_xterm_title)
 		}
 	}
 
-	if (title != NULL)
+	if(title != NULL)
 		fprintf(stderr, "\x1b]0;%s\x07", title);
-	else if (strlen(default_xterm_title) == 0) {
+	else if(strlen(default_xterm_title) == 0) {
 		char *pwd = getenv("PWD");
 		strreplace(&pwd, getenv("HOME"), "~", 1);
 		fprintf(stderr, "\x1b]0;%s@%s:%s\x07", getenv("LOGNAME"),
 			getenv("HOSTNAME"), pwd);
 	} else
 		fprintf(stderr, "\x1b]0;%s\x07", default_xterm_title);
-
+	
 	free(title);
 }

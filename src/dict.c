@@ -29,10 +29,22 @@
 #include "dict.h"
 #include "memory.h"
 
+// TODO: split from ilenia 
+
 #undef dict_free
 
 #define BLOCKSIZE 512
 #define ELEMENTS_PER_BLOCK (BLOCKSIZE / sizeof(element_t *))
+
+#define sdbm_hash(str,hash) do {				       \
+	 int c;							       \
+	 char *s;						       \
+	 s = (str);						       \
+	 (hash) = 0;						       \
+	 while ((c = *s++))					       \
+		 (hash) = c + ((hash) << 6) + ((hash) << 16) - (hash); \
+ } while(0)
+
 
 static element_t *element_new(char *key, void *data)
 {
@@ -40,6 +52,7 @@ static element_t *element_new(char *key, void *data)
 	assert(key);
 	self = xmalloc(sizeof(element_t));
 	self->key = xstrdup(key);
+	sdbm_hash(self->key, self->hash);
 	self->value = data;
 	return self;
 }
@@ -60,16 +73,16 @@ static void element_dump(element_t * self, void data_dump(void *))
 	data_dump(self->value);
 }
 
-static element_t *dict_element_find(dict_t * self, char *key)
+static inline element_t *dict_element_find(dict_t * self, unsigned long hash)
 {
 	int low, high, mid, cmp;
 	mid = low = 0;
 	high = self->length;
 	while (low < high) {
 		mid = (low + high) / 2;
-		if ((cmp = strcmp(self->elements[mid]->key, key)) < 0)
+		if (self->elements[mid]->hash < hash)
 			low = mid + 1;
-		else if (cmp > 0)
+		else if (self->elements[mid]->hash > hash)
 			high = mid;
 		else
 			return self->elements[mid];
@@ -77,11 +90,11 @@ static element_t *dict_element_find(dict_t * self, char *key)
 	return NULL;
 }
 
-static int dict_get_inner_position(dict_t * self, char *key)
+static inline int dict_get_inner_position(dict_t * self, unsigned long hash)
 {
 	unsigned i;
 	for (i = 0; i < self->length; i++)
-		if (strcmp(self->elements[i]->key, key) > 0)
+		if (self->elements[i]->hash > hash)
 			return i;
 	return self->length;
 }
@@ -93,6 +106,7 @@ dict_t *dict_new(void)
 	self->length = 0;
 	self->size = ELEMENTS_PER_BLOCK;
 	self->elements = xmalloc(self->size * sizeof(element_t *));
+	self->not_sorted = 0;
 	return self;
 }
 
@@ -110,16 +124,19 @@ dict_t *dict_add(dict_t * self, char *key, void *data)
 {
 	element_t *element;
 	int position;
+	unsigned hash;
 
 	assert(self);
 
-	if (self->length && (element = dict_element_find(self, key))) {
+	sdbm_hash(key, hash);
+	
+	if (self->length && (element = dict_element_find(self, hash))) {
 		element->value = data;
 		return self;
 	}
 
 	element = element_new(key, data);
-	position = self->length == 0 ? 0 : dict_get_inner_position(self, key);
+	position = self->length == 0 ? 0 : dict_get_inner_position(self, hash);
 	self->length++;
 	if (self->length >= self->size) {
 		self->size += ELEMENTS_PER_BLOCK;
@@ -130,16 +147,23 @@ dict_t *dict_add(dict_t * self, char *key, void *data)
 	      (self->length - position - 1) * sizeof(element_t *));
 	self->elements[position] = element;
 
+	self->not_sorted++;
+
 	return self;
 }
 
 void *dict_get(dict_t * self, char *key)
 {
 	element_t *element;
+	unsigned hash;
+
 	assert(self);
+
 	if (!self->length)
 		return NULL;
-	if ((element = dict_element_find(self, key)))
+	
+	sdbm_hash(key, hash);
+	if ((element = dict_element_find(self, hash)))
 		return element->value;
 
 	return NULL;
@@ -148,10 +172,16 @@ void *dict_get(dict_t * self, char *key)
 dict_t *dict_remove(dict_t * self, char *key, void data_free(void *))
 {
 	element_t *element;
+	unsigned hash;
+
 	assert(self);
-	if ((element = dict_element_find(self, key)))
+
+	sdbm_hash(key, hash);
+
+	if ((element = dict_element_find(self, hash))) {
 		element_free(element, data_free);
-	self->length--;
+		self->length--;
+	}
 	return self;
 }
 

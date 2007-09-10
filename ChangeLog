@@ -1,3 +1,38 @@
+2007-09-10  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/update.c (update_package): simplified the update package(s) system
+
+2007-08-29  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* conf/ilenia.conf: created the skeleton for the NEVER_INSTALL field
+
+	* doc/ilenia.8.in: documented the never_install system
+
+	* src/ilenia.c (main): created the --no-never-install option to
+	avoid the never_install system
+
+	* src/conf.c (conf_init): created the never_install system to
+	avoid the installation of some ports; it is configured by the
+	variable NEVER_INSTALL (that should contain a space separed list
+	of name of ports) in ilenia.conf
+
+2007-08-28  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/dependencies.c (dependencies_compact_and_check): the
+	function dependencies_compact_and_check replaces the function
+	dependencies_compact and checks for any cyclic dependence
+	(dependencies_list_from_dict): this function replaces the
+	"depencies_append_at_deep" system for building the dependencies list
+
+2007-08-21  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/update.c (update_system): using dependencies_multiple_list
+	to obtain the list of dependencies to upgrade/install
+
+	* src/dependencies.c (dependencies_multiple_list): created the
+	function dependencies_multiple_list to obtain the list of the
+	dependencies of a list of ports
+
 2007-08-20  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* src/port.c (ports_list_init): solved a bug that made doesn't

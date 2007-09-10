@@ -178,28 +178,28 @@ static int rejected_count(void)
 	struct dirent *entry;
 	int rejected;
 
-	dir = opendir("/var/lib/pkg/rejected");
-	if (!dir)
-		return 0;
+        dir = opendir("/var/lib/pkg/rejected");
+        if (!dir)
+                return 0;
 
 	rejected = 0;
 
-	while ((entry = readdir(dir))) {
-		if (*entry->d_name == '.')
-			continue;
+        while ((entry = readdir(dir))) {
+                if (*entry->d_name == '.')
+                        continue;
 		rejected++;
-	}
+        }
 
-	closedir(dir);
-
+        closedir(dir);
+	
 	return rejected;
 }
 
-static void rejected_manage(conf_t * conf)
+static void rejected_manage(conf_t *conf)
 {
 	int rejected;
 
-	assert(conf != NULL);
+	assert (conf != NULL);
 
 	if (conf->rejected_policy == REJ_NEVERMIND)
 		return;
@@ -213,70 +213,68 @@ static void rejected_manage(conf_t * conf)
 
 	if (conf->rejected_policy == REJ_RUN)
 		system("rejmerge");
-	else
+	else 
 		warning("there %s %d rejected file%s, run rejmerge!",
 			rejected == 1 ? "is" : "are",
-			rejected, rejected == 1 ? "" : "s");
+			rejected,
+			rejected == 1 ? "" : "s");
 }
 
-int update_system(dict_t * ports, int fetch_only, conf_t * conf)
+int update_system(dict_t * ports, int fetch_only, conf_t *conf)
 {
-	unsigned i, j;
+	unsigned i;
 	int ret;
-	port_t *port, *pport;
+	port_t *port;
 	list_t *jobs;
 	list_t *dependencies;
-	dict_t *seen, *not_founds;
+	list_t *outdateds;
+	dict_t *not_founds;
 	job_t *job;
 
 	assert(ports != NULL && conf != NULL);
 
 	jobs = list_new();
-	seen = dict_new();
 	not_founds = dict_new();
+
+	outdateds = list_new();
 
 	for (i = 0; i < ports->length; i++) {
 		port = ports->elements[i]->value;
-		if (port->status != PRT_OUTDATED)
+		if(port->status != PRT_OUTDATED)
 			continue;
-
-		dependencies = list_new();
-		dependencies_list(dependencies, port->name, ports,
-				  conf->aliases, not_founds,
-				  conf->enable_xterm_title);
-		for (j = 0; dependencies != NULL && j < dependencies->length;
-		     j++) {
-			pport = dependencies->elements[j];
-			if ((pport->status == PRT_OUTDATED || pport->status ==
-			     PRT_NOTINSTALLED)
-			    && dict_get(seen, pport->name) == NULL) {
-				dict_add(seen, pport->name, "");
-				if (pport->repository != NULL)
-					list_append(jobs, job_new(pport,
-								  fetch_only ?
-								  FETCH_JOB :
-								  UPDATE_JOB,
-								  conf->
-								  post_pkgadd,
-								  conf->
-								  enable_log));
-			}
-		}
-
-		list_free(dependencies, NULL);
+		list_append(outdateds, port->name);
 	}
+
+	dependencies = dependencies_multiple_list(outdateds, ports, 
+						  conf->aliases, not_founds,
+						  conf->enable_xterm_title);
+	list_free(outdateds, NULL);
+
+	for (i = 0; i < dependencies->length; i++) {
+		port = dependencies->elements[i];
+		if ((port->status == PRT_OUTDATED 
+		     || port->status == PRT_NOTINSTALLED)
+		    && port->repository != NULL)
+			list_append(jobs, job_new(port,
+						  fetch_only ?
+						  FETCH_JOB :
+						  UPDATE_JOB,
+						  conf->post_pkgadd,
+						  conf->enable_log));
+	}
+	
+	list_free(dependencies, NULL);
 
 	if (update_manage_not_founds(not_founds, conf->not_found_policy)) {
 		dict_free(not_founds, port_free);
-		dict_free(seen, NULL);
 		list_free(jobs, NULL);
 		return 2;
 	}
 
 	dict_free(not_founds, port_free);
-	dict_free(seen, NULL);
+
 	if (conf->enable_xterm_title)
-		xterm_set_title("Enable update?");
+		xterm_set_title("Confirm update?");
 	if (jobs->length && update_manage_ask(jobs, conf->ask_for_update)) {
 		list_free(jobs, free);
 		return 0;
@@ -309,7 +307,7 @@ int update_system(dict_t * ports, int fetch_only, conf_t * conf)
 	return ret;
 }
 
-int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
+int update_package(list_t * ports_name, dict_t * ports, int fetch_only, 
 		   conf_t * conf, int just_install)
 {
 	port_t *port;
@@ -333,7 +331,7 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 			return 1;
 		}
 		dependencies_list(dependencies, ports_name->elements[i], ports,
-				  conf->aliases, not_founds,
+				  conf->aliases, not_founds, 
 				  conf->enable_xterm_title);
 		if (port->status != PRT_NOTINSTALLED)
 			port->status = PRT_OUTDATED;
@@ -348,26 +346,26 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 	jobs = list_new();
 	for (i = 0; i < dependencies->length; i++) {
 		port = dependencies->elements[i];
-		if ((port->status != PRT_INSTALLED && port->status != PRT_DIFF)
-		    && (port->status != PRT_OUTDATED || !just_install
-			|| list_get_position(ports_name, strequ,
-					     port->name) != -1)
-		    && port->repository != NULL)
+		if (port->status == PRT_NOTINSTALLED
+			|| (port->status == PRT_OUTDATED && !just_install)
+			&& port->repository != NULL)
 			list_append(jobs, job_new(port, fetch_only ? FETCH_JOB :
 						  UPDATE_JOB,
 						  conf->post_pkgadd,
-						  conf->enable_log));
+					    conf->enable_log));
 	}
 
 	dict_free(not_founds, port_free);
 	list_free(dependencies, NULL);
 	if (conf->enable_xterm_title)
-		xterm_set_title("Enable update?");
+		xterm_set_title("Confirm update?");
 	if (update_manage_ask(jobs, 1)) {
 		list_free(jobs, free);
 		return 0;
 	}
-
+	
+	list_dump(jobs, job_dump);
+	
 	for (ret = 0, i = 0; ret == 0 && i < jobs->length; i++) {
 		job = jobs->elements[i];
 		if (conf->enable_xterm_title)
@@ -380,13 +378,13 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 			job->port->status ==
 			PRT_NOTINSTALLED ? "Installing" : "Updating",
 			job->port->name, i + 1, jobs->length);
-		ret = job_execute(jobs->elements[i]);
+/* 		ret = job_execute(jobs->elements[i]); */
 	}
 
 	dump_report(jobs);
 
 	list_free(jobs, free);
-
+	
 	rejected_manage(conf);
 
 	return 0;

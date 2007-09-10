@@ -112,8 +112,8 @@ dict_t *repositories_dict_init(list_t * drivers,
 	return self;
 }
 
-void repositories_dict_update(dict_t * self, list_t * repositories_name,
-			      int enable_xterm_title)
+void repositories_dict_update(dict_t * self, list_t * repositories_name, 
+	int enable_xterm_title)
 {
 	unsigned i;
 	repository_t *repository;

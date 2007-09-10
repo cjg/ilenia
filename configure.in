@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(ilenia, 3.2, Giuseppe Coviello <cjg@cruxppc.org>)
-AM_INIT_AUTOMAKE(ilenia, 3.2)
+AC_INIT(ilenia, 3.2.99, Giuseppe Coviello <cjg@cruxppc.org>)
+AM_INIT_AUTOMAKE(ilenia, 3.2.99)
 AC_CONFIG_SRCDIR([src/ilenia.c])
 AC_CONFIG_HEADER([config.h])
 
@@ -41,6 +41,7 @@ AC_CHECK_HEADERS([stdlib.h string.h strings.h fcntl.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+AC_C_INLINE
 AC_REPLACE_FNMATCH
 AC_TYPE_SIZE_T
 AC_TYPE_PID_T

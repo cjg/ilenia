@@ -118,6 +118,9 @@ Ignores the repositories hierarchy. This could be dangerous, probably.
 .B "\-\-no\-locked"
 Ignores the locked versions list.
 .TP
+.B "\-\-no\-never\-install"
+Disables the never_install list.
+.TP
 .B "\-\-tree"
 It is used with the "\-\-dependencies" or the "\-\-dependents" actions to obtain
 a tree instead of a list of dependencies or dependents ports.
@@ -157,6 +160,10 @@ port and continues the execution.
 It configures the repositories hierarchy, the value is a list of repositories
 separated by space, the first repository in the list is the repository with
 higher priority.
+.TP
+.B NEVER_INSTALL
+This field contains the list of ports that mustn't be installed also if they're
+setted as dependencies of other ports.
 .TP
 .B ASK_FOR_UPDATE
 Possible values are "Yes", the default one and "No"; setting this variable to

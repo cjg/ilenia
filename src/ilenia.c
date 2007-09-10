@@ -38,7 +38,7 @@
 #include "memory.h"
 #include "remove.h"
 
-const char *argp_program_version = "ilenia " VERSION " (No Holiday)"
+const char *argp_program_version = "ilenia " VERSION " (Never Install)"
     "\n"
     "Copyright (C) 2006-2007 Giuseppe Coviello.\n"
     "This is free software.  You may redistribute copies of it under the terms of\n"
@@ -49,9 +49,9 @@ static char doc[] = "A package manager for CRUX (and CRUX PPC of course)";
 static char args_doc[] = "ACT [ARG(S)]";
 
 enum OPT { OPT_CACHE = 300, OPT_REPOSITORY_LIST, OPT_NO_FAVOURITE_REPOSITORIES,
-	OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY, OPT_JUST_INSTALL,
-	OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
-	OPT_NO_COLORS
+	   OPT_NO_LOCKED_VERSIONS, OPT_ALL, OPT_FETCH_ONLY, OPT_JUST_INSTALL,
+	   OPT_NO_REPOSITORIES_HIERARCHY, OPT_TREE, OPT_NO_ALIASES,
+	   OPT_NO_COLORS, OPT_NO_NEVER_INSTALL
 };
 
 enum ACT { ACT_UPDATE = 300, ACT_LIST, ACT_SEARCH, ACT_INFO, ACT_README,
@@ -89,12 +89,14 @@ static struct argp_option options[] = {
 	{"all", OPT_ALL, 0, 0, "Shows or remove all dependents packages", 3},
 	{"fetch-only", OPT_FETCH_ONLY, 0, 0, "Just fetch the needed sources",
 	 3},
-	{"just-install", OPT_JUST_INSTALL, 0, 0,
+	{"just-install", OPT_JUST_INSTALL, 0, 0, 
 	 "Just install dependencies don't update outdate ones"},
 	{"no-hierarchy", OPT_NO_REPOSITORIES_HIERARCHY, 0, 0,
 	 "Do not use the repositories gerarchy", 3},
 	{"no-aliases", OPT_NO_ALIASES, 0, 0, "Do no use aliases", 3},
 	{"verbose", 'v', 0, 0, "Generate verbose output", 3},
+	{"no-never-install", OPT_NO_NEVER_INSTALL, 0, 0, 
+	 "Avoid the never_install list", 3},
 	{0}
 };
 
@@ -105,6 +107,7 @@ struct arguments {
 	int no_aliases;
 	int no_colors;
 	int no_deps;
+	int no_never_install;
 	int all;
 	int fetch_only;
 	int just_install;
@@ -138,6 +141,7 @@ int main(int argc, char **argv)
 	arguments.no_aliases = 0;
 	arguments.no_colors = 0;
 	arguments.no_deps = 1;
+	arguments.no_never_install = 0;
 	arguments.all = 0;
 	arguments.fetch_only = 0;
 	arguments.just_install = 0;
@@ -155,8 +159,10 @@ int main(int argc, char **argv)
 	}
 
 	argp_parse(&argp, argc, argv, 0, 0, &arguments);
+	debug("arguments parsed!");
 
 	conf = conf_init();
+	debug("configuration initialized!");
 
 	if (arguments.no_repositories_hierarchy) {
 		list_free(conf->repositories_hierarchy, free);
@@ -176,6 +182,11 @@ int main(int argc, char **argv)
 	if (arguments.no_aliases) {
 		aliases_free(conf->aliases);
 		conf->aliases = dict_new();
+	}
+
+	if (arguments.no_never_install) {
+		list_free(conf->never_install, free);
+		conf->never_install = list_new();
 	}
 
 	drivers = drivers_list_init();
@@ -202,6 +213,9 @@ int main(int argc, char **argv)
 	}
 
 	conf_reparse(conf, ports_list);
+#ifndef NDEBUG
+	conf_dump(conf);
+#endif
 	ports_dict = ports_dict_init(ports_list, packages, conf);
 	not_founds = dict_new();
 
@@ -273,8 +287,7 @@ int main(int argc, char **argv)
 		port_show_diffs(ports_dict, packages, conf->enable_xterm_title);
 		break;
 	case ACT_UPDATED:
-		port_show_outdated(ports_dict, packages,
-				   conf->enable_xterm_title);
+		port_show_outdated(ports_dict, packages, conf->enable_xterm_title);
 		break;
 	case ACT_DEPENDENCIES:
 		if (!arguments.args->length) {
@@ -286,7 +299,7 @@ int main(int argc, char **argv)
 		dependencies_dump(arguments.args,
 				  ports_dict, conf->aliases,
 				  not_founds,
-				  arguments.tree, arguments.verbose,
+				  arguments.tree, arguments.verbose, 
 				  conf->enable_xterm_title);
 		break;
 	case ACT_DEPENDENTS:
@@ -299,8 +312,7 @@ int main(int argc, char **argv)
 			dependents_dump(list_get(arguments.args, i),
 					ports_dict, conf->aliases,
 					arguments.tree, arguments.verbose,
-					arguments.all,
-					conf->enable_xterm_title);
+					arguments.all, conf->enable_xterm_title);
 		break;
 	case ACT_INFO:
 		if (!arguments.args->length) {
@@ -326,10 +338,10 @@ int main(int argc, char **argv)
 	case ACT_UPDATE:
 		if (arguments.args->length)
 			repositories_dict_update(repositories, arguments.args,
-						 conf->enable_xterm_title);
+						 conf->enable_xterm_title); 
 		else
 			repositories_dict_update_all(repositories,
-						     conf->enable_xterm_title);
+				conf->enable_xterm_title);
 		break;
 	case ACT_REMOVE:
 		if (!arguments.args->length) {
@@ -342,7 +354,9 @@ int main(int argc, char **argv)
 		break;
 	case ACT_UPDATE_PKG:
 		if (!arguments.args->length) {
-			update_system(ports_dict, arguments.fetch_only, conf);
+			update_system(ports_dict,
+				      arguments.fetch_only,
+				      conf);
 			break;
 		}
 		update_package(arguments.args, ports_dict,
@@ -442,6 +456,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 		break;
 	case OPT_NO_COLORS:
 		arguments->no_colors = 1;
+		break;
+	case OPT_NO_NEVER_INSTALL:
+		arguments->no_never_install = 1;
 		break;
 	case 'v':
 		arguments->verbose = 1;

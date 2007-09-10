@@ -31,6 +31,8 @@
 #include <stdio.h>
 #include "memory.h"
 
+// TODO: split from ilenia 
+
 typedef struct {
 	int fd;
 	void (*hook) (char *line, void *data);

@@ -29,12 +29,7 @@
 #include "str.h"
 #include "ini.h"
 
-/*
-static void section_dump(void *data)
-{
-	hash_dump((hash_t *) data, NULL);
-}
-*/
+// TODO: split from ilenia 
 
 ini_t *ini_new(char *filepath)
 {

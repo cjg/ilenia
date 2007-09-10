@@ -29,12 +29,14 @@
 #include "port.h"
 #include "output.h"
 #include "str.h"
+#define PORT(port) ((port_t *)(port))
 
 static char *status[] = {
 	"",
 	"[GREEN]installed[DEFAULT]",
 	"[GREEN]installed[DEFAULT]",
-	"[YELLOW]outdated[DEFAULT]"
+	"[YELLOW]outdated[DEFAULT]",
+	"[RED]never install[DEFAULT]"
 };
 
 static char *not_found = "[RED]not found[DEFAULT]";
@@ -99,9 +101,8 @@ static void deplist_verbose_dump_port(port_t * port)
 		port->repository != NULL ? port->repository->name : not_found);
 }
 
-static void
-dependencies_explode(port_t * port, dict_t * ports_dict, dict_t * aliases,
-		     dict_t * not_founds)
+static inline void dependencies_explode(port_t * port, dict_t * ports_dict, 
+					dict_t * aliases, dict_t * not_founds)
 {
 	unsigned i, j;
 	port_t *dport, *aport;
@@ -142,46 +143,66 @@ dependencies_explode(port_t * port, dict_t * ports_dict, dict_t * aliases,
 			}
 		}
 		list_append(port->dependencies_exploded, dport);
-		if (dport->dependencies_exploded == NULL)
-			dependencies_explode(dport, ports_dict, aliases,
-					     not_founds);
 	}
 }
 
-static unsigned dependencies_compact(port_t * port, unsigned deep,
-				     dict_t * seen)
-{
-	unsigned i, ndeep, mdeep;
-
-	if (port->dependencies_exploded->length == 0)
-		return deep;
-	deep++;
-	mdeep = deep;
-	for (i = 0; i < port->dependencies_exploded->length; i++) {
-		((port_t *)
-		 port->dependencies_exploded->elements[i])->deep = deep;
-		dict_add(seen, ((port_t *)
-				port->dependencies_exploded->elements[i])->name,
-			 port->dependencies_exploded->elements[i]);
-		ndeep =
-		    dependencies_compact(port->dependencies_exploded->
-					 elements[i], deep, seen);
-		if (ndeep > mdeep)
-			mdeep = ndeep;
-	}
-	return mdeep;
-}
-
-static void dependencies_append_at_deep(list_t * list, dict_t * dict, unsigned
-					deep)
+static int dependencies_compact_and_check(list_t *stack, dict_t *ports_dict,
+					  dict_t *aliases, dict_t *not_founds,
+					  dict_t *seen, unsigned deep)
 {
 	unsigned i;
 	port_t *port;
-	for (i = 0; i < dict->length; i++) {
-		port = dict->elements[i]->value;
-		if (port->deep == deep)
-			list_append(list, port);
+
+	assert(stack != NULL);
+
+	if(stack->length == 0)
+		return 0;
+	
+	port = list_get_port(stack, 0);
+
+	dependencies_explode(port, ports_dict, aliases, not_founds);
+
+	deep++;
+
+	for(i = 0; i < port->dependencies_exploded->length; i++) {
+		if(list_get_port(port->dependencies_exploded, i)->deep == 0)
+			dict_add(seen,
+				 list_get_port(port->dependencies_exploded,
+					       i)->name,
+				 list_get_port(port->dependencies_exploded, i));
+		if(list_get_port(port->dependencies_exploded, i)->deep < deep)
+			list_get_port(port->dependencies_exploded, i)->deep =
+				deep;
+		if(list_get_port(port->dependencies_exploded,i)->cyclic_dependencies_status
+		   == CYCLIC_DEPENDENCIES_EXIST 
+		   || (list_get_port(port->dependencies_exploded,i)->cyclic_dependencies_status
+		   == CYCLIC_DEPENDENCIES_NOT_CHECKED 
+		       && list_get_position(stack, port_query_by_name, 
+					    list_get_port(port->dependencies_exploded, 
+							  i)->name)!= -1)) {
+			error("Found a cyclic dependence in: %s (%s<==>%s)!", 
+			      list_get_port(stack, 0)->name,
+			      list_get_port(stack, 0)->name,
+			      list_get_port(port->dependencies_exploded, i)->name);
+			
+			return 1;
+		}
+		
+		list_prepend(stack, list_get_port(port->dependencies_exploded, 
+						  i));
+		if (dependencies_compact_and_check(stack, ports_dict, aliases,
+						   not_founds, seen, deep) != 0)
+						  {
+			list_get_port(stack, 0)->cyclic_dependencies_status =
+				CYCLIC_DEPENDENCIES_EXIST;
+			return 1;
+		}
+		list_get_port(stack, 0)->cyclic_dependencies_status =
+			CYCLIC_DEPENDENCIES_CHECKED;
+		list_remove(stack, 0, NULL);
 	}
+	
+	return 0;
 }
 
 static list_t *dependencies_list_merge(list_t * list1, list_t * list2)
@@ -210,15 +231,31 @@ static list_t *dependencies_list_merge(list_t * list1, list_t * list2)
 	return list1;
 }
 
+static int port_deep_cmp(void *port1, void *port2)
+{
+	return ((int)PORT(port2)->deep) - ((int)PORT(port1)->deep);
+}
+
+
+static inline list_t *dependencies_list_from_dict(dict_t *seen)
+{
+	unsigned i;
+	list_t *dependencies;
+	
+	dependencies = list_new_with_size(seen->length);
+	for(i=0;i<seen->length;i++)
+		list_append(dependencies, dict_get_port_at(seen, i));
+	return list_sort(dependencies, port_deep_cmp);
+}
+
 list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
 			  dict_t * aliases, dict_t * not_founds, int
 			  enable_xterm_title)
 {
 	port_t *port;
 	list_t *deplist;
+	list_t *stack;
 	dict_t *seen;
-	unsigned deep;
-	int i;
 
 	assert(port_name != NULL && ports_dict != NULL && aliases != NULL &&
 	       self != NULL);
@@ -227,26 +264,59 @@ list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
 		warning("%s not found!", port_name);
 		return NULL;
 	}
-
+	
 	if (enable_xterm_title)
 		xterm_set_title("Calculating dependencies ...");
-	dependencies_explode(port, ports_dict, aliases, not_founds);
+	stack = list_new();
+	list_append(stack, port);
 	seen = dict_new();
-	deep = dependencies_compact(port, 0, seen);
-	deplist = list_new();
+	if(dependencies_compact_and_check(stack, ports_dict, aliases,
+					  not_founds, seen, 0)) {
+		list_free(stack, NULL);
+		return NULL;
+	}
+	list_free(stack, NULL);
 	dict_add(seen, port->name, port);
-	port->deep = 0;
-	for (i = deep; i >= 0; i--)
-		dependencies_append_at_deep(deplist, seen, i);
+	deplist = dependencies_list_from_dict(seen);
 	dict_free(seen, NULL);
 	dependencies_list_merge(self, deplist);
 	list_free(deplist, NULL);
 	return self;
 }
 
+list_t *dependencies_multiple_list(list_t *ports_name, 
+				   dict_t * ports_dict, dict_t * aliases, 
+				   dict_t * not_founds, int enable_xterm_title)
+{
+	unsigned i;
+	port_t *port;
+	list_t *self;
+
+	assert(ports_name != NULL && ports_dict != NULL && aliases != NULL);
+
+	for (i = 0; i < ports_name->length; i++) {
+		if ((port = dict_get(ports_dict,
+				     (char *)ports_name->elements[i])) ==
+		    NULL) {
+			warning("%s not found!", ports_name->elements[i]);
+			list_remove(ports_name, i--, NULL);
+			continue;
+		}
+		dependencies_explode(port, ports_dict, aliases, not_founds);
+	}
+	
+	self = list_new();
+	for (i = 0; i < ports_name->length; i++) {
+		dependencies_list(self, ports_name->elements[i],
+				  ports_dict, aliases, not_founds,
+				  enable_xterm_title);
+	}
+	return self;
+}
+
 void
 dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
-		  dict_t * not_founds, int tree, int verbose,
+		  dict_t * not_founds, int tree, int verbose, 
 		  int enable_xterm_title)
 {
 	unsigned i;
@@ -256,7 +326,7 @@ dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
 
 	assert(ports_name != NULL && ports_dict != NULL && aliases != NULL &&
 	       not_founds != NULL);
-
+	
 	for (i = 0; i < ports_name->length; i++) {
 		if ((port = dict_get(ports_dict,
 				     (char *)ports_name->elements[i])) ==
@@ -411,12 +481,12 @@ static void dependents_tree_dump(port_t * port, dict_t * ports_dict, dict_t
 }
 
 void dependents_list_dump(port_t * port, dict_t * ports_dict,
-			  dict_t * aliases, int verbose, int all,
+			  dict_t * aliases, int verbose, int all, 
 			  int enable_xterm_title)
 {
 	list_t *detlist;
 
-	detlist = dependents_list(port->name, ports_dict, aliases, all,
+	detlist = dependents_list(port->name, ports_dict, aliases, all, 
 				  enable_xterm_title);
 	if (detlist == NULL)
 		return;
@@ -428,8 +498,7 @@ void dependents_list_dump(port_t * port, dict_t * ports_dict,
 }
 
 void dependents_dump(char *port_name, dict_t * ports_dict,
-		     dict_t * aliases, int tree, int verbose, int all,
-		     int enable_xterm_title)
+		     dict_t * aliases, int tree, int verbose, int all, int enable_xterm_title)
 {
 	port_t *port;
 	dict_t *seen;
@@ -442,6 +511,5 @@ void dependents_dump(char *port_name, dict_t * ports_dict,
 				     seen, verbose, all);
 		dict_free(seen, NULL);
 	} else
-		dependents_list_dump(port, ports_dict, aliases, verbose, all,
-				     enable_xterm_title);
+		dependents_list_dump(port, ports_dict, aliases, verbose, all, enable_xterm_title);
 }

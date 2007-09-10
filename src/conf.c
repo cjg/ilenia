@@ -62,6 +62,7 @@ conf_t *conf_init(void)
 	ini_set_default(ini, "ilenia", "default_xterm_title", xstrdup(""));
 	ini_set_default(ini, "ilenia", "enable_log", xstrdup("Yes"));
 	ini_set_default(ini, "ilenia", "rejected_policy", xstrdup("CHECK"));
+	ini_set_default(ini, "ilenia", "never_install", xstrdup(""));
 	ini_add(ini, "favourite_repositories");
 	ini_add(ini, "locked_versions");
 	ini_add(ini, "aliases");
@@ -122,7 +123,7 @@ conf_t *conf_init(void)
 		self->enable_xterm_title = 0;
 	else
 		self->enable_xterm_title = 1;
-
+	
 	if ((tmp = getenv("DEFAULT_XTERM_TITLE")) == NULL)
 		tmp = ini_get(ini, "ilenia", "default_xterm_title");
 	self->default_xterm_title = xstrdup(tmp);
@@ -142,6 +143,20 @@ conf_t *conf_init(void)
 		self->rejected_policy = REJ_RUN;
 	else
 		self->rejected_policy = REJ_CHECK;
+
+	tmp = ini_get(ini, "ilenia", "never_install");
+	if (tmp != NULL) {
+		strreplace(&tmp, "\t", " ", -1);
+		while (strstr(tmp, "  "))
+			strreplace(&tmp, "  ", " ", -1);
+
+		splitted = NULL;
+		nsplits = strsplit(tmp, ' ', &splitted);
+		self->never_install =
+		    list_new_from_array((void **)splitted, nsplits);
+		free(splitted);
+	} else
+		self->never_install = list_new();
 
 	self->favourite_repositories = dict_new();
 	vars = ini_get_vars(ini, "favourite_repositories");
@@ -205,6 +220,7 @@ void conf_free(conf_t * self)
 	dict_free(self->locked_versions, free);
 	aliases_free(self->aliases);
 	dict_free(self->pkgmk_confs, free);
+	list_free(self->never_install, free);
 	free(self);
 }
 
@@ -221,6 +237,11 @@ void conf_dump(conf_t * self)
 	for (i = 0; i < self->repositories_hierarchy->length; i++)
 		printf("%s ",
 		       (char *)list_get(self->repositories_hierarchy, i));
+	printf("\n");
+	printf("NEVER_INSTALL = ");
+	for (i = 0; i < self->never_install->length; i++)
+		printf("%s ",
+		       (char *)list_get(self->never_install, i));
 	printf("\n");
 	printf("FAVOURITE_REPOSITORIES =\n");
 	for (i = 0; i < self->favourite_repositories->length; i++) {

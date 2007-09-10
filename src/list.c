@@ -28,14 +28,63 @@
 #include "memory.h"
 #include "str.h"
 
+// TODO: split from ilenia 
+
 #undef list_free
 #undef list_query
 #undef list_get_position
 #undef list_dump
 #undef list_xstrdup
+#undef list_sort
 
 #define BLOCKSIZE 512
 #define ELEMENTS_PER_BLOCK (BLOCKSIZE / sizeof(void *))
+
+#define rnd(min, max) (min)+((unsigned) rand() % ((max)-(min) + 1))
+
+static void swap(void **a, void **b)
+{
+        void *tmp;
+        tmp = *a;
+        *a = *b;
+        *b = tmp;
+}
+
+static void quicksort(void **array, int first, int last, 
+		      int cmp(void *, void *))
+{
+	int left, right;
+	void *pivot;
+	left = first;
+	right = last;
+
+	/* se il primo elemento da ordinare si trova dopo l'ultimo elemento da
+	   ordinare (o vi coincide) significa che l'array e' gia' ordinato */
+	if (first >= last)
+		return;
+
+	/* il pivot e' scelto casualmente */
+	pivot = array[rnd(first, last)];
+
+	/* si spostano a sinistra del pivot gli elementi minori e a destra
+	   quelli maggiori */
+	while (left < right) {
+		while (cmp(array[left], pivot) < 0)
+			left++;
+		while (cmp(array[right], pivot) > 0)
+			right--;
+		if (left < right)
+			swap(&array[left], &array[right]);
+		if (cmp(array[left], pivot) == 0 &&
+		    cmp(array[right], pivot) == 0)
+			left++;
+	}
+
+	/* viene richiamata la function per ordinare i due sotto-array a
+	   sinistra e a destra del pivot */
+	quicksort(array, first, right - 1, cmp);
+	quicksort(array, right + 1, last, cmp);
+}
 
 list_t *list_new(void)
 {
@@ -43,6 +92,16 @@ list_t *list_new(void)
 	self = xmalloc(sizeof(list_t));
 	self->length = 0;
 	self->size = ELEMENTS_PER_BLOCK;
+	self->elements = xmalloc(self->size * sizeof(void *));
+	return self;
+}
+
+list_t *list_new_with_size(unsigned size)
+{
+	list_t *self;
+	self = xmalloc(sizeof(list_t));
+	self->length = 0;
+	self->size = size;
 	self->elements = xmalloc(self->size * sizeof(void *));
 	return self;
 }
@@ -109,10 +168,11 @@ list_t *list_insert(list_t * self, int position, void *data)
 
 	self->length++;
 
-/* 	if (self->length >= self->size) { */
-	self->size += ELEMENTS_PER_BLOCK;
-	self->elements = xrealloc(self->elements, self->size * sizeof(void *));
-/* 	} */
+	if (self->length >= self->size) {
+		self->size += ELEMENTS_PER_BLOCK;
+		self->elements = xrealloc(self->elements,
+					  self->size * sizeof(void *));
+	}
 
 	bcopy(self->elements + position, self->elements + position + 1,
 	      (self->length - position - 1) * sizeof(void *));
@@ -215,7 +275,7 @@ list_t *list_reverse(list_t * self)
 	return self;
 }
 
-char *list_xstrdup(list_t * self, const char *sep, char *data_str(void *))
+char *list_xstrdup(list_t *self, const char *sep, char *data_str(void *))
 {
 	unsigned i;
 	char *s, *data;
@@ -223,8 +283,8 @@ char *list_xstrdup(list_t * self, const char *sep, char *data_str(void *))
 
 	s = xstrdup("");
 
-	for (i = 0; i < self->length; i++) {
-		if (data_str != NULL)
+	for(i = 0; i < self->length; i++) {
+		if(data_str != NULL)
 			data = data_str(*(self->elements + i));
 		else
 			data = xstrdup_printf("%p", *(self->elements + i));
@@ -233,9 +293,16 @@ char *list_xstrdup(list_t * self, const char *sep, char *data_str(void *))
 
 		free(data);
 
-		if (sep != NULL && (i + 1) < self->length)
+		if(sep != NULL && (i + 1) < self->length)
 			strappend(&s, sep);
 	}
 
 	return s;
+}
+
+list_t *list_sort(list_t *self, int data_cmp(void *, void *))
+{
+        assert(self != NULL && data_cmp != NULL);
+	quicksort(self->elements, 0, self->length - 1, data_cmp);
+        return self;
 }

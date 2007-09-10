@@ -26,9 +26,11 @@
 #include "list.h"
 #include "repository.h"
 
-typedef enum { PRT_NOTINSTALLED, PRT_INSTALLED, PRT_DIFF,
-	PRT_OUTDATED
-} port_status_t;
+typedef enum {PRT_NOTINSTALLED, PRT_INSTALLED, PRT_DIFF, PRT_OUTDATED,
+	      PRT_NEVERINSTALL } port_status_t;
+
+typedef enum { CYCLIC_DEPENDENCIES_NOT_CHECKED, CYCLIC_DEPENDENCIES_CHECKED,
+	       CYCLIC_DEPENDENCIES_EXIST } port_cyclic_dependencies_status_t;
 
 typedef struct {
 	char *name;
@@ -41,6 +43,7 @@ typedef struct {
 	unsigned deep;
 	char *description;
 	char *pkgmk_conf;
+	port_cyclic_dependencies_status_t cyclic_dependencies_status;
 } port_t;
 
 port_t *port_new(char *name, char *version,
@@ -57,5 +60,7 @@ port_t *port_query_by_description(port_t * self, char *key);
 port_t *port_query_by_hash(port_t * self, unsigned long *hash);
 void port_show_outdated(dict_t * ports, list_t * packages, int enable_xterm_title);
 void port_show_diffs(dict_t * ports, list_t * packages, int enable_xterm_title);
-
+#define list_get_port(list,i) ((port_t *)((list)->elements[(i)]))
+#define dict_get_port(dict,name) ((port_t *)(dict_get((dict),(name))))
+#define dict_get_port_at(dict,i) ((port_t *)((dict)->elements[(i)]->value))
 #endif

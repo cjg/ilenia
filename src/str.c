@@ -27,6 +27,8 @@
 #include <ctype.h>
 #include "memory.h"
 
+// TODO: split from ilenia 
+
 int strequ(const char *s1, const char *s2)
 {
 	if (strcmp(s1, s2) == 0)

@@ -60,7 +60,7 @@ static void do_log(const char *format, ...)
 	FILE *stream;
 	va_list ap;
 
-	assert(format != NULL);
+	assert (format != NULL);
 
 	if (is_file(LOG))
 		stream = fopen(LOG, "a");
@@ -75,11 +75,11 @@ static void do_log(const char *format, ...)
 	time_t t = time(NULL);
 	char *times = ctime(&t);
 	*(times + strlen(times) - 1) = 0;
-	va_start(ap, format);
-	fprintf(stream, "%s: ", times);
+	va_start (ap, format);
+	fprintf (stream, "%s: ", times);
 	vfprintf(stream, format, ap);
-	fprintf(stream, "\n");
-	va_end(ap);
+	fprintf (stream, "\n");
+	va_end (ap);
 
 	fclose(stream);
 }
@@ -117,11 +117,11 @@ static void get_flags(const char *filename, char **cflags, char **cxxflags)
 	else
 		file = fopen("/etc/pkgmk.conf", "r");
 
-	if (file == NULL)
+	if(file == NULL)
 		return;
 
 	line = 0;
-	while ((nread = getline(&line, &n, file)) >= 0) {
+	while((nread = getline(&line, &n, file)) >= 0) {
 		*(line + strlen(line) - 1) = 0;
 
 		strtrim(line);
@@ -144,8 +144,10 @@ static void get_flags(const char *filename, char **cflags, char **cxxflags)
 
 static int job_update_execute(job_t * self)
 {
-
 	int ret;
+
+	/* TODO: split the download and make process, and made possible the 
+	   parallel download and install */
 
 	assert(self);
 
@@ -200,8 +202,8 @@ static int job_update_execute(job_t * self)
 		char *cflags, *cxxflags;
 		get_flags(self->port->pkgmk_conf, &cflags, &cxxflags);
 		do_log("%s %s-%s DEPENDENCIES=\"%s\" CFLAGS=\"%s\" "
-		       "CXXFLAGS=\"%s\"",
-		       self->port->status == PRT_NOTINSTALLED ? "Installed" :
+		       "CXXFLAGS=\"%s\"", 
+		       self->port->status == PRT_NOTINSTALLED ? "Installed" : 
 		       "Updated", self->port->name, self->port->version,
 		       dependencies, cflags, cxxflags);
 		free(dependencies);
@@ -279,8 +281,7 @@ static int job_remove_execute(job_t * self)
 	return 0;
 }
 
-job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd,
-	       int enable_log)
+job_t *job_new(port_t * port, job_type_t type, char *post_pkgadd, int enable_log)
 {
 	job_t *self;
 	char *path;

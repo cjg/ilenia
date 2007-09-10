@@ -30,6 +30,7 @@ typedef struct {
 } list_t;
 
 list_t *list_new(void);
+list_t *list_new_with_size(unsigned size);
 list_t *list_new_from_array(void **array, int array_len);
 void list_free(list_t * self, void data_free(void *));
 list_t *list_append(list_t * self, void *data);
@@ -45,6 +46,7 @@ list_t *list_query(list_t * self, void *data_query(void *, void *),
 list_t *list_swap(list_t * self, unsigned position1, unsigned position2);
 list_t *list_reverse(list_t * self);
 char *list_xstrdup(list_t *self, const char * sep, char *data_str(void *));
+list_t *list_sort(list_t *self, int data_cmp(void *, void *));
 #define list_free(self, data_free) list_free((self), \
 					     (void (*)(void *)) (data_free))
 #define list_query(self, query, arg) list_query((self), \
@@ -56,4 +58,6 @@ char *list_xstrdup(list_t *self, const char * sep, char *data_str(void *));
 #define list_dump(self, data_dump) list_dump((self), (void (*)(void *))(data_dump))
 #define list_xstrdup(self, sep, data_str) list_xstrdup((self), (sep), (char \
 								       *(*)(void *))(data_str))
+#define list_sort(self, data_cmp) list_sort((self), (int (*)(void *, void*))(data_cmp))
+
 #endif

@@ -43,6 +43,7 @@ typedef struct {
 	dict_t *locked_versions;
 	dict_t *aliases;
 	dict_t *pkgmk_confs;
+	list_t *never_install;
 } conf_t;
 
 conf_t *conf_init(void);

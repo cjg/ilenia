@@ -106,6 +106,7 @@ cache_parse_pkgfile(repository_t * repository, char *dir_name, FILE * cachefile)
 		    version != NULL && strlen(version) != 0 &&
 		    release != NULL && strlen(release) != 0 &&
 		    strcmp(name, dir_name) == 0) {
+			// TODO: add the timestamp to the entry
 			fprintf(cachefile, "%s %s-%s %s %%%s%%", name, version,
 				release, repository->name,
 				description != NULL ? description : "");
@@ -170,10 +171,10 @@ int cache_build(dict_t * repositories, int enable_xterm_title)
 
 	for (i = 0; i < repositories->length; i++) {
 		if (enable_xterm_title)
-			xterm_set_title("Caching repository %s (%d on %d) ...",
+			xterm_set_title("Caching repository %s (%d on %d) ...", 
 					((repository_t *)
-					 repositories->elements[i]->value)->
-					name, i + 1, repositories->length);
+					 repositories->elements[i]->value)->name,
+					i + 1, repositories->length);
 		cache_from_repository(repositories->elements[i]->value, file);
 		printf(".");
 		fflush(stdout);
@@ -198,6 +199,9 @@ void cache_update_stamp(void)
 int cache_is_update(char *cache_file)
 {
 	struct stat cache_stat, stamp_stat;
+
+	// TODO: use per port timestamp instead of global timestamp
+
 	assert(cache_file != NULL);
 	lstat(cache_file, &cache_stat);
 	lstat(STAMP_FILE, &stamp_stat);

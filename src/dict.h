@@ -26,12 +26,14 @@
 typedef struct {
 	char *key;
 	void *value;
+	unsigned hash;
 } element_t;
 
 typedef struct {
 	unsigned length;
 	element_t **elements;
 	unsigned size;
+	unsigned not_sorted;
 } dict_t;
 
 dict_t *dict_new(void);

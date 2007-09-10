@@ -32,5 +32,10 @@ typedef int (*cprintf_t) (FILE *, const char *, ...);
 cprintf_t cprintf;
 void xterm_set_title(const char *format, ...);
 void xterm_reset_title(const char *default_xterm_title);
+#ifndef NDEBUG
+#define debug(fmt,...) fprintf(stderr, "ilenia: " fmt "\n" __VA_ARGS__)
+#else
+#define debug(fmt,...)
+#endif
 
 #endif
