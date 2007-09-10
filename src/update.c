@@ -364,8 +364,6 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 		return 0;
 	}
 	
-	list_dump(jobs, job_dump);
-	
 	for (ret = 0, i = 0; ret == 0 && i < jobs->length; i++) {
 		job = jobs->elements[i];
 		if (conf->enable_xterm_title)
@@ -378,7 +376,7 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 			job->port->status ==
 			PRT_NOTINSTALLED ? "Installing" : "Updating",
 			job->port->name, i + 1, jobs->length);
-/* 		ret = job_execute(jobs->elements[i]); */
+		ret = job_execute(jobs->elements[i]);
 	}
 
 	dump_report(jobs);
