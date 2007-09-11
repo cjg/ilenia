@@ -346,8 +346,8 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 	jobs = list_new();
 	for (i = 0; i < dependencies->length; i++) {
 		port = dependencies->elements[i];
-		if (port->status == PRT_NOTINSTALLED
-			|| (port->status == PRT_OUTDATED && !just_install)
+		if ((port->status == PRT_NOTINSTALLED
+			|| (port->status == PRT_OUTDATED && !just_install))
 			&& port->repository != NULL)
 			list_append(jobs, job_new(port, fetch_only ? FETCH_JOB :
 						  UPDATE_JOB,
