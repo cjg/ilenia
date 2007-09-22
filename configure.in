@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(ilenia, 3.2.99, Giuseppe Coviello <cjg@cruxppc.org>)
-AM_INIT_AUTOMAKE(ilenia, 3.2.99)
+AC_INIT(ilenia, 3.3, Giuseppe Coviello <cjg@cruxppc.org>)
+AM_INIT_AUTOMAKE(ilenia, 3.3)
 AC_CONFIG_SRCDIR([src/ilenia.c])
 AC_CONFIG_HEADER([config.h])
 

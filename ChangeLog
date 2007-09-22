@@ -1,3 +1,10 @@
+2007-09-13  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/update.c (update_package): there was a costant 1 instead of
+	conf->ask_for_update in the update_manage_ask() call, it was
+	forcing ilenia to stop and ask also when ASK_FOR_UPDATE variable
+	was setted to "No"
+
 2007-09-11  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* src/update.c (update_package): solved little bug

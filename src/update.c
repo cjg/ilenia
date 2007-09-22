@@ -359,7 +359,7 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 	list_free(dependencies, NULL);
 	if (conf->enable_xterm_title)
 		xterm_set_title("Confirm update?");
-	if (update_manage_ask(jobs, 1)) {
+	if (update_manage_ask(jobs, conf->ask_for_update)) {
 		list_free(jobs, free);
 		return 0;
 	}

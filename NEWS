@@ -1,3 +1,14 @@
+22/10/2007 - ilenia-3.3 released 
+Here  we  are  at  Pianeta  Amiga  in Empoli  (Florence),  and  we're  releasing
+ilenia-3.3.  
+The new  features, the ones visible by  the users, are the  never intall system,
+that  make possibible  to config  ilenia to  never install  a list  of specified
+ports, and the other new feature is the cyclic dependecies check.  
+ilenia-3.3 comes  out with some  bugfixes, like the  one that made  ilenia fault
+when managing ports that had the  same value in the name and description fields.
+ilenia-3.3 has a  new simpler system for manage dependencies  of lists of ports,
+that make ilenia runs faster.
+
 18/08/2007 - ilenia-3.2 released 
 Someone goes to the beach some goes to the mountain, everyone goes on holiday; I
 make a new release!  
@@ -122,6 +133,7 @@ pazo/    stsp/          vico/    yhafri/  albe/      han/         jheino/
 jw/      noneus/        rrm3/    tbmnet/  wimpress/  zh_current/
 
 The dependencies system of ilenia had been improved very much in this release.
+
 
 07/11/2004 - ilenia-1.0 released 
 Now  'ilenia'  can  build,  install  and update  packages  while  resolving  the
