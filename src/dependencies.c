@@ -143,6 +143,7 @@ static inline void dependencies_explode(port_t * port, dict_t * ports_dict,
 			}
 		}
 		list_append(port->dependencies_exploded, dport);
+		dependencies_explode(dport, ports_dict, aliases, not_founds);
 	}
 }
 
