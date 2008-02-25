@@ -22,11 +22,11 @@
 
 #ifndef _INFO_H
 #define _INFO_H
-#include "dict.h"
+#include "hash.h"
 
-void info_dump(char *port_name, dict_t * ports_dict);
+void info_dump(char *port_name, hash_t * ports_hash);
 void port_info_dump(port_t * port);
-void readme_dump(char *port_name, dict_t * ports_dict);
+void readme_dump(char *port_name, hash_t * ports_hash);
 void port_readme_dump(port_t * port);
 
 #endif

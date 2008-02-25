@@ -24,8 +24,9 @@
 #define _REMOVE_H
 
 #include "conf.h"
+#include "hash.h"
 
-int remove_packages(list_t * packages_name, list_t * packages, dict_t * ports,
+int remove_packages(list_t * packages_name, list_t * packages, hash_t * ports,
 		    conf_t * conf, int all);
 
 #endif

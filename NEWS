@@ -1,3 +1,12 @@
+25/02/2007 - ilenia-3.4 released 
+Programming ilenia  is like researching the  philosophal stone: I've  used a new
+data  structure  in this  release  that made  ilenia  run  faster while  solving
+dependencies, it's about the 4% faster.  
+This is also a bugfix release  (like all others, of course): it's solved another
+of the nullpointer's bug: using the deptree option to obtain the dependencies of
+a port caused sometimes a segmentation  fault; and finally the count of rejected
+files is correct.
+
 22/09/2007 - ilenia-3.3 released 
 Here  we  are  at  Pianeta  Amiga  in Empoli  (Florence),  and  we're  releasing
 ilenia-3.3.  

@@ -46,7 +46,7 @@
  } while(0)
 
 
-static element_t *element_new(char *key, void *data)
+static inline element_t *element_new(char *key, void *data)
 {
 	element_t *self;
 	assert(key);
@@ -57,7 +57,7 @@ static element_t *element_new(char *key, void *data)
 	return self;
 }
 
-static void element_free(element_t * self, void data_free(void *))
+static inline void element_free(element_t * self, void data_free(void *))
 {
 	assert(self);
 	free(self->key);
@@ -66,7 +66,7 @@ static void element_free(element_t * self, void data_free(void *))
 	free(self);
 }
 
-static void element_dump(element_t * self, void data_dump(void *))
+static inline void element_dump(element_t * self, void data_dump(void *))
 {
 	assert(self && data_dump);
 	printf("%s => ", self->key);
@@ -75,18 +75,10 @@ static void element_dump(element_t * self, void data_dump(void *))
 
 static inline element_t *dict_element_find(dict_t * self, unsigned long hash)
 {
-	int low, high, mid, cmp;
-	mid = low = 0;
-	high = self->length;
-	while (low < high) {
-		mid = (low + high) / 2;
-		if (self->elements[mid]->hash < hash)
-			low = mid + 1;
-		else if (self->elements[mid]->hash > hash)
-			high = mid;
-		else
-			return self->elements[mid];
-	}
+	unsigned i;
+	for(i = 0; i < self->length; i++)
+		if(self->elements[i]->hash == hash)
+			return self->elements[i];
 	return NULL;
 }
 
@@ -136,18 +128,19 @@ dict_t *dict_add(dict_t * self, char *key, void *data)
 	}
 
 	element = element_new(key, data);
-	position = self->length == 0 ? 0 : dict_get_inner_position(self, hash);
+/* 	position = self->length == 0 ? 0 : dict_get_inner_position(self, hash); */
+	position = self->length;
 	self->length++;
 	if (self->length >= self->size) {
 		self->size += ELEMENTS_PER_BLOCK;
 		self->elements = xrealloc(self->elements,
 					  self->size * sizeof(element_t *));
 	}
-	bcopy(self->elements + position, self->elements + position + 1,
-	      (self->length - position - 1) * sizeof(element_t *));
+/* 	bcopy(self->elements + position, self->elements + position + 1, */
+/* 	      (self->length - position - 1) * sizeof(element_t *)); */
 	self->elements[position] = element;
 
-	self->not_sorted++;
+/* 	self->not_sorted++; */
 
 	return self;
 }

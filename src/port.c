@@ -34,17 +34,6 @@
 #include "file.h"
 #include "output.h"
 
-static unsigned long sdbm_hash(char *str)
-{
-	unsigned long hash = 0;
-	int c;
-
-	while ((c = *str++))
-		hash = c + (hash << 6) + (hash << 16) - hash;
-
-	return hash;
-}
-
 port_t *port_new(char *name, char *version,
 		 repository_t * repository, list_t * dependencies, char
 		 *description)
@@ -60,7 +49,7 @@ port_t *port_new(char *name, char *version,
 	self->repository = repository;
 	self->dependencies = dependencies;
 	self->dependencies_exploded = NULL;
-	self->hash = sdbm_hash(name);
+/* 	self->hash = sdbm_hash(name); */
 	self->description = description;
 	self->pkgmk_conf = NULL;
 	self->deep = 0;
@@ -207,9 +196,10 @@ static dict_t *pkgmk_confs_explode(dict_t * pkgmk_confs, list_t * ports)
 	return exploded;
 }
 
-dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf)
+hash_t *port_hash_init(list_t * ports_list, list_t * packages, conf_t * conf)
 {
-	dict_t *self, *pkgmk_confs_exploded;
+	hash_t *self;
+	dict_t *pkgmk_confs_exploded;
 	port_t *port, *found, *package;
 	unsigned i;
 	int cmp;
@@ -220,7 +210,7 @@ dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf)
 	pkgmk_confs_exploded = pkgmk_confs_explode(conf->pkgmk_confs,
 						   ports_list);
 
-	self = dict_new();
+	self = hash_new_with_size(1000);
 
 	for (i = 0; i < ports_list->length; i++) {
 		port = list_get(ports_list, i);
@@ -233,29 +223,29 @@ dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf)
 		if ((locked_version =
 		     dict_get(conf->locked_versions, port->name))) {
 			if (!strcmp(port->version, locked_version))
-				dict_add(self, port->name, port);
+				hash_add(self, port->name, port);
 		} else if (locked_version == NULL &&
 			   (found = dict_get(conf->favourite_repositories,
 					     port->name)) != NULL) {
 			if (strcmp(found->repository->name,
 				   port->repository->name) == 0)
-				dict_add(self, port->name, port);
+				hash_add(self, port->name, port);
 		} else if (!locked_version
-			   && !(found = dict_get(self, port->name)))
-			dict_add(self, port->name, port);
+			   && !(found = hash_get(self, port->name)))
+			hash_add(self, port->name, port);
 		else if (!locked_version && port->repository->priority >
 			 found->repository->priority)
-			dict_add(self, port->name, port);
+			hash_add(self, port->name, port);
 		else if (!locked_version && port->repository->priority ==
 			 found->repository->priority &&
 			 strverscmp(port->version, found->version) > 0)
-			dict_add(self, port->name, port);
+			hash_add(self, port->name, port);
 	}
 
 	for (i = 0; i < packages->length; i++) {
 		package = list_get(packages, i);
-		if (!(port = dict_get(self, package->name))) {
-			dict_add(self, package->name, package);
+		if (!(port = hash_get(self, package->name))) {
+			hash_add(self, package->name, package);
 			continue;
 		}
 		if(port->status == PRT_NEVERINSTALL)
@@ -294,13 +284,6 @@ port_t *port_query_by_description(port_t * self, char *key)
 	return NULL;
 }
 
-port_t *port_query_by_hash(port_t * self, unsigned long *hash)
-{
-	if (hash != NULL && self->hash == *hash)
-		return self;
-	return NULL;
-}
-
 void port_swap(port_t * port1, port_t * port2)
 {
 	port_t *tmp;
@@ -309,17 +292,20 @@ void port_swap(port_t * port1, port_t * port2)
 	port1 = tmp;
 }
 
-void port_show_outdated(dict_t * ports, list_t * packages,
+void port_show_outdated(hash_t * ports, list_t * packages,
 			int enable_xterm_title)
 {
-	unsigned i;
 	port_t *port, *package;
+	hashiterator_t *iter;
 
-	assert(ports);
+	assert(ports != NULL && packages != NULL);
+
 	if (enable_xterm_title)
 		xterm_set_title("Finding outdated packages ...");
-	for (i = 0; i < ports->length; i++) {
-		port = ports->elements[i]->value;
+/* 	for (i = 0; i < ports->length; i++) { */
+	iter = hashiterator_new(ports);
+	while(hashiterator_next(iter)) {
+		port = hashiterator_get(iter);
 		if (port->status == PRT_OUTDATED) {
 			package = packages_list_get(packages, port->name);
 			printf("%-26s %18s %-14s %18s\n",
@@ -329,16 +315,19 @@ void port_show_outdated(dict_t * ports, list_t * packages,
 	}
 }
 
-void port_show_diffs(dict_t * ports, list_t * packages, int enable_xterm_title)
+void port_show_diffs(hash_t * ports, list_t * packages, int enable_xterm_title)
 {
-	unsigned i;
 	port_t *port, *package;
+	hashiterator_t *iter;
 
-	assert(ports);
+	assert(ports != NULL && packages != NULL);
+
 	if (enable_xterm_title)
 		xterm_set_title("Finding packages with different versions ...");
-	for (i = 0; i < ports->length; i++) {
-		port = ports->elements[i]->value;
+/* 	for (i = 0; i < ports->length; i++) { */
+	iter = hashiterator_new(ports);
+	while(hashiterator_next(iter)) {
+		port = hashiterator_get(iter);
 		if (port->status == PRT_OUTDATED || port->status == PRT_DIFF) {
 			package = packages_list_get(packages, port->name);
 			printf("%-26s %18s %-14s %18s\n",

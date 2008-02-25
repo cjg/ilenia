@@ -25,6 +25,7 @@
 #include "conf.h"
 #include "list.h"
 #include "repository.h"
+#include "hash.h"
 
 typedef enum {PRT_NOTINSTALLED, PRT_INSTALLED, PRT_DIFF, PRT_OUTDATED,
 	      PRT_NEVERINSTALL } port_status_t;
@@ -39,7 +40,6 @@ typedef struct {
 	repository_t *repository;
 	list_t *dependencies;
 	list_t *dependencies_exploded;
-	unsigned long hash;
 	unsigned deep;
 	char *description;
 	char *pkgmk_conf;
@@ -53,13 +53,12 @@ void port_dump(port_t * self);
 void port_free(port_t * self);
 int port_have_readme(port_t * self);
 list_t *ports_list_init(dict_t * repositories, int enable_xterm_title);
-dict_t *ports_dict_init(list_t * ports_list, list_t * packages, conf_t * conf);
+hash_t *port_hash_init(list_t * ports_list, list_t * packages, conf_t * conf);
 port_t *port_query_by_repository(port_t * self, char *repository_name);
 port_t *port_query_by_name(port_t * self, char *name);
 port_t *port_query_by_description(port_t * self, char *key);
-port_t *port_query_by_hash(port_t * self, unsigned long *hash);
-void port_show_outdated(dict_t * ports, list_t * packages, int enable_xterm_title);
-void port_show_diffs(dict_t * ports, list_t * packages, int enable_xterm_title);
+void port_show_outdated(hash_t * ports, list_t * packages, int enable_xterm_title);
+void port_show_diffs(hash_t * ports, list_t * packages, int enable_xterm_title);
 #define list_get_port(list,i) ((port_t *)((list)->elements[(i)]))
 #define dict_get_port(dict,name) ((port_t *)(dict_get((dict),(name))))
 #define dict_get_port_at(dict,i) ((port_t *)((dict)->elements[(i)]->value))

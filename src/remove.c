@@ -65,7 +65,7 @@ static void dump_report(list_t * jobs)
 	printf("\n");
 }
 
-int remove_packages(list_t * packages_name, list_t * packages, dict_t * ports,
+int remove_packages(list_t * packages_name, list_t * packages, hash_t * ports,
 		    conf_t * conf, int all)
 {
 	unsigned i, j;

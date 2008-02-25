@@ -25,20 +25,21 @@
 
 #include "list.h"
 #include "dict.h"
+#include "hash.h"
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
+list_t *dependencies_list(list_t * self, char *port_name, hash_t * ports_hash,
 			  dict_t * aliases, dict_t * not_founds, 
 			  int enable_xterm_title);
 void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
+dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 		  dict_t * not_founds, int tree, int verbose, int
 		  enable_xterm_title);
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
+list_t *dependents_list(char *port_name, hash_t * ports_hash, dict_t * aliases,
 			int all, int enable_xterm_title);
 list_t *dependencies_multiple_list(list_t *ports_name, 
-				   dict_t * ports_dict, dict_t * aliases, 
+				   hash_t * ports_hash, dict_t * aliases, 
 				   dict_t * not_founds, int enable_xterm_title);
-void dependents_dump(char *port_name, dict_t * ports_dict,
+void dependents_dump(char *port_name, hash_t * ports_hash,
 		     dict_t * aliases, int tree, int verbose, int all, int
 		     enable_xterm_title);
 

@@ -94,13 +94,13 @@ void port_info_dump(port_t * port)
 	fclose(file);
 }
 
-void info_dump(char *port_name, dict_t * ports_dict)
+void info_dump(char *port_name, hash_t * ports_hash)
 {
 	port_t *port;
 
-	assert(port_name != NULL && ports_dict != NULL);
+	assert(port_name != NULL && ports_hash != NULL);
 
-	if ((port = dict_get(ports_dict, port_name)) == NULL ||
+	if ((port = hash_get(ports_hash, port_name)) == NULL ||
 	    port->repository == NULL)
 		return warning("%s not found!", port_name);
 
@@ -129,13 +129,13 @@ void port_readme_dump(port_t * port)
 	free(path);
 }
 
-void readme_dump(char *port_name, dict_t * ports_dict)
+void readme_dump(char *port_name, hash_t * ports_hash)
 {
 	port_t *port;
 
-	assert(port_name != NULL && ports_dict != NULL);
+	assert(port_name != NULL && ports_hash != NULL);
 
-	if ((port = dict_get(ports_dict, port_name)) == NULL ||
+	if ((port = hash_get(ports_hash, port_name)) == NULL ||
 	    port->repository == NULL)
 		return warning("%s not found!", port_name);
 

@@ -37,8 +37,9 @@
 #include "str.h"
 #include "memory.h"
 #include "remove.h"
+#include "hash.h"
 
-const char *argp_program_version = "ilenia " VERSION " (Pianeta Amiga)"
+const char *argp_program_version = "ilenia " VERSION " (Philosophal Stone)"
     "\n"
     "Copyright (C) 2006-2007 Giuseppe Coviello.\n"
     "This is free software.  You may redistribute copies of it under the terms of\n"
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
 	unsigned i;
 	conf_t *conf;
 	dict_t *repositories;
-	dict_t *ports_dict;
+	hash_t *ports_hash;
 	dict_t *not_founds;
 	list_t *ports_list;
 	list_t *packages;
@@ -216,7 +217,7 @@ int main(int argc, char **argv)
 #ifndef NDEBUG
 	conf_dump(conf);
 #endif
-	ports_dict = ports_dict_init(ports_list, packages, conf);
+	ports_hash = port_hash_init(ports_list, packages, conf);
 	not_founds = dict_new();
 
 	if (!arguments.verbose)
@@ -284,10 +285,10 @@ int main(int argc, char **argv)
 		}
 		break;
 	case ACT_DIFF:
-		port_show_diffs(ports_dict, packages, conf->enable_xterm_title);
+		port_show_diffs(ports_hash, packages, conf->enable_xterm_title);
 		break;
 	case ACT_UPDATED:
-		port_show_outdated(ports_dict, packages, conf->enable_xterm_title);
+		port_show_outdated(ports_hash, packages, conf->enable_xterm_title);
 		break;
 	case ACT_DEPENDENCIES:
 		if (!arguments.args->length) {
@@ -295,9 +296,8 @@ int main(int argc, char **argv)
 				"least an argument!");
 			break;
 		}
-		//for (i = 0; i < arguments.args->length; i++)
 		dependencies_dump(arguments.args,
-				  ports_dict, conf->aliases,
+				  ports_hash, conf->aliases,
 				  not_founds,
 				  arguments.tree, arguments.verbose, 
 				  conf->enable_xterm_title);
@@ -310,7 +310,7 @@ int main(int argc, char **argv)
 		}
 		for (i = 0; i < arguments.args->length; i++)
 			dependents_dump(list_get(arguments.args, i),
-					ports_dict, conf->aliases,
+					ports_hash, conf->aliases,
 					arguments.tree, arguments.verbose,
 					arguments.all, conf->enable_xterm_title);
 		break;
@@ -321,7 +321,7 @@ int main(int argc, char **argv)
 			break;
 		}
 		for (i = 0; i < arguments.args->length; i++)
-			info_dump(list_get(arguments.args, i), ports_dict);
+			info_dump(list_get(arguments.args, i), ports_hash);
 		break;
 	case ACT_README:
 		if (!arguments.args->length) {
@@ -330,7 +330,7 @@ int main(int argc, char **argv)
 			break;
 		}
 		for (i = 0; i < arguments.args->length; i++)
-			readme_dump(list_get(arguments.args, i), ports_dict);
+			readme_dump(list_get(arguments.args, i), ports_hash);
 		break;
 	case ACT_REPOSITORY_LIST:
 		repositories_dict_dump(repositories);
@@ -349,17 +349,17 @@ int main(int argc, char **argv)
 				"least an argument!");
 			break;
 		}
-		remove_packages(arguments.args, packages, ports_dict, conf,
+		remove_packages(arguments.args, packages, ports_hash, conf,
 				arguments.all);
 		break;
 	case ACT_UPDATE_PKG:
 		if (!arguments.args->length) {
-			update_system(ports_dict,
+			update_system(ports_hash,
 				      arguments.fetch_only,
 				      conf);
 			break;
 		}
-		update_package(arguments.args, ports_dict,
+		update_package(arguments.args, ports_hash,
 			       arguments.fetch_only,
 			       conf, arguments.just_install);
 		break;
@@ -375,7 +375,7 @@ int main(int argc, char **argv)
 	dict_free(repositories, repository_free);
 	list_free(ports_list, port_free);
 	list_free(packages, port_free);
-	dict_free(ports_dict, NULL);
+	hash_free(ports_hash, NULL);
 	list_free(drivers, free);
 	conf_free(conf);
 	dict_free(not_founds, port_free);

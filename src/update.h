@@ -22,12 +22,13 @@
 
 #ifndef _UPDATE_H
 #define _UPDATE_H
+
 #include "port.h"
-#include "dict.h"
+#include "hash.h"
 #include "conf.h"
 
-int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
+int update_package(list_t * ports_name, hash_t * ports, int fetch_only,
 		   conf_t * conf, int just_install);
-int update_system(dict_t * ports, int fetch_only, conf_t *conf);
+int update_system(hash_t * ports, int fetch_only, conf_t *conf);
 
 #endif

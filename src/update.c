@@ -26,12 +26,15 @@
 #include <stdarg.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <dirent.h>
 #include "job.h"
 #include "output.h"
 #include "update.h"
 #include "dependencies.h"
 #include "str.h"
+#include "memory.h"
 
 int ask_yn(char *s, ...)
 {
@@ -172,27 +175,39 @@ static void dump_report(list_t * jobs)
 	printf("\n");
 }
 
-static int rejected_count(void)
-{
+static int recursive_file_count(const char *path) {
 	DIR *dir;
 	struct dirent *entry;
-	int rejected;
+	struct stat statbuf;
+	char *filename;
+	int count;
 
-        dir = opendir("/var/lib/pkg/rejected");
+        dir = opendir(path);
         if (!dir)
                 return 0;
 
-	rejected = 0;
+	count = 0;
 
         while ((entry = readdir(dir))) {
                 if (*entry->d_name == '.')
                         continue;
-		rejected++;
+		filename = xstrdup_printf("%s/%s", path, entry->d_name);
+		stat(filename, &statbuf);
+		if (S_ISDIR(statbuf.st_mode))
+			count += recursive_file_count(filename);
+		else if (S_ISREG(statbuf.st_mode))
+			count++;
+		free(filename);
         }
 
         closedir(dir);
 	
-	return rejected;
+	return count;
+}
+
+static int rejected_count(void)
+{
+        return recursive_file_count("/var/lib/pkg/rejected");
 }
 
 static void rejected_manage(conf_t *conf)
@@ -220,7 +235,7 @@ static void rejected_manage(conf_t *conf)
 			rejected == 1 ? "" : "s");
 }
 
-int update_system(dict_t * ports, int fetch_only, conf_t *conf)
+int update_system(hash_t * ports, int fetch_only, conf_t *conf)
 {
 	unsigned i;
 	int ret;
@@ -230,6 +245,7 @@ int update_system(dict_t * ports, int fetch_only, conf_t *conf)
 	list_t *outdateds;
 	dict_t *not_founds;
 	job_t *job;
+	hashiterator_t *iter;
 
 	assert(ports != NULL && conf != NULL);
 
@@ -238,8 +254,9 @@ int update_system(dict_t * ports, int fetch_only, conf_t *conf)
 
 	outdateds = list_new();
 
-	for (i = 0; i < ports->length; i++) {
-		port = ports->elements[i]->value;
+	iter = hashiterator_new(ports);
+	while(hashiterator_next(iter)) {
+		port = hashiterator_get(iter);
 		if(port->status != PRT_OUTDATED)
 			continue;
 		list_append(outdateds, port->name);
@@ -307,7 +324,7 @@ int update_system(dict_t * ports, int fetch_only, conf_t *conf)
 	return ret;
 }
 
-int update_package(list_t * ports_name, dict_t * ports, int fetch_only, 
+int update_package(list_t * ports_name, hash_t * ports, int fetch_only, 
 		   conf_t * conf, int just_install)
 {
 	port_t *port;
@@ -323,7 +340,7 @@ int update_package(list_t * ports_name, dict_t * ports, int fetch_only,
 	not_founds = dict_new();
 	dependencies = list_new();
 	for (i = 0; i < ports_name->length; i++) {
-		if ((port = dict_get(ports, ports_name->elements[i])) == NULL ||
+		if ((port = hash_get(ports, ports_name->elements[i])) == NULL ||
 		    port->repository == NULL) {
 			error("%s not found!", ports_name->elements[i]);
 			dict_free(not_founds, port_free);

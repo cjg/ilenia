@@ -56,7 +56,9 @@ ilenia_SOURCES =\
 	job.h\
 	job.c\
 	remove.h\
-	remove.c
+	remove.c\
+	hash.h\
+	hash.c
 
 AM_CFLAGS = -D_GNU_SOURCE $(BAD_MAINTAINERS_FLAG) $(DEBUG_FLAG)
 ilenia_LDADD = -lpthread

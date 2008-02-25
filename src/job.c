@@ -140,6 +140,8 @@ static void get_flags(const char *filename, char **cflags, char **cxxflags)
 	}
 
 	free(line);
+	
+	fclose(file);
 }
 
 static int job_update_execute(job_t * self)

@@ -1,7 +1,28 @@
+2008-02-25  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* Release 3.4
+
+	* src/update.c (recursive_file_count): created
+	recursive_file_count, to count recursively the number of file
+	found in a directory and in her subdirectories
+	(rejected_count): using recursive_file_count to count the rejected files
+
+2008-01-18  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/ilenia.c (main): using an hashtable instead of a plain
+	dictionary to store the ports collection
+
+	* src/hash.h: added the hashtable data structure
+
 2007-10-23  Giuseppe Coviello  <cjg@cruxppc.org>
 
-	* src/dependencies.c (dependencies_explode): solved 'nullpointer'
-	bug, ilenia didn't expanded dependencies while using deptree
+	* src/dependencies.c (dependencies_explode): solved another
+	'nullpointer' bug, ilenia didn't expanded dependencies while using
+	deptree
+
+2007-09-23  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* Release 3.3
 
 2007-09-13  Giuseppe Coviello  <cjg@cruxppc.org>
 
@@ -56,13 +77,13 @@
 
 2007-08-18  Giuseppe Coviello  <cjg@cruxppc.org>
 
-	* Version 3.2
+	* Release 3.2
 
 2007-08-16  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* doc/ilenia.8.in: added the documentation for the --show-readme
 	command.
-	
+
 	* src/dependencies.c (dependencies_append_at_deep): solved a bug
 	while solving dependencies.
 
@@ -125,23 +146,22 @@
 	(coloredprintf): added a check for the output stream: if the
 	stream isn't a tty coloredprintf acts like uncoloredprintf,
 	usefull when redirecting output to file
-	
-	
+
 2007-05-05  Giuseppe Coviello  <cjg@cruxppc.org>
 
-	* Version 3.1
+	* Release 3.1
 
 	* src/ilenia.c: added the command --show-readme
-	
+
 	* src/info.c: added readme_dump and port_readme_dump functions
 
 	* src/str.c (strprepend, strappend): modified to eliminate memory
-	leak 	
+	leak
 	(strreplace): rewritten, now it is safer, faster and smarter
 
 2007-04-04  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 3.0
+	* Release 3.0
 
 	* feature: colorized output
 
@@ -173,7 +193,7 @@
 
 2007-01-27  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 2.2
+	* Release 2.2
 
 	* feature: added the support for repositories hierachy available
 	through REPOS_HIERACHY in ilenia.rc
@@ -183,19 +203,19 @@
 
 2007-01-17  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 2.1
+	* Release 2.1
 
 	* feature: added the --info action to obtain informations about
 	some ports
 
-	* feature: added the --fetch-only option 
+	* feature: added the --fetch-only option
 
 	* bugfix:  detected and solved a bug that forced ilenia to rebuild
 	up-to-date packages while using sysupng
 
 2006-12-21  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 2.0.1
+	* Release 2.0.1
 
 	* bugfix: managing cvs repositories
 
@@ -209,7 +229,7 @@
 
 2006-03-11  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 2.0
+	* Release 2.0
 
 	* feature: not found policy
 
@@ -223,13 +243,13 @@
 
 2005-11-14  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 1.5
-	
+	* Release 1.5
+
 	* feature: rsync support
 
 2005-10-02  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 1.4
+	* Release 1.4
 
 	* feature: introduced alias
 
@@ -239,8 +259,8 @@
 
 2005-03-25  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 1.3
-	
+	* Release 1.3
+
 	* feature: support for local repository
 
 	* feature: --cache forces ilenia to rebuild the cache
@@ -257,11 +277,11 @@
 	nullpointer)
 
 	* bugfix: eviting to build two or more times the same package from
-	various repositories during `ilenia -U`	
+	various repositories during `ilenia -U`
 
 2005-01-29  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 1.2
+	* Release 1.2
 
 	* feature: support for crux ppc's .cvs supfile
 
@@ -271,13 +291,13 @@
 
 2004-12-30  Giuseppe Coviello <cjg@cruxppc.org>
 
-	* Version 1.1
+	* Release 1.1
 
 	* feature: -R remove packages checking dependents
 
 	* feature: -T shows dependents package of the specified package
 
-	* feature: flexible way of storing ports 
+	* feature: flexible way of storing ports
 
 	* change: now ilenia has only a cache file in /var/cache/ilenia
 
@@ -287,5 +307,5 @@
 
 2004-11-07  Giuseppe Coviello  <cjg@cruxppc.org>
 
-	* Version 1.0
-	
+	* Release 1.0
+

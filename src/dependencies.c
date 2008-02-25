@@ -101,7 +101,7 @@ static void deplist_verbose_dump_port(port_t * port)
 		port->repository != NULL ? port->repository->name : not_found);
 }
 
-static inline void dependencies_explode(port_t * port, dict_t * ports_dict, 
+static inline void dependencies_explode(port_t * port, hash_t * ports_hash, 
 					dict_t * aliases, dict_t * not_founds)
 {
 	unsigned i, j;
@@ -115,7 +115,7 @@ static inline void dependencies_explode(port_t * port, dict_t * ports_dict,
 	port->dependencies_exploded = list_new();
 	for (i = 0; i < port->dependencies->length; i++) {
 		dport =
-		    dict_get(ports_dict,
+		    hash_get(ports_hash,
 			     (char *)port->dependencies->elements[i]);
 		if (dport == NULL && (dport = dict_get(not_founds,
 						       (char
@@ -133,7 +133,7 @@ static inline void dependencies_explode(port_t * port, dict_t * ports_dict,
 		if (dport->status == PRT_NOTINSTALLED &&
 		    (list = dict_get(aliases, dport->name))) {
 			for (j = 0; j < list->length; j++) {
-				aport = dict_get(ports_dict, list->elements[j]);
+				aport = hash_get(ports_hash, list->elements[j]);
 				if (aport == NULL)
 					continue;
 				if (aport->status != PRT_NOTINSTALLED) {
@@ -143,11 +143,11 @@ static inline void dependencies_explode(port_t * port, dict_t * ports_dict,
 			}
 		}
 		list_append(port->dependencies_exploded, dport);
-		dependencies_explode(dport, ports_dict, aliases, not_founds);
+		dependencies_explode(dport, ports_hash, aliases, not_founds);
 	}
 }
 
-static int dependencies_compact_and_check(list_t *stack, dict_t *ports_dict,
+static int dependencies_compact_and_check(list_t *stack, hash_t *ports_hash,
 					  dict_t *aliases, dict_t *not_founds,
 					  dict_t *seen, unsigned deep)
 {
@@ -161,7 +161,7 @@ static int dependencies_compact_and_check(list_t *stack, dict_t *ports_dict,
 	
 	port = list_get_port(stack, 0);
 
-	dependencies_explode(port, ports_dict, aliases, not_founds);
+	dependencies_explode(port, ports_hash, aliases, not_founds);
 
 	deep++;
 
@@ -191,7 +191,7 @@ static int dependencies_compact_and_check(list_t *stack, dict_t *ports_dict,
 		
 		list_prepend(stack, list_get_port(port->dependencies_exploded, 
 						  i));
-		if (dependencies_compact_and_check(stack, ports_dict, aliases,
+		if (dependencies_compact_and_check(stack, ports_hash, aliases,
 						   not_founds, seen, deep) != 0)
 						  {
 			list_get_port(stack, 0)->cyclic_dependencies_status =
@@ -249,7 +249,7 @@ static inline list_t *dependencies_list_from_dict(dict_t *seen)
 	return list_sort(dependencies, port_deep_cmp);
 }
 
-list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
+list_t *dependencies_list(list_t * self, char *port_name, hash_t * ports_hash,
 			  dict_t * aliases, dict_t * not_founds, int
 			  enable_xterm_title)
 {
@@ -258,10 +258,10 @@ list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
 	list_t *stack;
 	dict_t *seen;
 
-	assert(port_name != NULL && ports_dict != NULL && aliases != NULL &&
+	assert(port_name != NULL && ports_hash != NULL && aliases != NULL &&
 	       self != NULL);
 
-	if ((port = dict_get(ports_dict, port_name)) == NULL) {
+	if ((port = hash_get(ports_hash, port_name)) == NULL) {
 		warning("%s not found!", port_name);
 		return NULL;
 	}
@@ -271,7 +271,7 @@ list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
 	stack = list_new();
 	list_append(stack, port);
 	seen = dict_new();
-	if(dependencies_compact_and_check(stack, ports_dict, aliases,
+	if(dependencies_compact_and_check(stack, ports_hash, aliases,
 					  not_founds, seen, 0)) {
 		list_free(stack, NULL);
 		return NULL;
@@ -286,37 +286,37 @@ list_t *dependencies_list(list_t * self, char *port_name, dict_t * ports_dict,
 }
 
 list_t *dependencies_multiple_list(list_t *ports_name, 
-				   dict_t * ports_dict, dict_t * aliases, 
+				   hash_t * ports_hash, dict_t * aliases, 
 				   dict_t * not_founds, int enable_xterm_title)
 {
 	unsigned i;
 	port_t *port;
 	list_t *self;
 
-	assert(ports_name != NULL && ports_dict != NULL && aliases != NULL);
+	assert(ports_name != NULL && ports_hash != NULL && aliases != NULL);
 
 	for (i = 0; i < ports_name->length; i++) {
-		if ((port = dict_get(ports_dict,
+		if ((port = hash_get(ports_hash,
 				     (char *)ports_name->elements[i])) ==
 		    NULL) {
 			warning("%s not found!", ports_name->elements[i]);
 			list_remove(ports_name, i--, NULL);
 			continue;
 		}
-		dependencies_explode(port, ports_dict, aliases, not_founds);
+		dependencies_explode(port, ports_hash, aliases, not_founds);
 	}
 	
 	self = list_new();
 	for (i = 0; i < ports_name->length; i++) {
 		dependencies_list(self, ports_name->elements[i],
-				  ports_dict, aliases, not_founds,
+				  ports_hash, aliases, not_founds,
 				  enable_xterm_title);
 	}
 	return self;
 }
 
 void
-dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
+dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 		  dict_t * not_founds, int tree, int verbose, 
 		  int enable_xterm_title)
 {
@@ -325,23 +325,23 @@ dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
 	list_t *deplist;
 	dict_t *seen;
 
-	assert(ports_name != NULL && ports_dict != NULL && aliases != NULL &&
+	assert(ports_name != NULL && ports_hash != NULL && aliases != NULL &&
 	       not_founds != NULL);
 	
 	for (i = 0; i < ports_name->length; i++) {
-		if ((port = dict_get(ports_dict,
+		if ((port = hash_get(ports_hash,
 				     (char *)ports_name->elements[i])) ==
 		    NULL) {
 			warning("%s not found!", ports_name->elements[i]);
 			list_remove(ports_name, i--, NULL);
 			continue;
 		}
-		dependencies_explode(port, ports_dict, aliases, not_founds);
+		dependencies_explode(port, ports_hash, aliases, not_founds);
 	}
 
 	if (tree) {
 		for (i = 0; i < ports_name->length; i++) {
-			port = dict_get(ports_dict,
+			port = hash_get(ports_hash,
 					(char *)ports_name->elements[i]);
 			seen = dict_new();
 			if (verbose)
@@ -354,7 +354,7 @@ dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
 		deplist = list_new();
 		for (i = 0; i < ports_name->length; i++)
 			dependencies_list(deplist, ports_name->elements[i],
-					  ports_dict, aliases, not_founds,
+					  ports_hash, aliases, not_founds,
 					  enable_xterm_title);
 		if (deplist == NULL)
 			return;
@@ -366,12 +366,14 @@ dependencies_dump(list_t * ports_name, dict_t * ports_dict, dict_t * aliases,
 	}
 }
 
-static void dependents_list_append(list_t * self, port_t * port, dict_t *
-				   ports_dict, dict_t * aliases,
+static void dependents_list_append(list_t * self, port_t * port, hash_t *
+				   ports_hash, dict_t * aliases,
 				   dict_t * seen, int all)
 {
 	unsigned i, j;
 	port_t *pport;
+	hashiterator_t *iter;
+
 	assert(port != NULL && seen != NULL && self != NULL);
 
 	if (dict_get(seen, port->name) == NULL)
@@ -381,39 +383,41 @@ static void dependents_list_append(list_t * self, port_t * port, dict_t *
 
 	dict_add(seen, port->name, "");
 
-	for (i = 0; i < ports_dict->length; i++) {
-		pport = ports_dict->elements[i]->value;
+	iter = hashiterator_new(ports_hash);
+	while(hashiterator_next(iter)) {
+		pport = hashiterator_get(iter);
 		if (all != 1 && pport->status == PRT_NOTINSTALLED)
 			continue;
 		for (j = 0; j < pport->dependencies->length; j++) {
 			if (strcmp(pport->dependencies->elements[j],
 				   port->name) == 0) {
-				dependents_list_append(self, pport, ports_dict,
+				dependents_list_append(self, pport, ports_hash,
 						       aliases, seen, all);
 			}
 		}
 	}
+	hashiterator_free(iter);
 
 	for (i = 0; i < aliases->length; i++) {
 		if (list_get_position((list_t *) aliases->elements[i]->value,
 				      strequ, port->name) < 0)
 			continue;
-		pport = dict_get(ports_dict, aliases->elements[i]->key);
-		dependents_list_append(self, pport, ports_dict, aliases,
+		pport = hash_get(ports_hash, aliases->elements[i]->key);
+		dependents_list_append(self, pport, ports_hash, aliases,
 				       seen, all);
 	}
 }
 
-list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
+list_t *dependents_list(char *port_name, hash_t * ports_hash, dict_t * aliases,
 			int all, int enable_xterm_title)
 {
 	list_t *self;
 	dict_t *seen;
 	port_t *port;
 
-	assert(port_name != NULL && ports_dict != NULL && aliases != NULL);
+	assert(port_name != NULL && ports_hash != NULL && aliases != NULL);
 
-	if ((port = dict_get(ports_dict, port_name)) == NULL) {
+	if ((port = hash_get(ports_hash, port_name)) == NULL) {
 		warning("%s not found!", port_name);
 		return NULL;
 	}
@@ -424,20 +428,22 @@ list_t *dependents_list(char *port_name, dict_t * ports_dict, dict_t * aliases,
 	self = list_new();
 	seen = dict_new();
 
-	dependents_list_append(self, port, ports_dict, aliases, seen, all);
+	dependents_list_append(self, port, ports_hash, aliases, seen, all);
 
 	dict_free(seen, NULL);
 
 	return self;
 }
 
-static void dependents_tree_dump(port_t * port, dict_t * ports_dict, dict_t
+static void dependents_tree_dump(port_t * port, hash_t * ports_hash, dict_t
 				 * aliases,
 				 unsigned level, dict_t * seen, int
 				 verbose, int all)
 {
 	unsigned i, j;
 	port_t *pport;
+	hashiterator_t *iter;
+
 	assert(port != NULL && seen != NULL);
 
 	for (i = 0; i < level * 2; i++)
@@ -457,14 +463,15 @@ static void dependents_tree_dump(port_t * port, dict_t * ports_dict, dict_t
 	dict_add(seen, port->name, "");
 
 	level++;
-	for (i = 0; i < ports_dict->length; i++) {
-		pport = ports_dict->elements[i]->value;
+	iter = hashiterator_new(ports_hash);
+	while(hashiterator_next(iter)) {
+		pport = hashiterator_get(iter);
 		if (all != 1 && pport->status == PRT_NOTINSTALLED)
 			continue;
 		for (j = 0; j < pport->dependencies->length; j++) {
 			if (strequ(pport->dependencies->elements[j],
 				   port->name)) {
-				dependents_tree_dump(pport, ports_dict, aliases,
+				dependents_tree_dump(pport, ports_hash, aliases,
 						     level + 1, seen,
 						     verbose, all);
 			}
@@ -475,19 +482,19 @@ static void dependents_tree_dump(port_t * port, dict_t * ports_dict, dict_t
 		if (list_get_position((list_t *) aliases->elements[i]->value,
 				      strequ, port->name) < 0)
 			continue;
-		pport = dict_get(ports_dict, aliases->elements[i]->key);
-		dependents_tree_dump(pport, ports_dict, aliases, level,
+		pport = hash_get(ports_hash, aliases->elements[i]->key);
+		dependents_tree_dump(pport, ports_hash, aliases, level,
 				     seen, verbose, all);
 	}
 }
 
-void dependents_list_dump(port_t * port, dict_t * ports_dict,
+void dependents_list_dump(port_t * port, hash_t * ports_hash,
 			  dict_t * aliases, int verbose, int all, 
 			  int enable_xterm_title)
 {
 	list_t *detlist;
 
-	detlist = dependents_list(port->name, ports_dict, aliases, all, 
+	detlist = dependents_list(port->name, ports_hash, aliases, all, 
 				  enable_xterm_title);
 	if (detlist == NULL)
 		return;
@@ -498,19 +505,19 @@ void dependents_list_dump(port_t * port, dict_t * ports_dict,
 	list_free(detlist, NULL);
 }
 
-void dependents_dump(char *port_name, dict_t * ports_dict,
+void dependents_dump(char *port_name, hash_t * ports_hash,
 		     dict_t * aliases, int tree, int verbose, int all, int enable_xterm_title)
 {
 	port_t *port;
 	dict_t *seen;
-	assert(port_name != NULL && ports_dict != NULL && aliases != NULL);
-	if ((port = dict_get(ports_dict, port_name)) == NULL)
+	assert(port_name != NULL && ports_hash != NULL && aliases != NULL);
+	if ((port = hash_get(ports_hash, port_name)) == NULL)
 		return warning("%s not found!", port_name);
 	if (tree) {
 		seen = dict_new();
-		dependents_tree_dump(port, ports_dict, aliases, 0,
+		dependents_tree_dump(port, ports_hash, aliases, 0,
 				     seen, verbose, all);
 		dict_free(seen, NULL);
 	} else
-		dependents_list_dump(port, ports_dict, aliases, verbose, all, enable_xterm_title);
+		dependents_list_dump(port, ports_hash, aliases, verbose, all, enable_xterm_title);
 }
