@@ -112,7 +112,6 @@ conf_t *conf_init(void)
 
 	if ((tmp = getenv("VERBOSE")) == NULL)
 		tmp = ini_get(ini, "ilenia", "verbose");
-	printf("***%s\n", tmp);
 	if (strcasecmp(tmp, "Yes") == 0)
 		self->verbose = 1;
 	else
