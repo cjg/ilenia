@@ -142,7 +142,7 @@ static void cache_from_repository(repository_t * repository, FILE * file)
 	while ((entry = readdir(dir))) {
 		if (*entry->d_name == '.')
 			continue;
-		if (entry->d_type != DT_DIR)
+		if (entry->d_type != DT_DIR && entry->d_type != DT_UNKNOWN)
 			continue;
 		cache_parse_pkgfile(repository, entry->d_name, file);
 	}

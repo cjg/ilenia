@@ -233,7 +233,6 @@ void conf_dump(conf_t * self)
 	printf("POST_PKGADD = %s\n", self->post_pkgadd);
 	printf("ASK_FOR_UPDATE = %d\n", self->ask_for_update);
 	printf("NOT_FOUND_POLICY = %s\n", policies[self->not_found_policy]);
-	printf("VERBOSE = %d\n", self->verbose);
 	printf("REPOSITORIES_HIERARCHY = ");
 	for (i = 0; i < self->repositories_hierarchy->length; i++)
 		printf("%s ",

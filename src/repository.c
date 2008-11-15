@@ -95,6 +95,8 @@ dict_t *repositories_dict_init(list_t * drivers,
 		repository = NULL;
 		if (*entry->d_name == '.')
 			continue;
+		if (entry->d_type != DT_UNKNOWN)
+			continue;
 		for (i = 0; i < drivers->length; i++) {
 			driver = list_get(drivers, i);
 			if ((repository = driver->get_repository(driver,
