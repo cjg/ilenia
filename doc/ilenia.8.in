@@ -247,7 +247,11 @@ Local repositories are repositories that resides only on the local machine
 created by the local sysadmin. To let ilenia recognize the admin have to create
 a file in "/etc/ports/" with ".local" extension (for example: my.local); this
 file must be a single row, where there is specified the full path of the local
-repository. For example:
+repository. 
+It's possible to update automatically (i.e.: downloading them from various 
+repositories) adding a shell script called ".updater.sh" in the same directory
+where ports reside; this shell script will be executed in the repository's
+directory. For example:
 .br
 # my.local
 .br
@@ -256,6 +260,15 @@ PATH="/root/ports"
 .br
 .br
 # End of file
+.br
+#!/bin/bash
+#
+# /root/ports/updater.sh
+#
+.br
+rsync -aqz cruxppc.org::ports/core/2.5/ilenia/ ilenia
+.br
+# End Of File
 .br
 .SH SEE ALSO
 pkgadd(8), pkgrm(8), pkginfo(8), rsync(1), httpup(8)
