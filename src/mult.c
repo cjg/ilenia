@@ -60,7 +60,6 @@ repository_t *mult_get_repository(driver_t * self, char *supfile,
 		path = strtrim(xstrdup(strchr(line, '=') + 1));
 		name = xstrdup(strrchr(supfile, '/'));
 		*(strrchr(name, '.')) = 0;
-		strprepend(&name, "local");
 		repository = repository_new(name, path, supfile, self,
 					    repositories_hierarchy);
 		break;
@@ -94,7 +93,7 @@ void mult_update(repository_t * repository)
 		strreplaceall(&dot_file, "$ROOT_DIR", repository->path);
 		break;
 		char *args[] = { "bash", dot_file, NULL };
-		exec("/bin/bash", args);
+		exec2("/bin/bash", repository->path, args);
 		return;
 	}
 	warning("Can't update %s\n", repository->name);
