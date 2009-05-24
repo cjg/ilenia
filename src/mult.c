@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include "output.h"
 #include "memory.h"
 #include "str.h"
 #include "exec.h"

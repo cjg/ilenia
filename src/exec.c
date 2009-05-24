@@ -209,3 +209,14 @@ int exec(char *command, char *args[])
 {
 	return exechook2(command, args, stdout_hook, NULL, stderr_hook, NULL);
 }
+
+int exec2(char *command, char *workdir, char *args[])
+{
+	char *currentdir;
+	int status;
+	currentdir = get_current_dir_name();
+	chdir(workdir);
+	status = exechook2(command, args, stdout_hook, NULL, stderr_hook, NULL);
+	chdir(currentdir);
+	return status;
+}
