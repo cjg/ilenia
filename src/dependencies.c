@@ -130,16 +130,15 @@ static inline void dependencies_explode(port_t * port, hash_t * ports_hash,
 					      *)port->dependencies->elements[i],
 				 dport);
 		}
-		if (dport->status == PRT_NOTINSTALLED &&
+ 		if (dport->status == PRT_NOTINSTALLED &&  
 		    (list = dict_get(aliases, dport->name))) {
 			for (j = 0; j < list->length; j++) {
 				aport = hash_get(ports_hash, list->elements[j]);
 				if (aport == NULL)
 					continue;
-				if (aport->status != PRT_NOTINSTALLED) {
-					dport = aport;
+				dport = aport;
+				if (aport->status != PRT_NOTINSTALLED) 
 					break;
-				}
 			}
 		}
 		list_append(port->dependencies_exploded, dport);

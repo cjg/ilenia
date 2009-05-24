@@ -130,6 +130,7 @@ static void cache_from_repository(repository_t * repository, FILE * file)
 {
 	DIR *dir;
 	struct dirent *entry;
+	struct stat entry_stat;
 
 	assert(repository != NULL && file != NULL);
 
@@ -142,7 +143,8 @@ static void cache_from_repository(repository_t * repository, FILE * file)
 	while ((entry = readdir(dir))) {
 		if (*entry->d_name == '.')
 			continue;
-		if (entry->d_type != DT_DIR && entry->d_type != DT_UNKNOWN)
+		lstat(entry->d_name, &entry_stat);
+		if(!S_ISDIR(entry_stat.st_mode))
 			continue;
 		cache_parse_pkgfile(repository, entry->d_name, file);
 	}

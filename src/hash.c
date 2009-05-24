@@ -154,6 +154,8 @@ hashiterator_t *hashiterator_new(hash_t *hash)
 /* 	get_first(self->hash, 0, 0, &self->current_dict,  */
 /* 		  &self->current_position); */
 	self->first = -1;
+	self->current_dict = 0;
+	self->current_position = 0;
 	return self;
 }
 

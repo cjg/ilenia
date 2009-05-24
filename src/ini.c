@@ -29,7 +29,20 @@
 #include "str.h"
 #include "ini.h"
 
+	
 // TODO: split from ilenia 
+
+static char *eatcomments(char *line)
+{
+ 	char *cptr;
+
+	cptr = strchr(line, '#');
+
+	if (cptr != NULL)
+	line[cptr - line] = 0;
+
+	return line;
+}
 
 ini_t *ini_new(char *filepath)
 {
@@ -225,6 +238,8 @@ extern int ini_load(ini_t * self)
 		if (!strlen(line) || *line == '#') {
 			continue;
 		}
+
+		eatcomments(line);
 
 		if (*line == '[') {
 			free(section);
