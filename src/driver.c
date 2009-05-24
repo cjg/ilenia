@@ -26,7 +26,6 @@
 #include "httpup.h"
 #include "cvs.h"
 #include "local.h"
-#include "mult.h"
 #include "driver.h"
 
 static driver_t *driver_new(char *name,
@@ -55,6 +54,5 @@ list_t *drivers_list_init(void)
 	list_append(self, driver_new("cvs", cvs_get_repository, cvs_update));
 	list_append(self, driver_new("local", local_get_repository,
 				     local_update));
-	list_append(self, driver_new("mult", mult_get_repository, mult_update));
 	return self;
 }

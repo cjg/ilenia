@@ -26,6 +26,8 @@
 #include "memory.h"
 #include "str.h"
 #include "local.h"
+#include "file.h"
+#include "exec.h"
 
 repository_t *local_get_repository(driver_t * self, char *supfile,
 				   list_t * repositories_hierarchy)
@@ -70,5 +72,19 @@ repository_t *local_get_repository(driver_t * self, char *supfile,
 
 void local_update(repository_t * repository)
 {
-	return;
+	char *updater;
+
+	assert(repository != NULL);
+	
+	updater = xstrdup(repository->path);
+	strappend(&updater, "/.updater.sh");
+	
+	if(!is_file(updater))
+		goto cleanup;
+
+	char *args[] = { "bash", updater, NULL };
+	exec2("/bin/bash", repository->path, args);
+
+  cleanup:
+	free(updater);
 }
