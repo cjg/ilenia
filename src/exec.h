@@ -34,5 +34,6 @@ int execlogp(char *command, char *args[], char **log);
 int execlog2(char *command, char *args[], char **out_log, char **err_log);
 int execlog(char *command, char *args[], char **log);
 int exec(char *command, char *args[]);
+int exec2(char *command, char *workdir, char *args[]);
 
 #endif

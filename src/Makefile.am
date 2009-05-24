@@ -13,6 +13,8 @@ ilenia_SOURCES =\
 	ilenia.c\
 	memory.h\
 	memory.c\
+	mult.h\
+	mult.c\
 	str.h\
 	str.c\
 	list.h\
