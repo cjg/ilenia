@@ -22,6 +22,7 @@
 
 #ifndef _DICT_H
 #define _DICT_H
+#include "list.h"
 
 typedef struct {
 	char *key;
@@ -40,6 +41,10 @@ dict_t *dict_new(void);
 void dict_free(dict_t * self, void data_free(void *));
 dict_t *dict_add(dict_t * self, char *key, void *data);
 void *dict_get(dict_t * self, char *key);
+int dict_has_key(dict_t * self, char *key);
+void *dict_get_at(dict_t * self, int position);
+char *dict_get_key_at(dict_t * self, int position);
+list_t *dict_get_keys(dict_t *self);
 dict_t *dict_remove(dict_t * self, char *key, void data_free(void *));
 void dict_dump(dict_t * self, void data_dump(void *));
 #define dict_free(self, data_free) dict_free((self), \

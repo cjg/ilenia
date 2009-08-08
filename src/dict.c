@@ -162,6 +162,59 @@ void *dict_get(dict_t * self, char *key)
 	return NULL;
 }
 
+int dict_has_key(dict_t * self, char *key)
+{
+	element_t *element;
+	unsigned hash;
+
+	assert(self);
+
+	if (!self->length)
+		return 0;
+	
+	sdbm_hash(key, hash);
+	if ((element = dict_element_find(self, hash)))
+		return 1;
+
+	return 0;
+}
+
+void *dict_get_at(dict_t * self, int position)
+{
+	assert(self != NULL);
+
+	if (position < 0 && (position = self->length - 1 + position) < 0)
+		return NULL;
+
+	if ((unsigned)position >= self->length)
+		position = self->length - 1;
+
+	return self->elements[position]->value;
+}
+
+char *dict_get_key_at(dict_t * self, int position)
+{
+	assert(self != NULL);
+
+	if (position < 0 && (position = self->length - 1 + position) < 0)
+		return NULL;
+
+	if ((unsigned)position >= self->length)
+		position = self->length - 1;
+
+	return xstrdup(self->elements[position]->key);
+}
+
+list_t *dict_get_keys(dict_t *self)
+{
+	assert(self != NULL);
+	list_t *keys = list_new_with_size(self->length);
+	unsigned i;
+	for(i = 0; i < self->length; i++)
+		list_append(keys, xstrdup(self->elements[i]->key));
+	return keys;
+}
+
 dict_t *dict_remove(dict_t * self, char *key, void data_free(void *))
 {
 	element_t *element;

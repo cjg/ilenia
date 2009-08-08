@@ -47,6 +47,7 @@ list_t *list_swap(list_t * self, unsigned position1, unsigned position2);
 list_t *list_reverse(list_t * self);
 char *list_xstrdup(list_t *self, const char * sep, char *data_str(void *));
 list_t *list_sort(list_t *self, int data_cmp(void *, void *));
+list_t *list_cat(list_t * self, list_t *other, void *data_copy(void *));
 #define list_free(self, data_free) list_free((self), \
 					     (void (*)(void *)) (data_free))
 #define list_query(self, query, arg) list_query((self), \

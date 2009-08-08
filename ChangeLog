@@ -1,3 +1,39 @@
+2009-08-08  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* src/repository.c (repositories_dict_init): [bugfix] DT_UNKNOWN
+	aren't considered directory anymore
+
+	* src/local.c (local_update): making local repository dinamically
+	updatable using a script, ".update.sh", in the repository
+	directory self
+
+	* src/ini.c (ini_load): [bugfix] removing correctly comments
+
+	* src/hash.c (hashiterator_new): [bugfix] initializing
+	current_dict and current_position
+
+	* src/exec.c (exec2): added routine to execute synchronously a
+	command in a given working directory
+
+	* src/cache.c (cache_from_repository): using lstat to obtain
+	informations about filesystem's objects
+
+	* src/port.c (port_alias): added method to select an elegible
+	alias for a given port
+	(port_equ): added method
+
+	* src/list.c (list_cat): added method
+
+	* src/hash.c (hash_get_keys): added method
+
+	* src/dict.c (dict_has_key): added method
+	(dict_get_at): added method
+	(dict_get_key_at): added method
+	(dict_get_keys): added method
+
+	* src/dependencies.c: using a new system (based on graph) for
+	dependencies solving and cyclic dependencies checking and managing
+
 2008-02-25  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* Release 3.4

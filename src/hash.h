@@ -110,6 +110,16 @@ hash_t *hash_remove(hash_t * self, char *key, void data_free(void *));
 #define hash_dump(self, data_dump) hash_dump((self), \
                                              (void (*)(void *)) (data_dump))
 
+/**
+ * hash_get_keys:
+ * @self: the hash to get the keys from.
+ *
+ * Get the keys found in the hash %self.
+ *
+ * Returns: a list conaining the keys.
+ */
+list_t *hash_get_keys(hash_t *self);
+
 hashiterator_t *hashiterator_new(hash_t *hash);
 void *hashiterator_get(hashiterator_t *self);
 int hashiterator_next(hashiterator_t * self);

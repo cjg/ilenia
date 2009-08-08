@@ -53,7 +53,6 @@ port_t *port_new(char *name, char *version,
 	self->description = description;
 	self->pkgmk_conf = NULL;
 	self->deep = 0;
-	self->cyclic_dependencies_status = CYCLIC_DEPENDENCIES_NOT_CHECKED;
 	return self;
 }
 
@@ -335,4 +334,45 @@ void port_show_diffs(hash_t * ports, list_t * packages, int enable_xterm_title)
 			       port->repository->name, port->version);
 		}
 	}
+}
+
+port_t *port_alias(port_t *self, hash_t *ports, dict_t *aliases)
+{
+	assert(self != NULL && ports != NULL && aliases != NULL);
+
+	/* == checking if there's an alias to honour == */
+	/* === if the port is installed no alias is checked === */
+	if(self->status != PRT_NOTINSTALLED)
+		return self;
+
+	/* === checking if the port has any alias === */
+	list_t *alias = dict_get(aliases, self->name);
+	if(alias == NULL)
+		return self;
+
+	/* === looking for an installed alias, if found it will be the one to
+	   honour === */
+	unsigned j;
+	for(j = 0; j < alias->length; j++) {
+		port_t *a = hash_get(ports, list_get(alias, j));
+		if(a == NULL || a->status == PRT_NOTINSTALLED)
+			continue;
+		return a;
+	}
+
+	/* === the first alias found in ports is the alias to honour === */
+	for(j = 0; j < alias->length; j++) {
+		port_t *a = hash_get(ports, list_get(alias, j));
+		if(a == NULL)
+			continue;
+		return a;
+	}
+
+	/* === no honourable alias found === */
+	return self;
+}
+
+int port_equ(port_t *self, port_t *other)
+{
+	return !strcmp(self->name, other->name);
 }

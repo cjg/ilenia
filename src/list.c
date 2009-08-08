@@ -306,3 +306,15 @@ list_t *list_sort(list_t *self, int data_cmp(void *, void *))
 	quicksort(self->elements, 0, self->length - 1, data_cmp);
         return self;
 }
+
+list_t *list_cat(list_t * self, list_t *other, void *data_copy(void *))
+{
+	assert(self != NULL && other != NULL);
+	unsigned i;
+	for(i = 0; i  < other->length; i++)
+		if(data_copy != NULL)
+			list_append(self, data_copy(list_get(other, i)));
+		else
+			list_append(self, list_get(other, i));
+	return self;
+}

@@ -30,9 +30,6 @@
 typedef enum {PRT_NOTINSTALLED, PRT_INSTALLED, PRT_DIFF, PRT_OUTDATED,
 	      PRT_NEVERINSTALL } port_status_t;
 
-typedef enum { CYCLIC_DEPENDENCIES_NOT_CHECKED, CYCLIC_DEPENDENCIES_CHECKED,
-	       CYCLIC_DEPENDENCIES_EXIST } port_cyclic_dependencies_status_t;
-
 typedef struct {
 	char *name;
 	char *version;
@@ -43,7 +40,6 @@ typedef struct {
 	unsigned deep;
 	char *description;
 	char *pkgmk_conf;
-	port_cyclic_dependencies_status_t cyclic_dependencies_status;
 } port_t;
 
 port_t *port_new(char *name, char *version,
@@ -59,6 +55,8 @@ port_t *port_query_by_name(port_t * self, char *name);
 port_t *port_query_by_description(port_t * self, char *key);
 void port_show_outdated(hash_t * ports, list_t * packages, int enable_xterm_title);
 void port_show_diffs(hash_t * ports, list_t * packages, int enable_xterm_title);
+port_t *port_alias(port_t *self, hash_t *ports, dict_t *aliases);
+int port_equ(port_t *self, port_t *other);
 #define list_get_port(list,i) ((port_t *)((list)->elements[(i)]))
 #define dict_get_port(dict,name) ((port_t *)(dict_get((dict),(name))))
 #define dict_get_port_at(dict,i) ((port_t *)((dict)->elements[(i)]->value))

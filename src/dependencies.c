@@ -41,7 +41,8 @@ static char *status[] = {
 
 static char *not_found = "[RED]not found[DEFAULT]";
 
-static void deptree_data_dump(port_t * port, unsigned level, dict_t * seen)
+static void deptree_data_dump(port_t * port, hash_t *ports, unsigned level,
+			      dict_t * seen)
 {
 	unsigned i;
 	assert(port != NULL && seen != NULL);
@@ -57,17 +58,16 @@ static void deptree_data_dump(port_t * port, unsigned level, dict_t * seen)
 	dict_add(seen, port->name, "");
 
 	level++;
-	if (port->dependencies_exploded == NULL) {
-		printf("%s\n", port->name);
-		abort();
+	for (i = 0; i < port->dependencies->length; i++) {
+		port_t *p = (port_t *) hash_get(ports, 
+						list_get(port->dependencies,
+							 i));
+		deptree_data_dump(p, ports, level, seen);
 	}
-	for (i = 0; i < port->dependencies_exploded->length; i++)
-		deptree_data_dump(port->dependencies_exploded->elements[i],
-				  level, seen);
 }
 
-static void deptree_verbose_data_dump(port_t * port, unsigned level, dict_t *
-				      seen)
+static void deptree_verbose_data_dump(port_t * port, hash_t *ports, 
+				      unsigned level, dict_t *seen)
 {
 	unsigned i;
 	assert(port != NULL && seen != NULL);
@@ -84,9 +84,12 @@ static void deptree_verbose_data_dump(port_t * port, unsigned level, dict_t *
 	dict_add(seen, port->name, "");
 
 	level++;
-	for (i = 0; i < port->dependencies_exploded->length; i++)
-		deptree_verbose_data_dump(port->dependencies_exploded->
-					  elements[i], level, seen);
+	for (i = 0; i < port->dependencies->length; i++) {
+		port_t *p = (port_t *) hash_get(ports, 
+						list_get(port->dependencies,
+							 i));
+		deptree_verbose_data_dump(p, ports, level, seen);
+	}
 }
 
 static void deplist_dump_port(port_t * port)
@@ -101,151 +104,168 @@ static void deplist_verbose_dump_port(port_t * port)
 		port->repository != NULL ? port->repository->name : not_found);
 }
 
-static inline void dependencies_explode(port_t * port, hash_t * ports_hash, 
-					dict_t * aliases, dict_t * not_founds)
+static port_t *port_new_not_found(char *name)
 {
-	unsigned i, j;
-	port_t *dport, *aport;
-	list_t *list;
-	assert(port != NULL);
+	port_t *self = port_new(xstrdup(name), xstrdup(""), NULL, list_new(),
+				NULL);
+	self->status = PRT_NOTINSTALLED;
+	return self;
+}
 
-	if (port->dependencies_exploded != NULL)
+/* = build recursively the adjacencies matrix representing the graph of
+   dependencies of the port = */
+static void build_adj_matrix(dict_t *G, port_t *port, hash_t *ports, 
+			 dict_t *aliases,  dict_t *not_founds)
+{
+	/* == checking if the port went already inserted == */
+	if(dict_get(G, port->name) != NULL)
 		return;
 
-	port->dependencies_exploded = list_new();
-	for (i = 0; i < port->dependencies->length; i++) {
-		dport =
-		    hash_get(ports_hash,
-			     (char *)port->dependencies->elements[i]);
-		if (dport == NULL && (dport = dict_get(not_founds,
-						       (char
-							*)port->dependencies->
-						       elements[i])) == NULL) {
-			dport =
-			    port_new(xstrdup
-				     ((char *)port->dependencies->elements[i]),
-				     xstrdup(""), NULL, list_new(), NULL);
-			dport->status = PRT_NOTINSTALLED;
-			dict_add(not_founds, (char
-					      *)port->dependencies->elements[i],
-				 dport);
+	/* == add the port to the matrix == */
+	list_t *adjacencies = list_new();
+	dict_add(G, port->name, adjacencies);
+
+	/* == fill the adjiacencies == */
+	unsigned i;
+	for(i = 0; i < port->dependencies->length; i++) {
+		char *name = list_get(port->dependencies, i);
+
+		/* === checking if the port is found in ports tree === */
+		port_t *p = hash_get(ports, name);
+		if(p == NULL) {
+			p = port_new_not_found(name);
+			dict_add(not_founds, name, p);
 		}
- 		if (dport->status == PRT_NOTINSTALLED &&  
-		    (list = dict_get(aliases, dport->name))) {
-			for (j = 0; j < list->length; j++) {
-				aport = hash_get(ports_hash, list->elements[j]);
-				if (aport == NULL)
-					continue;
-				dport = aport;
-				if (aport->status != PRT_NOTINSTALLED) 
-					break;
+
+		/* === substuting the port with an honourable alias === */
+		p = port_alias(p, ports, aliases);
+
+		/* === add the dependencies to the matrix === */
+		list_append(adjacencies, p->name);
+		build_adj_matrix(G, p, ports, aliases, not_founds);
+	}
+}
+
+/* = allocate and initialize a dynamic int to be used in list_t and dict_t
+   structures = */
+int *int_new(int value)
+{
+	int *self = xmalloc(sizeof(int));
+	*self = value;
+	return self;
+}
+
+static char *black = "black";
+static char *gray = "gray";
+static char *white = "white";
+
+/* = provide a dsf on the graph G starting from the node u, it's a subroutine
+   for the topological sort algorithm = */
+static void topological_dsf(dict_t *G, list_t *L, char *u, dict_t *color, 
+		    dict_t *f, int *time)
+{
+	dict_add(color, u, gray);
+	*time = *time + 1; 
+	list_t *adj = dict_get(G, u);
+	unsigned i;
+	for(i = 0; i < adj->length; i++) {
+		char *v = list_get(adj, i);
+		if(dict_get(color, v) == white)
+			topological_dsf(G, L, v, color, f, time);
+	}
+	dict_add(color, u, black);
+	*time = *time + 1;
+	dict_add(f, u, int_new(*time));
+	list_append(L, u);
+}
+
+/* = after applying the topological sort on G a vector, f, containing the time
+   of visit of each node; in a dag for each oriented edge (u, v) we have that 
+   f[v] < f[u], so this property is here used to detect and find cycles = */
+static void search_cycle(dict_t *G, dict_t *f, dict_t *cycles)
+{
+	list_t *V = dict_get_keys(G);
+	unsigned i, j;
+	for(i = 0; i < V->length; i++) {
+		char *u = list_get(V, i);
+		list_t *adj = dict_get(G, u);
+		for(j = 0; j < adj->length; j++) {
+			char *v = list_get(adj, j);
+			if(*((int *)dict_get(f, v))
+			   >= *((int *) dict_get(f, u))) {
+				dict_add(cycles, u, xstrdup(v));
 			}
 		}
-		list_append(port->dependencies_exploded, dport);
-		dependencies_explode(dport, ports_hash, aliases, not_founds);
 	}
 }
 
-static int dependencies_compact_and_check(list_t *stack, hash_t *ports_hash,
-					  dict_t *aliases, dict_t *not_founds,
-					  dict_t *seen, unsigned deep)
+/* = the topological sort algorithm is used to obtain a sorted list of
+   dependencies from the dependencies graph = */
+static void topological_sort(dict_t *G, list_t *L, dict_t *C)
 {
+	list_t *V = dict_get_keys(G);
 	unsigned i;
-	port_t *port;
+	dict_t *color = dict_new();
+	dict_t *f = dict_new();
+	int time = 0;
 
-	assert(stack != NULL);
-
-	if(stack->length == 0)
-		return 0;
-	
-	port = list_get_port(stack, 0);
-
-	dependencies_explode(port, ports_hash, aliases, not_founds);
-
-	deep++;
-
-	for(i = 0; i < port->dependencies_exploded->length; i++) {
-		if(list_get_port(port->dependencies_exploded, i)->deep == 0)
-			dict_add(seen,
-				 list_get_port(port->dependencies_exploded,
-					       i)->name,
-				 list_get_port(port->dependencies_exploded, i));
-		if(list_get_port(port->dependencies_exploded, i)->deep < deep)
-			list_get_port(port->dependencies_exploded, i)->deep =
-				deep;
-		if(list_get_port(port->dependencies_exploded,i)->cyclic_dependencies_status
-		   == CYCLIC_DEPENDENCIES_EXIST 
-		   || (list_get_port(port->dependencies_exploded,i)->cyclic_dependencies_status
-		   == CYCLIC_DEPENDENCIES_NOT_CHECKED 
-		       && list_get_position(stack, port_query_by_name, 
-					    list_get_port(port->dependencies_exploded, 
-							  i)->name)!= -1)) {
-			error("Found a cyclic dependence in: %s (%s<==>%s)!", 
-			      list_get_port(stack, 0)->name,
-			      list_get_port(stack, 0)->name,
-			      list_get_port(port->dependencies_exploded, i)->name);
-			
-			return 1;
-		}
-		
-		list_prepend(stack, list_get_port(port->dependencies_exploded, 
-						  i));
-		if (dependencies_compact_and_check(stack, ports_hash, aliases,
-						   not_founds, seen, deep) != 0)
-						  {
-			list_get_port(stack, 0)->cyclic_dependencies_status =
-				CYCLIC_DEPENDENCIES_EXIST;
-			return 1;
-		}
-		list_get_port(stack, 0)->cyclic_dependencies_status =
-			CYCLIC_DEPENDENCIES_CHECKED;
-		list_remove(stack, 0, NULL);
+	for(i = 0; i < V->length; i++) {
+		dict_add(color, list_get(V, i), white);
+		dict_add(f, list_get(V, i), int_new(0
+));
 	}
 	
-	return 0;
-}
-
-static list_t *dependencies_list_merge(list_t * list1, list_t * list2)
-{
-	unsigned i;
-	dict_t *dict1;
-	port_t *port;
-
-	dict1 = dict_new();
-
-	for (i = 0; i < list1->length; i++) {
-		port = list1->elements[i];
-		dict_add(dict1, port->name, port);
+	for(i = 0; i < V->length; i++) {
+		char *u = list_get(V, i);
+		if(dict_get(color, u) == white)
+			topological_dsf(G, L, u, color, f, &time);
 	}
 
-	for (i = 0; i < list2->length; i++) {
-		port = list2->elements[i];
-		if (dict_get(dict1, port->name) == NULL) {
-			dict_add(dict1, port->name, "");
-			list_append(list1, port);
-		}
+	search_cycle(G, f, C);
+	dict_free(color, NULL);
+	dict_free(f, free);
+}
+
+static void manage_cycles(dict_t *G, dict_t *C, hash_t *ports)
+{
+	if(C->length == 0)
+		return;
+	char *u = C->elements[0]->key;
+	char *v = C->elements[0]->value;
+	port_t *p = hash_get(ports, v);
+
+	if(p->status != PRT_NOTINSTALLED) {
+		/* remove the v dependence from u and retry with
+		   dependencies_list */
+		warning("Breackable dependencies cycle found: %s <-> %s. "
+			"Removing the %s dependence from %s.", u, v, v, u);
+		list_t *adj = dict_get(G, u);
+		list_remove(adj, list_get_position(adj, strequ, v), NULL);
+		return;
 	}
 
-	dict_free(dict1, NULL);
+	/* giving up if u and v are the same */
+	if(strcmp(u, v) == 0)
+		return;
 
-	return list1;
-}
-
-static int port_deep_cmp(void *port1, void *port2)
-{
-	return ((int)PORT(port2)->deep) - ((int)PORT(port1)->deep);
-}
-
-
-static inline list_t *dependencies_list_from_dict(dict_t *seen)
-{
-	unsigned i;
-	list_t *dependencies;
-	
-	dependencies = list_new_with_size(seen->length);
-	for(i=0;i<seen->length;i++)
-		list_append(dependencies, dict_get_port_at(seen, i));
-	return list_sort(dependencies, port_deep_cmp);
+	/* adds to all ports that dependes from v the dependencies of v, then
+	   remove all dependencies to v and retry with dependencies_list */
+	warning("Breackable dependencies cycle found: %s <-> %s. "
+		"Replacing all accurences of %s with its dependencies.",
+		u, v, u);
+	list_t *v_adj = dict_get(G, v);
+	list_t *G_keys = dict_get_keys(G);
+	unsigned j;
+	for(j = 0; j < G_keys->length; j++) {
+		char *z = list_get(G_keys, j);
+		list_t *adj = dict_get(G, z);
+		if(list_get_position(adj, strequ, v) < 0)
+			continue;
+		list_cat(adj, v_adj, NULL);
+	}
+	list_free(v_adj, NULL);
+	dict_add(G, v, list_new());
+	list_free(G_keys, NULL);
 }
 
 list_t *dependencies_list(list_t * self, char *port_name, hash_t * ports_hash,
@@ -253,9 +273,6 @@ list_t *dependencies_list(list_t * self, char *port_name, hash_t * ports_hash,
 			  enable_xterm_title)
 {
 	port_t *port;
-	list_t *deplist;
-	list_t *stack;
-	dict_t *seen;
 
 	assert(port_name != NULL && ports_hash != NULL && aliases != NULL &&
 	       self != NULL);
@@ -264,23 +281,59 @@ list_t *dependencies_list(list_t * self, char *port_name, hash_t * ports_hash,
 		warning("%s not found!", port_name);
 		return NULL;
 	}
+
+	dict_t *G = dict_new();
+	build_adj_matrix(G, port, ports_hash, aliases, not_founds);
+
+	list_t *L = NULL;;
+	dict_t *C = NULL;
+	char *previous_u = xstrdup("");
+	char *previous_v = xstrdup("");
 	
-	if (enable_xterm_title)
-		xterm_set_title("Calculating dependencies ...");
-	stack = list_new();
-	list_append(stack, port);
-	seen = dict_new();
-	if(dependencies_compact_and_check(stack, ports_hash, aliases,
-					  not_founds, seen, 0)) {
-		list_free(stack, NULL);
+	do {
+		if(C != NULL && C->length > 0) {
+			free(previous_u);
+			free(previous_v);
+			previous_u = xstrdup(C->elements[0]->key);
+			previous_v = xstrdup(C->elements[0]->value);
+		}
+		if(L != NULL)
+			list_free(L, NULL);
+		if(C != NULL)
+			dict_free(C, free);
+		L = list_new();
+		C = dict_new();
+		topological_sort(G, L, C);
+		manage_cycles(G, C, ports_hash);
+	} while(C->length > 0 
+		&& (strcmp(previous_u, C->elements[0]->key) != 0
+		    || strcmp(previous_v, C->elements[0]->value) != 0));
+
+	if(C->length != 0) {
+		/* unbreackable cycles found, giving up */
+		unsigned i;
+		for(i = 0; i < C->length; i++)
+			error("Unbreackable dependencies cycle found: "
+			      "%s <-> %s.", C->elements[i]->key,
+			      (char *) C->elements[i]->value);
+		list_free(L, NULL);
+		dict_free(C, free);
 		return NULL;
 	}
-	list_free(stack, NULL);
-	dict_add(seen, port->name, port);
-	deplist = dependencies_list_from_dict(seen);
-	dict_free(seen, NULL);
-	dependencies_list_merge(self, deplist);
-	list_free(deplist, NULL);
+
+	unsigned i;
+	for(i = 0; i < L->length; i++) {
+		port_t *p = hash_get(ports_hash, (char *) list_get(L, i));
+		if(p == NULL) 
+			p = dict_get(not_founds, (char *) list_get(L, i));
+		if(list_get_position(self, port_equ, p) >= 0)
+			continue;
+		list_append(self, p);
+	}
+
+	list_free(L, NULL);
+	dict_free(C, free);
+
 	return self;
 }
 
@@ -302,7 +355,6 @@ list_t *dependencies_multiple_list(list_t *ports_name,
 			list_remove(ports_name, i--, NULL);
 			continue;
 		}
-		dependencies_explode(port, ports_hash, aliases, not_founds);
 	}
 	
 	self = list_new();
@@ -335,7 +387,6 @@ dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 			list_remove(ports_name, i--, NULL);
 			continue;
 		}
-		dependencies_explode(port, ports_hash, aliases, not_founds);
 	}
 
 	if (tree) {
@@ -344,9 +395,10 @@ dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 					(char *)ports_name->elements[i]);
 			seen = dict_new();
 			if (verbose)
-				deptree_verbose_data_dump(port, 0, seen);
+				deptree_verbose_data_dump(port, ports_hash, 
+							  0, seen);
 			else
-				deptree_data_dump(port, 0, seen);
+				deptree_data_dump(port, ports_hash, 0, seen);
 			dict_free(seen, NULL);
 		}
 	} else {

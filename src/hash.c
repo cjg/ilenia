@@ -128,6 +128,23 @@ void hash_dump(hash_t * self, void data_dump(void *))
 	}
 }
 
+list_t *hash_get_keys(hash_t *self)
+{
+	assert(self != NULL);
+	dict_t *k = dict_new();
+	int i, j;
+	for(i = 0; i < self->size; i++)
+		for(j = 0; j < self->elements[i]->length; j++) {
+			char *key = dict_get_key_at(self->elements[i], j);
+			dict_add(k, key, NULL);
+			free(key);
+		}
+	list_t *keys = dict_get_keys(k);
+	dict_free(k, NULL);
+	return keys;
+}
+
+
 static inline int get_first(hash_t *hash, unsigned offset_dict, 
 			    unsigned offset_position, unsigned *current_dict, 
 			    unsigned *current_position)
@@ -151,8 +168,6 @@ hashiterator_t *hashiterator_new(hash_t *hash)
 	assert(hash != NULL);
 	self = xmalloc(sizeof(hashiterator_t));
 	self->hash = hash;
-/* 	get_first(self->hash, 0, 0, &self->current_dict,  */
-/* 		  &self->current_position); */
 	self->first = -1;
 	self->current_dict = 0;
 	self->current_position = 0;
