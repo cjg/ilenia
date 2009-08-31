@@ -300,7 +300,7 @@ int main(int argc, char **argv)
 				  ports_hash, conf->aliases,
 				  not_founds,
 				  arguments.tree, arguments.verbose, 
-				  conf->enable_xterm_title);
+				  conf->enable_xterm_title, arguments.all);
 		break;
 	case ACT_DEPENDENTS:
 		if (!arguments.args->length) {

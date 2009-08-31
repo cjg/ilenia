@@ -1,3 +1,10 @@
+2009-08-31  Giuseppe Coviello  <cjg@cruxppc.org>
+
+	* doc/ilenia.8.in: documented the new dependencies_dump way
+
+	* src/dependencies.c (dependencies_dump): installed ports aren't
+	defaultly showed when listing dependencies
+
 2009-08-08  Giuseppe Coviello  <cjg@cruxppc.org>
 
 	* src/repository.c (repositories_dict_init): [bugfix] DT_UNKNOWN

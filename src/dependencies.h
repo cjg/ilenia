@@ -33,7 +33,7 @@ list_t *dependencies_list(list_t * self, char *port_name, hash_t * ports_hash,
 void
 dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 		  dict_t * not_founds, int tree, int verbose, int
-		  enable_xterm_title);
+		  enable_xterm_titlei, int all);
 list_t *dependents_list(char *port_name, hash_t * ports_hash, dict_t * aliases,
 			int all, int enable_xterm_title);
 list_t *dependencies_multiple_list(list_t *ports_name, 

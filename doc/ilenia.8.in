@@ -32,10 +32,12 @@ Shows the list of the installed packages with different version from the ones in
 the ports tree.
 .TP
 .B "\-D, \-\-dependencies"
-Shows the list of the dependencies of the port(s) in ARG(S). This action can be
-used with the "\-\-verbose" option to obtain more information (such as the
-repository where the port is found, or i the port has a README) for each port in
-the list.
+Shows the list of the dependencies needed to install the port(s) in ARG(S). 
+This action can be used with the "\-\-verbose" option to obtain more 
+information (such as the repository where the port is found, or i the port has 
+a README) for each port in the list.
+To obtain the complete list of dependencies the "\-\-all" options has to be
+used.
 .TP
 .B "\-i, \-\-info"
 Shows information about the port(s) in ARG(S).

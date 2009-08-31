@@ -42,10 +42,13 @@ static char *status[] = {
 static char *not_found = "[RED]not found[DEFAULT]";
 
 static void deptree_data_dump(port_t * port, hash_t *ports, unsigned level,
-			      dict_t * seen)
+			      dict_t * seen, int all)
 {
 	unsigned i;
 	assert(port != NULL && seen != NULL);
+
+	if(!all && port->status == PRT_INSTALLED)
+		return;
 
 	for (i = 0; i < level * 2; i++)
 		printf(" ");
@@ -62,15 +65,18 @@ static void deptree_data_dump(port_t * port, hash_t *ports, unsigned level,
 		port_t *p = (port_t *) hash_get(ports, 
 						list_get(port->dependencies,
 							 i));
-		deptree_data_dump(p, ports, level, seen);
+		deptree_data_dump(p, ports, level, seen, all);
 	}
 }
 
 static void deptree_verbose_data_dump(port_t * port, hash_t *ports, 
-				      unsigned level, dict_t *seen)
+				      unsigned level, dict_t *seen, int all)
 {
 	unsigned i;
 	assert(port != NULL && seen != NULL);
+
+	if(!all && port->status == PRT_INSTALLED)
+		return;
 
 	for (i = 0; i < level * 2; i++)
 		printf(" ");
@@ -88,16 +94,34 @@ static void deptree_verbose_data_dump(port_t * port, hash_t *ports,
 		port_t *p = (port_t *) hash_get(ports, 
 						list_get(port->dependencies,
 							 i));
-		deptree_verbose_data_dump(p, ports, level, seen);
+		deptree_verbose_data_dump(p, ports, level, seen, all);
 	}
 }
 
 static void deplist_dump_port(port_t * port)
 {
+	if(port->status == PRT_INSTALLED)
+		return;
+
 	cprintf(stdout, "%s [%s]\n", port->name, status[port->status]);
 }
 
 static void deplist_verbose_dump_port(port_t * port)
+{
+	if(port->status == PRT_INSTALLED)
+		return;
+
+	cprintf(stdout, "%s [%s] %s(%s)\n", port->name, status[port->status],
+		port_have_readme(port) ? "[BLUE]README[DEFAULT] " : "",
+		port->repository != NULL ? port->repository->name : not_found);
+}
+
+static void deplist_dump_port_all(port_t * port)
+{
+	cprintf(stdout, "%s [%s]\n", port->name, status[port->status]);
+}
+
+static void deplist_verbose_dump_port_all(port_t * port)
 {
 	cprintf(stdout, "%s [%s] %s(%s)\n", port->name, status[port->status],
 		port_have_readme(port) ? "[BLUE]README[DEFAULT] " : "",
@@ -369,7 +393,7 @@ list_t *dependencies_multiple_list(list_t *ports_name,
 void
 dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 		  dict_t * not_founds, int tree, int verbose, 
-		  int enable_xterm_title)
+		  int enable_xterm_title, int all)
 {
 	unsigned i;
 	port_t *port;
@@ -396,9 +420,10 @@ dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 			seen = dict_new();
 			if (verbose)
 				deptree_verbose_data_dump(port, ports_hash, 
-							  0, seen);
+							  0, seen, all);
 			else
-				deptree_data_dump(port, ports_hash, 0, seen);
+				deptree_data_dump(port, ports_hash, 0, seen,
+						  all);
 			dict_free(seen, NULL);
 		}
 	} else {
@@ -410,9 +435,16 @@ dependencies_dump(list_t * ports_name, hash_t * ports_hash, dict_t * aliases,
 		if (deplist == NULL)
 			return;
 		if (verbose)
-			list_dump(deplist, deplist_verbose_dump_port);
+			if(all)
+				list_dump(deplist,
+					  deplist_verbose_dump_port_all);
+			else
+				list_dump(deplist, deplist_verbose_dump_port);
 		else
-			list_dump(deplist, deplist_dump_port);
+			if(all)
+				list_dump(deplist, deplist_dump_port_all);
+			else
+				list_dump(deplist, deplist_dump_port);
 		list_free(deplist, NULL);
 	}
 }
