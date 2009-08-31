@@ -93,6 +93,8 @@ updated.
 .B "\-\-all"
 It is used with the "\-\-remove" or the "\-\-dependents" action to,
 respectively, remove all dependents packages or show all dependents packages.
+And with the "\-\-dependencies" action to obtain the complete list of the
+dependencies.
 .TP
 .B "\-\-cache"
 Forces the rebuild of the cache.
@@ -263,9 +265,13 @@ PATH="/root/ports"
 .br
 # End of file
 .br
+.br
 #!/bin/bash
+.br
 #
-# /root/ports/updater.sh
+.br
+# /root/ports/.updater.sh
+.br
 #
 .br
 rsync -aqz cruxppc.org::ports/core/2.5/ilenia/ ilenia
